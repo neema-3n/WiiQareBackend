@@ -10,6 +10,12 @@ import { DataSource } from 'typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfigService } from './config/app-config.service';
 import { ConfigService } from '@nestjs/config';
+import { SessionModule } from './modules/session/session.module';
+import { AuthModule } from './auth/auth.module';
+import { GlobalExceptionsFilter } from './common/filters/global-exception.filter';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { JWTAuthGuard } from './common/guards/jwt-auth.guard';
+import { RolesGuard } from './common/guards/roles.guard';
 
 @Module({
   imports: [
@@ -21,6 +27,8 @@ import { ConfigService } from '@nestjs/config';
       },
       extraProviders: [ConfigService, AppConfigService],
     }),
+    AuthModule,
+    SessionModule,
     AdminstrationSvcModule,
     PatientSvcModule,
     PayerSvcModule,
@@ -28,6 +36,10 @@ import { ConfigService } from '@nestjs/config';
     CommonModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    { provide: APP_FILTER, useClass: GlobalExceptionsFilter },
+    { provide: APP_GUARD, useClass: JWTAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
+  ],
 })
 export class AppModule {}
