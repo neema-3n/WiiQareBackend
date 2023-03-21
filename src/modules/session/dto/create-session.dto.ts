@@ -1,9 +1,16 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+} from 'class-validator';
+import { Transform } from 'class-transformer';
+import { transformPasswordToHash } from '../../../helpers/transform.helper';
 
 export class CreateSessionDto {
-
   @IsNotEmpty()
   @IsString()
+  @Transform(transformPasswordToHash)
   readonly password: string;
 
   @IsOptional()

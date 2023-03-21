@@ -8,3 +8,6 @@ export const IS_PUBLIC = 'isPublic';
 export const ROLES = 'Roles';
 
 export const AUTO_FORGOT_TTL = 180;
+
+
+export const SALT_ROUNDS = 10;

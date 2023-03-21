@@ -1,14 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { _404 } from 'src/common/constants/errors';
+import { _400, _401, _404 } from 'src/common/constants/errors';
 import { User } from 'src/modules/session/entities/user.entity';
-import { Connection, FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { AppConfigService } from '../../config/app-config.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { JwtClaimsDataDto } from './dto/jwt-claims-data.dto';
 import { SessionResponseDto } from './dto/session.dto';
+import _ from 'lodash';
+import { UserRole } from '../../common/constants/enums';
+import { PayerSvcService } from '../payer-svc/payer-svc.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class SessionService {
@@ -16,8 +25,8 @@ export class SessionService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private jwtService: JwtService,
     //TODO: Update this DataSource Later!.
-    private readonly connection: Connection,
     private readonly appConfigService: AppConfigService,
+    private readonly payerService: PayerSvcService,
   ) {}
 
   async authenticateUser(
@@ -25,20 +34,39 @@ export class SessionService {
   ): Promise<SessionResponseDto> {
     const { password, phoneNumber, username, email } = payload;
 
-    const user = await this.userRepository.findOne({
-      where: { phoneNumber },
-      relations: ['payer'],
+    if (_.isEmpty(phoneNumber) && _.isEmpty(username) && _.isEmpty(email))
+      throw new BadRequestException({
+        ..._400.MALFORMED_INPUTS_PROVIDED,
+        description: 'phone number or username or email is missing',
+      });
+
+    const user: User = await this.userRepository.findOne({
+      where: [{ username }, { email }, { phoneNumber }],
     });
 
     if (!user) throw new NotFoundException(_404.USER_NOT_FOUND);
 
-    const jwtClaimsData = {
-      sub: user.id,
-      type: user.role,
-      phoneNumber: user.phoneNumber,
-      names: 'add name here!',
-      status: user.status,
-    } as JwtClaimsDataDto;
+    let jwtClaimsData;
+
+    if (user.role === UserRole.PAYER) {
+      // retrieve payer information if payer //TODO: later retrieve this information at same time!.
+      const payer = await this.payerService.findPayerByUserId(user.id);
+
+      if (!payer) throw new NotFoundException(_404.PAYER_NOT_FOUND);
+
+      const isValidPassword = bcrypt.compareSync(password, user.password);
+
+      if (!isValidPassword)
+        throw new UnauthorizedException(_401.INVALID_CREDENTIALS);
+
+      jwtClaimsData = {
+        sub: user.id,
+        type: user.role,
+        phoneNumber: user.phoneNumber,
+        names: `${payer.firstName} ${payer.lastName}`,
+        status: user.status,
+      } as JwtClaimsDataDto;
+    }
 
     const jsonWebToken = this.jwtService.sign(jwtClaimsData);
 
