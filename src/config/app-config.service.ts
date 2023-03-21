@@ -13,6 +13,7 @@ export class AppConfigService {
   get appName(): string {
     return APP_NAME;
   }
+
   get port(): number {
     return this.configService.get<number>('PORT');
   }
@@ -33,8 +34,8 @@ export class AppConfigService {
     return this.configService.get<string>('DB_HOST');
   }
 
-  get dbPort(): string {
-    return this.configService.get<string>('DB_PORT').toString();
+  get dbPort(): number {
+    return this.configService.get<number>('DB_PORT');
   }
 
   get dbUser(): string {
@@ -48,7 +49,24 @@ export class AppConfigService {
   get dbName(): string {
     return this.configService.get<string>('DB_NAME');
   }
+
   get isProduction(): boolean {
     return this.environment == Environment.Production;
+  }
+
+  get isSSLEnabled(): boolean {
+    return this.environment == Environment.Production;
+  }
+
+  get dbCertificateAuthority(): string | undefined {
+    return this.configService.get<string | undefined>('DATABASE_CA');
+  }
+
+  get dbCertificateKey(): string | undefined {
+    return this.configService.get<string | undefined>('DATABASE_KEY');
+  }
+
+  get dbCertificate(): string | undefined {
+    return this.configService.get<string | undefined>('DATABASE_CERT');
   }
 }

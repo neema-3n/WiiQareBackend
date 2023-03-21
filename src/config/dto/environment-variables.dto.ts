@@ -1,5 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
 export enum Environment {
   Development = 'development',
@@ -63,4 +63,16 @@ export class EnvironmentVariables {
   @Expose()
   @IsNotEmpty()
   REDIS_DATABASE: number;
+
+  @Expose()
+  @IsOptional()
+  DATABASE_CA?: string;
+
+  @Expose()
+  @IsOptional()
+  DATABASE_KEY?: string;
+
+  @Expose()
+  @IsOptional()
+  DATABASE_CERT?: string;
 }
