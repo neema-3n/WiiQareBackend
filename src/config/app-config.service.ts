@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { APP_NAME, AUTO_FORGOT_TTL } from '../common/constants/constants';
 import {
   Environment,
   EnvironmentVariables,
 } from './dto/environment-variables.dto';
-import { APP_NAME } from '../common/constants/constants';
 
 @Injectable()
 export class AppConfigService {
@@ -68,5 +68,18 @@ export class AppConfigService {
 
   get dbCertificate(): string | undefined {
     return this.configService.get<string | undefined>('DATABASE_CERT');
+  }
+
+  // redis caching service
+  get redisConfigOptions() {
+    return {
+      ttl: AUTO_FORGOT_TTL,
+      //TODO: fix incompatibility with cache-manager-redis-store later!
+      // store: redisStore,
+      host: this.configService.get('REDIS_HOST'),
+      port: this.configService.get('REDIS_PORT'),
+      password: this.configService.get('REDIS_PASSWORD'),
+      prefix: `${APP_NAME}:`,
+    };
   }
 }

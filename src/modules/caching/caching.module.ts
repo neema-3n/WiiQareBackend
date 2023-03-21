@@ -1,0 +1,15 @@
+import { CacheModule, Module } from '@nestjs/common';
+import { CacheConfig } from './cache.config';
+import { CachingService } from './caching.service';
+
+@Module({
+  imports: [
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useClass: CacheConfig,
+    }),
+  ],
+  providers: [CachingService],
+  exports: [CachingService],
+})
+export class CachingModule {}

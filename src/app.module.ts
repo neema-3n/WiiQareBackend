@@ -1,21 +1,23 @@
 import { Module } from '@nestjs/common';
-import { CommonModule } from './common/common.module';
-import { AdminstrationSvcModule } from './modules/adminstration-svc/adminstration-svc.module';
-import { PatientSvcModule } from './modules/patient-svc/patient-svc.module';
-import { ProviderSvcModule } from './modules/provider-svc/provider-svc.module';
-import { PayerSvcModule } from './modules/payer-svc/payer-svc.module';
-import { AppConfigModule } from './config/app-config.module';
-import { TypeOrmConfigService } from './db/typeorm-config.service';
-import { DataSource } from 'typeorm';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppConfigService } from './config/app-config.service';
 import { ConfigService } from '@nestjs/config';
-import { SessionModule } from './modules/session/session.module';
-import { AuthModule } from './auth/auth.module';
-import { GlobalExceptionsFilter } from './common/filters/global-exception.filter';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { AuthModule } from './auth/auth.module';
+import { CommonModule } from './common/common.module';
+import { GlobalExceptionsFilter } from './common/filters/global-exception.filter';
 import { JWTAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
+import { AppConfigModule } from './config/app-config.module';
+import { AppConfigService } from './config/app-config.service';
+import { TypeOrmConfigService } from './db/typeorm-config.service';
+import { AdministrationSvcModule } from './modules/administration-svc/adminstration-svc.module';
+import { CachingModule } from './modules/caching/caching.module';
+import { MailModule } from './modules/mail/mail.module';
+import { PatientSvcModule } from './modules/patient-svc/patient-svc.module';
+import { PayerSvcModule } from './modules/payer-svc/payer-svc.module';
+import { ProviderSvcModule } from './modules/provider-svc/provider-svc.module';
+import { SessionModule } from './modules/session/session.module';
 
 @Module({
   imports: [
@@ -27,9 +29,11 @@ import { RolesGuard } from './common/guards/roles.guard';
       },
       extraProviders: [ConfigService, AppConfigService],
     }),
+    CachingModule,
+    MailModule,
     AuthModule,
     SessionModule,
-    AdminstrationSvcModule,
+    AdministrationSvcModule,
     PatientSvcModule,
     PayerSvcModule,
     ProviderSvcModule,

@@ -6,3 +6,5 @@ export const JWT_APP_ISSUER = 'WIIQARE';
 
 export const IS_PUBLIC = 'isPublic';
 export const ROLES = 'Roles';
+
+export const AUTO_FORGOT_TTL = 180;
