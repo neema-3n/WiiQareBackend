@@ -11,12 +11,13 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       //HINT: from: '"wiiQare Support Team" <support@wiiQare.com>',
-      subject: 'Welcome to wiiQare platform!, Confirm your Email',
-      template: './confirmation', // `.hbs` extension is appended automatically
+      subject: 'Bienvenu sur WiiQare!, Confirmé Votre Email',
+      template: './confirmation-v2', // `.hbs` extension is appended automatically
       context: {
         email: email,
         url,
         token,
+        year: `© ${new Date().getFullYear()}`,
       },
     });
   }
