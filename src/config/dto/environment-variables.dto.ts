@@ -75,4 +75,8 @@ export class EnvironmentVariables {
   @Expose()
   @IsOptional()
   DATABASE_CERT?: string;
+
+  @Expose()
+  @IsNotEmpty()
+  HASHING_SECRET: string;
 }

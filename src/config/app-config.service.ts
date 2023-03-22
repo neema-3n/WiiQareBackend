@@ -82,4 +82,8 @@ export class AppConfigService {
       prefix: `${APP_NAME}:`,
     };
   }
+
+  get hashingSecret(): string {
+    return this.configService.get('HASHING_SECRET');
+  }
 }

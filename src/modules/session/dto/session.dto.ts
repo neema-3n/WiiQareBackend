@@ -4,7 +4,7 @@ export class SessionResponseDto {
   access_token: string;
 }
 
-export class SessionEmailVerifyResponseDto {
+export class SessionVerifyEmailOTPResponseDto {
   @IsUUID()
   emailVerificationToken: string;
 }

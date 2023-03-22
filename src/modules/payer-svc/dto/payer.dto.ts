@@ -3,10 +3,8 @@ import {
   IsISO31661Alpha2,
   IsNotEmpty,
   IsString,
-  IsUUID,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { transformPasswordToHash } from '../../../helpers/transform.helper';
 
 export class CreatePayerAccountDto {
   @IsNotEmpty()
@@ -14,7 +12,7 @@ export class CreatePayerAccountDto {
   email: string;
 
   @IsNotEmpty()
-  @IsUUID()
+  @IsString()
   emailVerificationToken: string;
 
   @IsNotEmpty()
@@ -31,7 +29,6 @@ export class CreatePayerAccountDto {
 
   @IsNotEmpty()
   @IsString()
-  @Transform(transformPasswordToHash)
   password: string;
 
   @IsNotEmpty()

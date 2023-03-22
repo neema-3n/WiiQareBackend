@@ -10,5 +10,6 @@ import { MailModule } from '../mail/mail.module';
   imports: [TypeOrmModule.forFeature([User]), PayerSvcModule, MailModule],
   providers: [SessionService],
   controllers: [SessionController],
+  exports: [SessionService],
 })
 export class SessionModule {}

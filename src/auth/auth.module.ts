@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { forwardRef, Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JWT_APP_ISSUER } from 'src/common/constants/constants';
@@ -10,7 +10,7 @@ import { JWTStrategy } from './jwt-strategy';
 @Global()
 @Module({
   imports: [
-    SessionModule,
+    forwardRef(() => SessionModule),
     PassportModule.register({
       defaultStrategy: 'jwt',
       session: false,

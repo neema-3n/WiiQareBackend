@@ -21,7 +21,7 @@ export class User extends BaseEntity {
   status: UserStatus;
 
   @Exclude()
-  @Column({ nullable: true, select: false })
+  @Column({ nullable: true })
   password: string;
 
   //TODO: adds fields for google and apple authentication!

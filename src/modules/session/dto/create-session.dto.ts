@@ -1,18 +1,15 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsPhoneNumber,
   IsString,
-  IsUUID,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
-import { transformPasswordToHash } from '../../../helpers/transform.helper';
 
 export class CreateSessionDto {
   @IsNotEmpty()
   @IsString()
-  @Transform(transformPasswordToHash)
   readonly password: string;
 
   @IsOptional()
@@ -32,4 +29,14 @@ export class SessionEmailVerifyRequestDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+}
+
+export class SessionVerifyEmailOTPRequestDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  otpCode: number;
 }

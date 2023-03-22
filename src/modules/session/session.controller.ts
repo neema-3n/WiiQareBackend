@@ -7,10 +7,11 @@ import { Public } from '../../common/decorators/public.decorator';
 import {
   CreateSessionDto,
   SessionEmailVerifyRequestDto,
+  SessionVerifyEmailOTPRequestDto,
 } from './dto/create-session.dto';
 import {
-  SessionEmailVerifyResponseDto,
   SessionResponseDto,
+  SessionVerifyEmailOTPResponseDto,
 } from './dto/session.dto';
 
 @ApiTags('Session')
@@ -31,7 +32,9 @@ export class SessionController {
   @HttpCode(HttpStatus.OK)
   @Public()
   @ApiNotFoundResponse(http_statuses([_404.USER_NOT_FOUND]))
-  @ApiOperation({ summary: 'API endpoint for authentication' })
+  @ApiOperation({
+    summary: 'API endpoint for sending email verification OTP code.',
+  })
   sendEmailVerification(
     @Body() payload: SessionEmailVerifyRequestDto,
   ): Promise<void> {
@@ -43,11 +46,13 @@ export class SessionController {
   @HttpCode(HttpStatus.OK)
   @Public()
   @ApiNotFoundResponse(http_statuses([_404.USER_NOT_FOUND]))
-  @ApiOperation({ summary: 'API endpoint for authentication' })
+  @ApiOperation({
+    summary: 'API endpoint for verify email with OTP code sent.',
+  })
   emailVerification(
-    @Body() payload: SessionEmailVerifyRequestDto,
-  ): Promise<SessionEmailVerifyResponseDto> {
-    const { email } = payload;
-    return this.sessionService.validateEmailOTP(email);
+    @Body() payload: SessionVerifyEmailOTPRequestDto,
+  ): Promise<SessionVerifyEmailOTPResponseDto> {
+    const { email, otpCode } = payload;
+    return this.sessionService.validateEmailOTP(email, otpCode);
   }
 }

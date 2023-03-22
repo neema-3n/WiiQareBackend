@@ -19,6 +19,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../session/entities/user.entity';
 import { CachingService } from '../caching/caching.service';
+import _ from 'lodash';
+import { SessionService } from '../session/session.service';
+import { isEmpty } from 'class-validator';
 
 @ApiTags('Payer')
 @Controller('payer')
@@ -27,8 +30,8 @@ export class PayerSvcController {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly payerService: PayerSvcService,
-
     private readonly cachingService: CachingService,
+    private readonly sessionService: SessionService,
   ) {}
 
   @Get(':id')
@@ -56,11 +59,15 @@ export class PayerSvcController {
     const { email, phoneNumber, emailVerificationToken } = createPayerAccount;
 
     //check if email is valid (otp not expired!).
-    const isEmailTokenValid = await this.cachingService.get(
-      emailVerificationToken,
+    const dataToHash: string = await this.cachingService.get(
+      `wiiQare:email:verify:${email}`,
     );
 
-    if (!isEmailTokenValid)
+    if (isEmpty(dataToHash))
+      throw new ForbiddenException(_403.EMAIL_VERIFICATION_REQUIRED);
+
+    const hashedData = this.sessionService.hashDataToHex(dataToHash);
+    if (hashedData !== emailVerificationToken)
       throw new ForbiddenException(_403.EMAIL_VERIFICATION_REQUIRED);
 
     // check if user doesn't exists!
@@ -72,7 +79,6 @@ export class PayerSvcController {
 
     if (userExists) throw new ConflictException(_409.USER_ALREADY_EXISTS);
 
-    //TODO: skip validating email for now!!.
     return this.payerService.registerNewPayerAccount(createPayerAccount);
   }
 }

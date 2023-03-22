@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import 'reflect-metadata';
 import { AppModule } from './app.module';
 import { enableConfig } from './config/config';
 import { AppConfigService } from './config/app-config.service';

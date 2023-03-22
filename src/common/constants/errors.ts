@@ -29,6 +29,15 @@ export const _403 = {
     code: 'EMAIL_VERIFICATION_REQUIRED',
     description: 'Email is not verified or verification expired!',
   },
+  OTP_VERIFICATION_FAILED: {
+    code: 'OTP_VERIFICATION_FAILED',
+    description:
+      'One time password verification failed, needs to verify again!',
+  },
+  USER_ACCOUNT_NOT_ACTIVE: {
+    code: 'USER_ACCOUNT_NOT_ACTIVE',
+    description: 'User account not active!',
+  },
 };
 
 export const _404 = {
