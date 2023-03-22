@@ -1,7 +1,7 @@
 import {
-    CacheModuleOptions,
-    CacheOptionsFactory,
-    Injectable,
+  CacheModuleOptions,
+  CacheOptionsFactory,
+  Injectable,
 } from '@nestjs/common';
 import { AppConfigService } from 'src/config/app-config.service';
 

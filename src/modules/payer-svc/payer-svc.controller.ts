@@ -2,6 +2,7 @@ import {
   Body,
   ConflictException,
   Controller,
+  ForbiddenException,
   Get,
   NotFoundException,
   Param,
@@ -13,7 +14,7 @@ import { CreatePayerAccountDto } from './dto/payer.dto';
 import { Payer } from './entities/payer.entity';
 import { PayerSvcService } from './payer-svc.service';
 import { Public } from '../../common/decorators/public.decorator';
-import { _404, _409 } from '../../common/constants/errors';
+import { _403, _404, _409 } from '../../common/constants/errors';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../session/entities/user.entity';
@@ -52,9 +53,15 @@ export class PayerSvcController {
   async createPayerAccount(
     @Body() createPayerAccount: CreatePayerAccountDto,
   ): Promise<Payer> {
-    const { email, phoneNumber } = createPayerAccount;
+    const { email, phoneNumber, emailVerificationToken } = createPayerAccount;
 
     //check if email is valid (otp not expired!).
+    const isEmailTokenValid = await this.cachingService.get(
+      emailVerificationToken,
+    );
+
+    if (!isEmailTokenValid)
+      throw new ForbiddenException(_403.EMAIL_VERIFICATION_REQUIRED);
 
     // check if user doesn't exists!
     const userExists = await this.userRepository

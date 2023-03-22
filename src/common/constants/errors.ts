@@ -24,6 +24,13 @@ export const _401 = {
   },
 };
 
+export const _403 = {
+  EMAIL_VERIFICATION_REQUIRED: {
+    code: 'EMAIL_VERIFICATION_REQUIRED',
+    description: 'Email is not verified or verification expired!',
+  },
+};
+
 export const _404 = {
   USER_NOT_FOUND: { code: 'USER_NOT_FOUND', description: 'User not found!' },
   PAYER_NOT_FOUND: {

@@ -1,4 +1,9 @@
-import { ExecutionContext, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
@@ -8,9 +13,7 @@ import { _401 } from '../constants/errors';
 
 @Injectable()
 export class JWTAuthGuard extends AuthGuard('jwt') {
-  constructor(
-    private reflector: Reflector
-  ) {
+  constructor(private reflector: Reflector) {
     super();
   }
 
@@ -26,23 +29,21 @@ export class JWTAuthGuard extends AuthGuard('jwt') {
   }
 
   handleRequest(err: any, user: any, info: any): any {
-
     const message =
       info instanceof TokenExpiredError
         ? _401.AUTH_TOKEN_EXPIRED
         : info instanceof JsonWebTokenError
-          ? _401.MALFORMED_TOKEN
-          : info instanceof Error || info
-            ? _401.AUTH_INVALID_TOKEN
-            : null;
+        ? _401.MALFORMED_TOKEN
+        : info instanceof Error || info
+        ? _401.AUTH_INVALID_TOKEN
+        : null;
 
     if (message)
       throw new UnauthorizedException({
         statusCode: HttpStatus.UNAUTHORIZED,
         ...message,
-      })
+      });
 
     return user;
   }
-
 }

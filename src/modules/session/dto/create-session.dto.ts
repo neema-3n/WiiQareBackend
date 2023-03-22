@@ -1,8 +1,10 @@
 import {
+  IsEmail,
   IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
   IsString,
+  IsUUID,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { transformPasswordToHash } from '../../../helpers/transform.helper';
@@ -24,4 +26,10 @@ export class CreateSessionDto {
   @IsOptional()
   @IsString()
   readonly email: string;
+}
+
+export class SessionEmailVerifyRequestDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 }

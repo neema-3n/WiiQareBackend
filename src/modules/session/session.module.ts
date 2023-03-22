@@ -4,9 +4,10 @@ import { User } from './entities/user.entity';
 import { SessionService } from './session.service';
 import { SessionController } from './session.controller';
 import { PayerSvcModule } from '../payer-svc/payer-svc.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), PayerSvcModule],
+  imports: [TypeOrmModule.forFeature([User]), PayerSvcModule, MailModule],
   providers: [SessionService],
   controllers: [SessionController],
 })

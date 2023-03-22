@@ -13,11 +13,16 @@ import { FindOneOptions, Repository } from 'typeorm';
 import { AppConfigService } from '../../config/app-config.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { JwtClaimsDataDto } from './dto/jwt-claims-data.dto';
-import { SessionResponseDto } from './dto/session.dto';
+import {
+  SessionEmailVerifyResponseDto,
+  SessionResponseDto,
+} from './dto/session.dto';
 import _ from 'lodash';
 import { UserRole } from '../../common/constants/enums';
 import { PayerSvcService } from '../payer-svc/payer-svc.service';
 import * as bcrypt from 'bcrypt';
+import { MailService } from '../mail/mail.service';
+import { randomSixDigitNumber } from '../../helpers/common.helper';
 
 @Injectable()
 export class SessionService {
@@ -27,6 +32,7 @@ export class SessionService {
     //TODO: Update this DataSource Later!.
     private readonly appConfigService: AppConfigService,
     private readonly payerService: PayerSvcService,
+    private mailService: MailService,
   ) {}
 
   async authenticateUser(
@@ -84,5 +90,24 @@ export class SessionService {
     if (!user) throw new NotFoundException(_404.USER_NOT_FOUND);
 
     return user;
+  }
+
+  /**
+   * This function generate OTP for email verification
+   *  and send it to customer (PAYER,PROVIDER,PATIENT)
+   */
+  async emailVerification(email: string): Promise<void> {
+    const randomSixDigitsNumber = randomSixDigitNumber();
+    return this.mailService.sendOTPEmail(email, randomSixDigitsNumber);
+  }
+
+  /**
+   * This function validate if email and OTP user provided is valid
+   * @param email
+   */
+  async validateEmailOTP(
+    email: string,
+  ): Promise<SessionEmailVerifyResponseDto> {
+    return;
   }
 }
