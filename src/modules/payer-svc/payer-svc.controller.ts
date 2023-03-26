@@ -12,11 +12,13 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isEmpty } from 'class-validator';
+import { UserRole } from 'src/common/constants/enums';
+import { Roles } from 'src/common/decorators/user-role.decorator';
 import { Repository } from 'typeorm';
 import { _403, _404, _409 } from '../../common/constants/errors';
 import { Public } from '../../common/decorators/public.decorator';
 import { CachingService } from '../caching/caching.service';
-import { PatientSearchResponseDto } from '../patient-svc/dto/patient.dto';
+import { CreatePatientDto, PatientResponseDto } from '../patient-svc/dto/patient.dto';
 import { PatientSvcService } from '../patient-svc/patient-svc.service';
 import { User } from '../session/entities/user.entity';
 import { SessionService } from '../session/session.service';
@@ -85,13 +87,24 @@ export class PayerSvcController {
   }
 
   @Get('patient/:phoneNumber')
-  @Public()
+  @Roles(UserRole.PAYER)
   @ApiOperation({
     summary: 'This API is used retrieve Patient information by phoneNumber.',
   })
   async retrievePatientByPhoneNumber(
     @Param('phoneNumber') phoneNumber: string,
-  ): Promise<PatientSearchResponseDto> {
+  ): Promise<PatientResponseDto> {
     return await this.patientService.findPatientByPhoneNumber(phoneNumber);
+  }
+
+  @Post('patient')
+  @Roles(UserRole.PAYER)
+  @ApiOperation({
+    summary: 'This API is used register new Patient by PAYER.',
+  })
+  async registerNewPatient(
+    @Body() createPatientAccountDto: CreatePatientDto,
+  ): Promise<PatientResponseDto> {
+    return await this.patientService.registerPatient(createPatientAccountDto);
   }
 }

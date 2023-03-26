@@ -37,7 +37,7 @@ export class CreatePatientDto {
   city?: string;
 }
 
-export class PatientSearchResponseDto {
+export class PatientResponseDto {
   @IsNotEmpty()
   @IsUUID()
   id: string;

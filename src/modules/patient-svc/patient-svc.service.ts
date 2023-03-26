@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { _404 } from 'src/common/constants/errors';
 import { Repository } from 'typeorm';
-import { CreatePatientDto, PatientSearchResponseDto } from './dto/patient.dto';
+import { CreatePatientDto, PatientResponseDto } from './dto/patient.dto';
 import { Patient } from './entities/patient.entity';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class PatientSvcService {
    */
   async findPatientByPhoneNumber(
     phoneNumber: string,
-  ): Promise<PatientSearchResponseDto> {
+  ): Promise<PatientResponseDto> {
     const patient = await this.patientRepository.findOne({
       where: { phoneNumber },
     });
@@ -39,6 +39,6 @@ export class PatientSvcService {
       firstName,
       lastName,
       id,
-    } as PatientSearchResponseDto;
+    } as PatientResponseDto;
   }
 }
