@@ -10,18 +10,19 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { InjectRepository } from '@nestjs/typeorm';
+import { isEmpty } from 'class-validator';
+import { Repository } from 'typeorm';
+import { _403, _404, _409 } from '../../common/constants/errors';
+import { Public } from '../../common/decorators/public.decorator';
+import { CachingService } from '../caching/caching.service';
+import { PatientSearchResponseDto } from '../patient-svc/dto/patient.dto';
+import { PatientSvcService } from '../patient-svc/patient-svc.service';
+import { User } from '../session/entities/user.entity';
+import { SessionService } from '../session/session.service';
 import { CreatePayerAccountDto } from './dto/payer.dto';
 import { Payer } from './entities/payer.entity';
 import { PayerSvcService } from './payer-svc.service';
-import { Public } from '../../common/decorators/public.decorator';
-import { _403, _404, _409 } from '../../common/constants/errors';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from '../session/entities/user.entity';
-import { CachingService } from '../caching/caching.service';
-import _ from 'lodash';
-import { SessionService } from '../session/session.service';
-import { isEmpty } from 'class-validator';
 
 @ApiTags('Payer')
 @Controller('payer')
@@ -32,6 +33,7 @@ export class PayerSvcController {
     private readonly payerService: PayerSvcService,
     private readonly cachingService: CachingService,
     private readonly sessionService: SessionService,
+    private readonly patientService: PatientSvcService,
   ) {}
 
   @Get(':id')
@@ -80,5 +82,16 @@ export class PayerSvcController {
     if (userExists) throw new ConflictException(_409.USER_ALREADY_EXISTS);
 
     return this.payerService.registerNewPayerAccount(createPayerAccount);
+  }
+
+  @Get('patient/:phoneNumber')
+  @Public()
+  @ApiOperation({
+    summary: 'This API is used retrieve Patient information by phoneNumber.',
+  })
+  async retrievePatientByPhoneNumber(
+    @Param('phoneNumber') phoneNumber: string,
+  ): Promise<PatientSearchResponseDto> {
+    return await this.patientService.findPatientByPhoneNumber(phoneNumber);
   }
 }

@@ -46,6 +46,10 @@ export const _404 = {
     code: 'PAYER_NOT_FOUND',
     description: 'Expart not found!',
   },
+  PATIENT_NOT_FOUND: {
+    code: 'PATIENT_NOT_FOUND',
+    description: 'Patient not found!',
+  },
 };
 
 export const _409 = {
