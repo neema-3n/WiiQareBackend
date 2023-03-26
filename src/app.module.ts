@@ -18,6 +18,7 @@ import { PatientSvcModule } from './modules/patient-svc/patient-svc.module';
 import { PayerSvcModule } from './modules/payer-svc/payer-svc.module';
 import { ProviderSvcModule } from './modules/provider-svc/provider-svc.module';
 import { SessionModule } from './modules/session/session.module';
+import { SmartContractModule } from './modules/smart-contract/smart-contract.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { SessionModule } from './modules/session/session.module';
     PayerSvcModule,
     ProviderSvcModule,
     CommonModule,
+    SmartContractModule,
   ],
   controllers: [],
   providers: [
