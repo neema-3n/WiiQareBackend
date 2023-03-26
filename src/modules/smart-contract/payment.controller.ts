@@ -7,6 +7,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { InjectStripe } from 'nestjs-stripe';
 import { _500 } from 'src/common/constants/errors';
+import { Public } from 'src/common/decorators/public.decorator';
 import { logError } from 'src/helpers/common.helper';
 import { Stripe } from 'stripe';
 
@@ -16,6 +17,7 @@ export class PaymentController {
   constructor(@InjectStripe() private readonly stripe: Stripe) {}
 
   @Post('notification')
+  @Public()
   async handlePaymentWebhookEvent(@Body() event: Stripe.Event) {
     try {
       // Verify the webhook event with Stripe to ensure it is authentic
