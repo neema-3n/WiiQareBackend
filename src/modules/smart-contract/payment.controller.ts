@@ -1,16 +1,19 @@
 import {
-    Body,
-    Controller,
-    InternalServerErrorException,
-    Post,
+  Body,
+  Controller,
+  InternalServerErrorException,
+  Post,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { InjectStripe } from 'nestjs-stripe';
 import { _500 } from 'src/common/constants/errors';
 import { logError } from 'src/helpers/common.helper';
 import { Stripe } from 'stripe';
 
+@ApiTags('payment')
 @Controller('payment')
 export class PaymentController {
-  constructor(private readonly stripe: Stripe) {}
+  constructor(@InjectStripe() private readonly stripe: Stripe) {}
 
   @Post('notification')
   async handlePaymentWebhookEvent(@Body() event: Stripe.Event) {
