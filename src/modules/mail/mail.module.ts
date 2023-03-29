@@ -13,8 +13,8 @@ import { MailService } from './mail.service';
         host: 'sandbox.smtp.mailtrap.io',
         secure: false,
         auth: {
-          user: 'c357e8d74cc9c6',
-          pass: 'd141e3367c7318',
+          user: 'ebfcbd3f6523a8', // user: 'c357e8d74cc9c6',
+          pass: '48f8c0b33561d0', //pass: 'd141e3367c7318',
         },
       },
       defaults: {
