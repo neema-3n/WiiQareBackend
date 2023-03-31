@@ -9,24 +9,24 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 
+import * as bcrypt from 'bcrypt';
+import { isEmpty } from 'class-validator';
+import * as crypto from 'crypto';
 import { _400, _401, _403, _404, _500 } from 'src/common/constants/errors';
 import { User } from 'src/modules/session/entities/user.entity';
 import { FindOneOptions, Repository } from 'typeorm';
+import { UserRole, UserStatus } from '../../common/constants/enums';
 import { AppConfigService } from '../../config/app-config.service';
+import { logError, randomSixDigitNumber } from '../../helpers/common.helper';
+import { CachingService } from '../caching/caching.service';
+import { MailService } from '../mail/mail.service';
+import { PayerSvcService } from '../payer-svc/payer-svc.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { JwtClaimsDataDto } from './dto/jwt-claims-data.dto';
 import {
   SessionResponseDto,
   SessionVerifyEmailOTPResponseDto,
 } from './dto/session.dto';
-import { UserRole, UserStatus } from '../../common/constants/enums';
-import { PayerSvcService } from '../payer-svc/payer-svc.service';
-import * as bcrypt from 'bcrypt';
-import { MailService } from '../mail/mail.service';
-import { logError, randomSixDigitNumber } from '../../helpers/common.helper';
-import { CachingService } from '../caching/caching.service';
-import * as crypto from 'crypto';
-import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class SessionService {
@@ -60,31 +60,34 @@ export class SessionService {
     if (user.status !== UserStatus.ACTIVE)
       throw new ForbiddenException(_403.USER_ACCOUNT_NOT_ACTIVE);
 
-    let jwtClaimsData;
+    let detailsInformation;
 
     if (user.role === UserRole.PAYER) {
-      // retrieve payer information if payer //TODO: later retrieve this information at same time!.
-      const payer = await this.payerService.findPayerByUserId(user.id);
+      detailsInformation = await this.payerService.findPayerByUserId(user.id);
 
-      if (!payer) throw new NotFoundException(_404.PAYER_NOT_FOUND);
+      if (!detailsInformation)
+        throw new NotFoundException(_404.PAYER_NOT_FOUND);
 
       const isValidPassword = bcrypt.compareSync(password, user.password);
 
       if (!isValidPassword)
         throw new UnauthorizedException(_401.INVALID_CREDENTIALS);
-
-      jwtClaimsData = {
-        sub: user.id,
-        type: user.role,
-        phoneNumber: user.phoneNumber,
-        names: `${payer.firstName} ${payer.lastName}`,
-        status: user.status,
-      } as JwtClaimsDataDto;
     }
+
+    const jwtClaimsData: JwtClaimsDataDto = {
+      sub: user.id,
+      type: user.role,
+      phoneNumber: user.phoneNumber,
+      names: `${detailsInformation.firstName} ${detailsInformation.lastName}`,
+      status: user.status,
+    } as JwtClaimsDataDto;
 
     const jsonWebToken = this.jwtService.sign(jwtClaimsData);
 
     return {
+      phoneNumber: user.phoneNumber,
+      names: `${detailsInformation.firstName} ${detailsInformation.lastName}`,
+      email: user?.email,
       access_token: jsonWebToken,
     } as SessionResponseDto;
   }
