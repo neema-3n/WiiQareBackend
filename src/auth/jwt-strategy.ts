@@ -6,9 +6,7 @@ import { AppConfigService } from '../config/app-config.service';
 
 @Injectable()
 export class JWTStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    appConfigService: AppConfigService,
-  ) {
+  constructor(appConfigService: AppConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: appConfigService.tokenSecretKey,

@@ -18,7 +18,10 @@ import { Repository } from 'typeorm';
 import { _403, _404, _409 } from '../../common/constants/errors';
 import { Public } from '../../common/decorators/public.decorator';
 import { CachingService } from '../caching/caching.service';
-import { CreatePatientDto, PatientResponseDto } from '../patient-svc/dto/patient.dto';
+import {
+  CreatePatientDto,
+  PatientResponseDto,
+} from '../patient-svc/dto/patient.dto';
 import { PatientSvcService } from '../patient-svc/patient-svc.service';
 import { User } from '../session/entities/user.entity';
 import { SessionService } from '../session/session.service';
@@ -38,9 +41,19 @@ export class PayerSvcController {
     private readonly patientService: PatientSvcService,
   ) {}
 
+  @Get('patient/:phoneNumber')
+  @Roles(UserRole.PAYER)
+  @ApiOperation({
+    summary: 'This API is used retrieve Patient information by phoneNumber.',
+  })
+  async retrievePatientByPhoneNumber(
+    @Param('phoneNumber') phoneNumber: string,
+  ): Promise<PatientResponseDto> {
+    return await this.patientService.findPatientByPhoneNumber(phoneNumber);
+  }
+
   @Get(':id')
-  // @Roles(UserRole.PAYER)
-  @Public()
+  @Roles(UserRole.PAYER)
   @ApiOperation({ summary: 'This API is used retrieve Payer information.' })
   async retrievePayerAccountInfo(
     @Param('id', new ParseUUIDPipe({ version: '4' })) payerId: string,
@@ -84,17 +97,6 @@ export class PayerSvcController {
     if (userExists) throw new ConflictException(_409.USER_ALREADY_EXISTS);
 
     return this.payerService.registerNewPayerAccount(createPayerAccount);
-  }
-
-  @Get('patient/:phoneNumber')
-  @Roles(UserRole.PAYER)
-  @ApiOperation({
-    summary: 'This API is used retrieve Patient information by phoneNumber.',
-  })
-  async retrievePatientByPhoneNumber(
-    @Param('phoneNumber') phoneNumber: string,
-  ): Promise<PatientResponseDto> {
-    return await this.patientService.findPatientByPhoneNumber(phoneNumber);
   }
 
   @Post('patient')
