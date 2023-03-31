@@ -38,6 +38,10 @@ export const _403 = {
     code: 'USER_ACCOUNT_NOT_ACTIVE',
     description: 'User account not active!',
   },
+  PATIENT_ALREADY_EXISTS: {
+    code: 'PATIENT_ALREADY_EXISTS',
+    description: 'Patient already registered!',
+  },
 };
 
 export const _404 = {

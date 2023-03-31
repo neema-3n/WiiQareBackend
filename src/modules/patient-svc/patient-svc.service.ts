@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { _404 } from 'src/common/constants/errors';
+import { _403, _404 } from 'src/common/constants/errors';
 import { Repository } from 'typeorm';
 import { CreatePatientDto, PatientResponseDto } from './dto/patient.dto';
 import { Patient } from './entities/patient.entity';
@@ -16,6 +20,14 @@ export class PatientSvcService {
    * This function is used to register a patient account
    */
   async registerPatient(patientDto: CreatePatientDto): Promise<Patient> {
+    // Check if patient already exists
+    const patientExists = await this.patientRepository.findOne({
+      where: { phoneNumber: patientDto.phoneNumber },
+    });
+
+    if (patientExists)
+      throw new ForbiddenException(_403.PATIENT_ALREADY_EXISTS);
+
     const patient = this.patientRepository.create(patientDto);
     return await this.patientRepository.save(patient);
   }

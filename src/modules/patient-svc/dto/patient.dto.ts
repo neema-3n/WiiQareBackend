@@ -1,15 +1,15 @@
 import {
-    IsEmail,
-    IsNotEmpty,
-    IsOptional,
-    IsPhoneNumber,
-    IsString,
-    IsUUID,
+  IsEmail,
+  IsISO31661Alpha2,
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  IsUUID,
 } from 'class-validator';
 
 export class CreatePatientDto {
-  @IsNotEmpty()
-  @IsPhoneNumber()
+  @IsOptional()
   phoneNumber: string;
 
   @IsNotEmpty()
@@ -29,7 +29,7 @@ export class CreatePatientDto {
   homeAddress: string;
 
   @IsNotEmpty()
-  @IsString()
+  @IsISO31661Alpha2()
   country: string;
 
   @IsOptional()
