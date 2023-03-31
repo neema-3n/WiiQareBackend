@@ -14,15 +14,15 @@ export class CreateSessionDto {
 
   @IsOptional()
   @IsPhoneNumber()
-  readonly phoneNumber: string;
+  readonly phoneNumber?: string;
 
   @IsOptional()
   @IsPhoneNumber()
-  readonly username: string;
+  readonly username?: string;
 
   @IsOptional()
   @IsString()
-  readonly email: string;
+  readonly email?: string;
 }
 
 export class SessionEmailVerifyRequestDto {
