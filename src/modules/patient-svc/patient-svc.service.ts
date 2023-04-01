@@ -44,12 +44,13 @@ export class PatientSvcService {
 
     if (!patient) throw new NotFoundException(_404.PATIENT_NOT_FOUND);
 
-    const { phoneNumber: phone, firstName, lastName, id } = patient;
+    const { phoneNumber: phone, firstName, lastName, email, id } = patient;
 
     return {
       phoneNumber: phone,
       firstName,
       lastName,
+      email,
       id,
     } as PatientResponseDto;
   }

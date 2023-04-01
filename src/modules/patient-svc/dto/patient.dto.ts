@@ -53,4 +53,8 @@ export class PatientResponseDto {
   @IsNotEmpty()
   @IsString()
   lastName: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
 }
