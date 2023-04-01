@@ -1,9 +1,8 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { SessionService } from './session.service';
 import { ApiNotFoundResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { http_statuses } from '../../helpers/common.helper';
 import { _404 } from '../../common/constants/errors';
 import { Public } from '../../common/decorators/public.decorator';
+import { http_statuses } from '../../helpers/common.helper';
 import {
   CreateSessionDto,
   SessionEmailVerifyRequestDto,
@@ -13,6 +12,7 @@ import {
   SessionResponseDto,
   SessionVerifyEmailOTPResponseDto,
 } from './dto/session.dto';
+import { SessionService } from './session.service';
 
 @ApiTags('Session')
 @Controller('session')

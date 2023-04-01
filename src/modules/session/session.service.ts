@@ -13,11 +13,11 @@ import * as bcrypt from 'bcrypt';
 import { isEmpty } from 'class-validator';
 import * as crypto from 'crypto';
 import { _400, _401, _403, _404, _500 } from 'src/common/constants/errors';
+import { logError, randomSixDigitNumber } from 'src/helpers/common.helper';
 import { User } from 'src/modules/session/entities/user.entity';
 import { FindOneOptions, Repository } from 'typeorm';
 import { UserRole, UserStatus } from '../../common/constants/enums';
 import { AppConfigService } from '../../config/app-config.service';
-import { logError, randomSixDigitNumber } from '../../helpers/common.helper';
 import { CachingService } from '../caching/caching.service';
 import { MailService } from '../mail/mail.service';
 import { PayerSvcService } from '../payer-svc/payer-svc.service';
@@ -108,6 +108,12 @@ export class SessionService {
    *  and send it to customer (PAYER,PROVIDER,PATIENT)
    */
   async emailVerification(email: string): Promise<void> {
+    // check if user exist
+    const userExist = await this.userRepository.findOne({ where: { email } });
+
+    if (userExist)
+      throw new ForbiddenException(_403.USER_ACCOUNT_ALREADY_EXIST);
+
     const randomSixDigitsNumber = randomSixDigitNumber();
 
     if (isEmpty(randomSixDigitsNumber)) {
