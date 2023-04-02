@@ -89,4 +89,8 @@ export class AppConfigService {
   get stripeWebHookSecret(): string {
     return this.configService.get('STRIPE_WEBHOOK_SECRET');
   }
+
+  get smartContractAddress(): string {
+    return this.configService.get('SMART_CONTRACT_ADDRESS');
+  }
 }

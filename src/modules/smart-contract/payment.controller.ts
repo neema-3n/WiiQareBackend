@@ -44,12 +44,13 @@ export class PaymentController {
         case 'payment_intent.succeeded':
           // Update the relevant database record to indicate that the payment succeeded
           logInfo(`Payment succeeded for payment intent ${verifiedEvent}`);
+          //TODO: Mint Voucher!
           break;
         case 'payment_intent.payment_failed':
           // Handle the failure in some way
           break;
         default:
-          logError(`Unhandled event type: ${verifiedEvent.type}`);
+          logInfo(`Unhandled Stripe event type: ${verifiedEvent.type}`);
       }
     } catch (err) {
       logError(`Error processing webhook event: ${err}`);

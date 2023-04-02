@@ -1,6 +1,6 @@
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE'
+  INACTIVE = 'INACTIVE',
 }
 
 export enum UserRole {
@@ -8,5 +8,11 @@ export enum UserRole {
   WIIQARE_MANAGER = 'WIIQARE_MANAGER',
   PAYER = 'PAYER',
   PATIENT = 'PATIENT',
-  PROVIDER = 'PROVIDER'
+  PROVIDER = 'PROVIDER',
+}
+
+export enum VoucherStatus {
+  CLAIMED = 'CLAIMED',
+  UNCLAIMED = 'UNCLAIMED',
+  BURNED = 'BURNED',
 }

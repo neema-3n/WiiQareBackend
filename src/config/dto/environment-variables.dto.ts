@@ -83,4 +83,8 @@ export class EnvironmentVariables {
   @Expose()
   @IsNotEmpty()
   STRIPE_WEBHOOK_SECRET: string;
+
+  @Expose()
+  @IsNotEmpty()
+  SMART_CONTRACT_ADDRESS: string;
 }

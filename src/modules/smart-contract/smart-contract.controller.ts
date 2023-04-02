@@ -1,7 +1,8 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
 import { SmartContractService } from './smart-contract.service';
+import { MintVoucherDto, TransferVoucherDto } from './dto/mint-voucher.dto';
 
 @ApiTags('smart-contract')
 @Controller('smart-contract')
@@ -9,15 +10,26 @@ export class SmartContractController {
   constructor(private readonly smartContractService: SmartContractService) {}
   @Post()
   @Public()
-  async testVoucher() {
-    const response = await this.smartContractService.mintVoucher();
-    return response;
+  async testVoucher(@Body() payload: MintVoucherDto) {
+    return await this.smartContractService.mintVoucher(payload);
+  }
+
+  @Post('transfer')
+  @Public()
+  async transferVoucher(@Body() payload: TransferVoucherDto) {
+    const { voucherId, ownerId } = payload;
+    return await this.smartContractService.transferVoucher(voucherId, ownerId);
   }
 
   @Get()
   @Public()
-  async getVoucherInformation() {
-    const response = await this.smartContractService.getVoucher();
-    return response;
+  async getVoucherInformation(@Query('accountId') accountId: string) {
+    return await this.smartContractService.getAllVouchers(accountId);
+  }
+
+  @Get('by-id')
+  @Public()
+  async getVoucherById(@Query('voucherId') voucherId: string) {
+    return await this.smartContractService.getVoucherById(voucherId);
   }
 }
