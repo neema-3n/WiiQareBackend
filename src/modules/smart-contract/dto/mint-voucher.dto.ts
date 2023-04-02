@@ -14,7 +14,7 @@ export class MintVoucherDto {
 
   @IsNotEmpty()
   @IsIn(['USD', 'EURO'])
-  currency: 'USD' | 'EURO';
+  currency: string;
 
   @IsNotEmpty()
   @IsUUID(4)
@@ -25,7 +25,7 @@ export class MintVoucherDto {
   patientId: string;
 
   @IsOptional()
-  description: Record<string, any>;
+  description?: Record<string, any>;
 }
 
 export class TransferVoucherDto {

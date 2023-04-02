@@ -13,6 +13,8 @@ import { logError, logInfo } from 'src/helpers/common.helper';
 import { Stripe } from 'stripe';
 import { AppConfigService } from '../../config/app-config.service';
 import { Request } from 'express';
+import { SmartContractService } from './smart-contract.service';
+import _ from 'lodash';
 
 @ApiTags('payment')
 @Controller('payment')
@@ -20,6 +22,7 @@ export class PaymentController {
   constructor(
     @InjectStripe() private readonly stripe: Stripe,
     private readonly appConfigService: AppConfigService,
+    private readonly smartContractService: SmartContractService,
   ) {}
 
   @Post('notification')
@@ -44,7 +47,25 @@ export class PaymentController {
         case 'payment_intent.succeeded':
           // Update the relevant database record to indicate that the payment succeeded
           logInfo(`Payment succeeded for payment intent ${verifiedEvent}`);
-          //TODO: Mint Voucher!
+
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const { amount, currency } = verifiedEvent.data.object;
+
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const { senderId } = verifiedEvent.data.object?.metadata;
+          //TODO: save transaction to database
+
+          await this.smartContractService.mintVoucher({
+            amount,
+            ownerId: senderId,
+            currency: currency.toUpperCase(),
+            patientId: senderId,
+          });
+
+          //TODO: save voucher details to our database.
+
           break;
         case 'payment_intent.payment_failed':
           // Handle the failure in some way
