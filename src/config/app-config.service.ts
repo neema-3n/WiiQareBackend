@@ -86,4 +86,7 @@ export class AppConfigService {
   get hashingSecret(): string {
     return this.configService.get('HASHING_SECRET');
   }
+  get stripeWebHookSecret(): string {
+    return this.configService.get('STRIPE_WEBHOOK_SECRET');
+  }
 }

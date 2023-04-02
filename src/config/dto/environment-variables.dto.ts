@@ -79,4 +79,8 @@ export class EnvironmentVariables {
   @Expose()
   @IsNotEmpty()
   HASHING_SECRET: string;
+
+  @Expose()
+  @IsNotEmpty()
+  STRIPE_WEBHOOK_SECRET: string;
 }

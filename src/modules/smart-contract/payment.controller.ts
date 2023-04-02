@@ -1,34 +1,41 @@
 import {
   Body,
   Controller,
-  InternalServerErrorException,
   Post,
+  Headers,
+  Req,
+  RawBodyRequest,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { InjectStripe } from 'nestjs-stripe';
-import { _500 } from 'src/common/constants/errors';
 import { Public } from 'src/common/decorators/public.decorator';
-import { logError } from 'src/helpers/common.helper';
+import { logError, logInfo } from 'src/helpers/common.helper';
 import { Stripe } from 'stripe';
+import { AppConfigService } from '../../config/app-config.service';
+import { Request } from 'express';
 
 @ApiTags('payment')
 @Controller('payment')
 export class PaymentController {
-  constructor(@InjectStripe() private readonly stripe: Stripe) {}
+  constructor(
+    @InjectStripe() private readonly stripe: Stripe,
+    private readonly appConfigService: AppConfigService,
+  ) {}
 
   @Post('notification')
   @Public()
-  async handlePaymentWebhookEvent(@Body() event: Stripe.Event) {
+  async handlePaymentWebhookEvent(
+    @Headers('stripe-signature') signature: string,
+    @Body() event: Stripe.Event,
+    @Req() req: RawBodyRequest<Request>,
+  ) {
     try {
       // Verify the webhook event with Stripe to ensure it is authentic
-      const webhookSecret = 'your-webhook-secret-key-here';
+      const webhookSecret = this.appConfigService.stripeWebHookSecret;
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      const sig = event.headers['stripe-signature'];
       const verifiedEvent = this.stripe.webhooks.constructEvent(
-        JSON.stringify(event),
-        sig,
+        req.rawBody,
+        signature,
         webhookSecret,
       );
 
@@ -36,13 +43,13 @@ export class PaymentController {
       switch (verifiedEvent.type) {
         case 'payment_intent.succeeded':
           // Update the relevant database record to indicate that the payment succeeded
+          logInfo(`Payment succeeded for payment intent ${verifiedEvent}`);
           break;
         case 'payment_intent.payment_failed':
           // Handle the failure in some way
           break;
         default:
           logError(`Unhandled event type: ${verifiedEvent.type}`);
-          throw new InternalServerErrorException(_500.INTERNAL_SERVER_ERROR);
       }
     } catch (err) {
       logError(`Error processing webhook event: ${err}`);

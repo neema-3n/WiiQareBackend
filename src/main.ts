@@ -5,7 +5,7 @@ import { enableConfig } from './config/config';
 import { AppConfigService } from './config/app-config.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   await enableConfig(app);
 
