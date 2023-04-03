@@ -37,8 +37,7 @@ export class SmartContractService {
 
       logInfo(`accounts -> ${accounts}`);
 
-      const { ownerId, amount, currency, patientId, description } =
-        mintVoucherDto;
+      const { ownerId, amount, currency, patientId } = mintVoucherDto;
 
       const response = await this.wiiqareContract.methods
         .mintVoucher([

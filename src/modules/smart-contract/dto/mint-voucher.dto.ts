@@ -23,9 +23,6 @@ export class MintVoucherDto {
   @IsNotEmpty()
   @IsUUID(4)
   patientId: string;
-
-  @IsOptional()
-  description?: Record<string, any>;
 }
 
 export class TransferVoucherDto {

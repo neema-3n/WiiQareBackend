@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
-  Post,
+  Get,
   Headers,
-  Req,
+  Post,
+  Query,
   RawBodyRequest,
+  Req,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { InjectStripe } from 'nestjs-stripe';
@@ -15,6 +17,9 @@ import { AppConfigService } from '../../config/app-config.service';
 import { Request } from 'express';
 import { SmartContractService } from './smart-contract.service';
 import _ from 'lodash';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Transaction } from './entities/transaction.entity';
+import { Repository } from 'typeorm';
 
 @ApiTags('payment')
 @Controller('payment')
@@ -23,6 +28,8 @@ export class PaymentController {
     @InjectStripe() private readonly stripe: Stripe,
     private readonly appConfigService: AppConfigService,
     private readonly smartContractService: SmartContractService,
+    @InjectRepository(Transaction)
+    private readonly transactionRepository: Repository<Transaction>,
   ) {}
 
   @Post('notification')
@@ -48,23 +55,64 @@ export class PaymentController {
           // Update the relevant database record to indicate that the payment succeeded
           logInfo(`Payment succeeded for payment intent ${verifiedEvent}`);
 
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          const { amount, currency } = verifiedEvent.data.object;
+          const {
+            id: stripePaymentId,
+            amount,
+            currency,
+          } = verifiedEvent.data.object as Stripe.PaymentIntent;
 
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           const { senderId } = verifiedEvent.data.object?.metadata;
-          //TODO: save transaction to database
 
-          await this.smartContractService.mintVoucher({
-            amount,
+          const voucherData = await this.smartContractService.mintVoucher({
+            amount: amount / 100,
             ownerId: senderId,
             currency: currency.toUpperCase(),
             patientId: senderId,
           });
 
-          //TODO: save voucher details to our database.
+          const voucherToSave = {
+            id: _.get(voucherData, 'events.mintVoucherEvent.returnValues.0'),
+            amount: _.get(
+              voucherData,
+              'events.mintVoucherEvent.returnValues.1.[0]',
+            ),
+            currency: _.get(
+              voucherData,
+              'events.mintVoucherEvent.returnValues.1.[1]',
+            ),
+            ownerId: _.get(
+              voucherData,
+              'events.mintVoucherEvent.returnValues.1.[2]',
+            ),
+            hospitalId: _.get(
+              voucherData,
+              'events.mintVoucherEvent.returnValues.1.[3]',
+            ),
+            patientId: _.get(
+              voucherData,
+              'events.mintVoucherEvent.returnValues.1.[4]',
+            ),
+            status: _.get(
+              voucherData,
+              'events.mintVoucherEvent.returnValues.1.[5]',
+            ),
+          };
+
+          const transactionToSave = this.transactionRepository.create({
+            amount: amount / 100,
+            currency,
+            senderId,
+            stripePaymentId,
+            transactionHash: _.get(
+              voucherData,
+              'events.mintVoucherEvent.transactionHash',
+            ),
+            voucher: voucherToSave,
+            status: 'success', //TODO: adds status to transaction
+          });
+          await this.transactionRepository.save(transactionToSave);
 
           break;
         case 'payment_intent.payment_failed':
@@ -77,5 +125,15 @@ export class PaymentController {
       logError(`Error processing webhook event: ${err}`);
       return { error: 'Failed to process webhook event' };
     }
+  }
+
+  @Get('voucher')
+  @Public()
+  async retrieveVoucherByPaymentId(
+    @Query('paymentId') paymentId: string,
+  ): Promise<any> {
+    return await this.transactionRepository.findOne({
+      where: { stripePaymentId: paymentId },
+    });
   }
 }

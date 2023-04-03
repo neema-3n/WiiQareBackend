@@ -16,6 +16,12 @@ export class Transaction extends BaseEntity {
   @Column()
   status: string;
 
+  @Column()
+  transactionHash: string;
+
+  @Column()
+  stripePaymentId: string;
+
   @Column({ type: 'jsonb' })
-  description: Record<string, any>;
+  voucher: Record<string, any>;
 }

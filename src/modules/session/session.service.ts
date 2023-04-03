@@ -85,6 +85,7 @@ export class SessionService {
     const jsonWebToken = this.jwtService.sign(jwtClaimsData);
 
     return {
+      userId: user.id,
       phoneNumber: user.phoneNumber,
       names: `${detailsInformation.firstName} ${detailsInformation.lastName}`,
       email: user?.email,

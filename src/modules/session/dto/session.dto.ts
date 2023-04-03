@@ -10,6 +10,10 @@ import {
 
 export class SessionResponseDto {
   @IsNotEmpty()
+  @IsUUID(4)
+  userId: string;
+
+  @IsNotEmpty()
   @IsPhoneNumber()
   phoneNumber: string;
 
