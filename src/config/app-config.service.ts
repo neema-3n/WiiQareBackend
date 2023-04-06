@@ -90,7 +90,15 @@ export class AppConfigService {
     return this.configService.get('STRIPE_WEBHOOK_SECRET');
   }
 
+  get smartContractPrivateKey(): string {
+    return this.configService.get('SMART_CONTRACT_PRIVATE_KEY');
+  }
+
   get smartContractAddress(): string {
     return this.configService.get('SMART_CONTRACT_ADDRESS');
+  }
+
+  get blockChainNodeURI(): string {
+    return this.configService.get('BLOCK_CHAIN_NODE_URI');
   }
 }

@@ -86,5 +86,13 @@ export class EnvironmentVariables {
 
   @Expose()
   @IsNotEmpty()
+  SMART_CONTRACT_PRIVATE_KEY: string;
+
+  @Expose()
+  @IsNotEmpty()
   SMART_CONTRACT_ADDRESS: string;
+
+  @Expose()
+  @IsNotEmpty()
+  BLOCK_CHAIN_NODE_URI: string;
 }

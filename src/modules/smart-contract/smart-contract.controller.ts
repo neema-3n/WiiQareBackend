@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
-import { SmartContractService } from './smart-contract.service';
 import { MintVoucherDto, TransferVoucherDto } from './dto/mint-voucher.dto';
+import { SmartContractService } from './smart-contract.service';
 
 @ApiTags('smart-contract')
 @Controller('smart-contract')
@@ -23,8 +23,8 @@ export class SmartContractController {
 
   @Get()
   @Public()
-  async getVoucherInformation(@Query('accountId') accountId: string) {
-    return await this.smartContractService.getAllVouchers(accountId);
+  async getVoucherInformation(@Query('ownerId') ownerId: string) {
+    return await this.smartContractService.getAllVouchers(ownerId);
   }
 
   @Get('by-id')
