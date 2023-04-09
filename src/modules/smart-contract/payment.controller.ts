@@ -9,17 +9,17 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Request } from 'express';
+import _ from 'lodash';
 import { InjectStripe } from 'nestjs-stripe';
 import { Public } from 'src/common/decorators/public.decorator';
 import { logError, logInfo } from 'src/helpers/common.helper';
 import { Stripe } from 'stripe';
-import { AppConfigService } from '../../config/app-config.service';
-import { Request } from 'express';
-import { SmartContractService } from './smart-contract.service';
-import _ from 'lodash';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Transaction } from './entities/transaction.entity';
 import { Repository } from 'typeorm';
+import { AppConfigService } from '../../config/app-config.service';
+import { Transaction } from './entities/transaction.entity';
+import { SmartContractService } from './smart-contract.service';
 
 @ApiTags('payment')
 @Controller('payment')
@@ -30,7 +30,7 @@ export class PaymentController {
     private readonly smartContractService: SmartContractService,
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
-  ) {}
+  ) { }
 
   @Post('notification')
   @Public()
@@ -63,13 +63,13 @@ export class PaymentController {
 
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          const { senderId } = verifiedEvent.data.object?.metadata;
+          const { senderId, patientId } = verifiedEvent.data.object?.metadata;
 
           const voucherData = await this.smartContractService.mintVoucher({
             amount: amount / 100,
-            ownerId: senderId,
+            ownerId: patientId,
             currency: currency.toUpperCase(),
-            patientId: senderId,
+            patientId: patientId,
           });
 
           const voucherToSave = {
@@ -104,6 +104,7 @@ export class PaymentController {
             amount: amount / 100,
             currency,
             senderId,
+            patientId,
             stripePaymentId,
             transactionHash: _.get(
               voucherData,

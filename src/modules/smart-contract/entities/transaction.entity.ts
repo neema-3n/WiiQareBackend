@@ -10,6 +10,10 @@ export class Transaction extends BaseEntity {
   @Column()
   senderId: string;
 
+  //TODO: @remove nullable later!
+  @Column({ nullable: true })
+  patientId: string;
+
   @Column()
   currency: string;
 
