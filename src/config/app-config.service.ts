@@ -8,7 +8,7 @@ import {
 
 @Injectable()
 export class AppConfigService {
-  constructor(private configService: ConfigService<EnvironmentVariables>) {}
+  constructor(private configService: ConfigService<EnvironmentVariables>) { }
 
   get appName(): string {
     return APP_NAME;
@@ -100,5 +100,9 @@ export class AppConfigService {
 
   get blockChainNodeURI(): string {
     return this.configService.get('BLOCK_CHAIN_NODE_URI');
+  }
+
+  get smtpPassword(): string {
+    return this.configService.get('SMTP_PASSWORD');
   }
 }

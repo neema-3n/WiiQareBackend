@@ -3,10 +3,10 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {}
+  constructor(private mailerService: MailerService) { }
 
   async sendOTPEmail(email: string, token: number) {
-    const url = `example.com/auth/confirm?token=${token}`;
+    const url = `https://wiiqare-app.com/auth/confirm?token=${token}`;
 
     await this.mailerService.sendMail({
       to: email,

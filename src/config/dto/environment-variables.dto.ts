@@ -95,4 +95,8 @@ export class EnvironmentVariables {
   @Expose()
   @IsNotEmpty()
   BLOCK_CHAIN_NODE_URI: string;
+
+  @Expose()
+  @IsNotEmpty()
+  SMTP_PASSWORD: string;
 }
