@@ -6,6 +6,7 @@ import { PaymentController } from './payment.controller';
 import { SmartContractController } from './smart-contract.controller';
 import { nodeProvider } from './smart-contract.providers';
 import { SmartContractService } from './smart-contract.service';
+import { TransactionService } from './transaction.service';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { SmartContractService } from './smart-contract.service';
     TypeOrmModule.forFeature([Transaction]),
   ],
   controllers: [SmartContractController, PaymentController],
-  providers: [SmartContractService, nodeProvider],
+  providers: [SmartContractService, TransactionService, nodeProvider],
 })
-export class SmartContractModule {}
+export class SmartContractModule { }

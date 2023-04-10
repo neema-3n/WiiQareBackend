@@ -8,18 +8,21 @@ import {
   RawBodyRequest,
   Req,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
 import _ from 'lodash';
 import { InjectStripe } from 'nestjs-stripe';
+import { UserRole } from 'src/common/constants/enums';
 import { Public } from 'src/common/decorators/public.decorator';
+import { Roles } from 'src/common/decorators/user-role.decorator';
 import { logError, logInfo } from 'src/helpers/common.helper';
 import { Stripe } from 'stripe';
 import { Repository } from 'typeorm';
 import { AppConfigService } from '../../config/app-config.service';
 import { Transaction } from './entities/transaction.entity';
 import { SmartContractService } from './smart-contract.service';
+import { TransactionService } from './transaction.service';
 
 @ApiTags('payment')
 @Controller('payment')
@@ -30,10 +33,21 @@ export class PaymentController {
     private readonly smartContractService: SmartContractService,
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
-  ) { }
+    private readonly transactionService: TransactionService,
+  ) {}
+
+  @Get()
+  @ApiOperation({ summary: 'This API list all transaction history' })
+  @Roles(UserRole.WIIQARE_ADMIN, UserRole.WIIQARE_MANAGER)
+  async getPaymentHistory(): Promise<Transaction[]> {
+    return this.transactionService.getTransactionHistory();
+  }
 
   @Post('notification')
   @Public()
+  @ApiOperation({
+    summary: 'This API receive payment notification from stripe[webhook]',
+  })
   async handlePaymentWebhookEvent(
     @Headers('stripe-signature') signature: string,
     @Body() event: Stripe.Event,
@@ -130,6 +144,7 @@ export class PaymentController {
 
   @Get('voucher')
   @Public()
+  @ApiOperation({ summary: 'This API retrieve voucher by payment id' })
   async retrieveVoucherByPaymentId(
     @Query('paymentId') paymentId: string,
   ): Promise<any> {
