@@ -1,5 +1,4 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { Request } from 'express';
 import { JwtClaimsDataDto } from '../../modules/session/dto/jwt-claims-data.dto';
 
 /**
@@ -8,8 +7,7 @@ import { JwtClaimsDataDto } from '../../modules/session/dto/jwt-claims-data.dto'
  */
 export const AuthUser = createParamDecorator(
   (_data: unknown, context: ExecutionContext): JwtClaimsDataDto => {
-    const request: Request = context.switchToHttp().getRequest();
-    // return request.user as unknown as JwtClaimsDataDto;
-    return;
+    const request = context.switchToHttp().getRequest();
+    return request.user as unknown as JwtClaimsDataDto;
   },
 );
