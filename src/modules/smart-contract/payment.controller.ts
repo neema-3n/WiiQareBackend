@@ -48,7 +48,7 @@ export class PaymentController {
     @AuthUser() authUser: JwtClaimsDataDto,
   ): Promise<Transaction[]> {
     if (authUser.type === UserRole.PAYER) {
-      return this.transactionService.getTransactionHistoryByPayerId(
+      return this.transactionService.getTransactionHistoryBySenderId(
         authUser.sub,
       );
     }

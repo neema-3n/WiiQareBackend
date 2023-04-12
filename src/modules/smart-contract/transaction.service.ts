@@ -30,12 +30,12 @@ export class TransactionService {
    * TODO: add pagination later!
    * @returns {Promise<any>}
    */
-  async getTransactionHistoryByPayerId(
-    payerId: string,
+  async getTransactionHistoryBySenderId(
+    senderId: string,
   ): Promise<Transaction[]> {
     return await this.transactionRepository.find({
       where: {
-        id: payerId,
+        senderId,
       },
       order: {
         createdAt: 'DESC',
