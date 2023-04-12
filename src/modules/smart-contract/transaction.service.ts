@@ -17,8 +17,26 @@ export class TransactionService {
    * TODO: add pagination later!
    * @returns {Promise<any>}
    */
-  async getTransactionHistory(): Promise<Transaction[]> {
+  async getAllTransactionHistory(): Promise<Transaction[]> {
     return await this.transactionRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+  }
+
+  /**
+   * This function is used to get transaction history from payer id
+   * TODO: add pagination later!
+   * @returns {Promise<any>}
+   */
+  async getTransactionHistoryByPayerId(
+    payerId: string,
+  ): Promise<Transaction[]> {
+    return await this.transactionRepository.find({
+      where: {
+        id: payerId,
+      },
       order: {
         createdAt: 'DESC',
       },

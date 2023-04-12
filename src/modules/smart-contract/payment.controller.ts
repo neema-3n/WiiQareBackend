@@ -14,12 +14,14 @@ import { Request } from 'express';
 import _ from 'lodash';
 import { InjectStripe } from 'nestjs-stripe';
 import { UserRole } from 'src/common/constants/enums';
+import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { Public } from 'src/common/decorators/public.decorator';
 import { Roles } from 'src/common/decorators/user-role.decorator';
 import { logError, logInfo } from 'src/helpers/common.helper';
 import { Stripe } from 'stripe';
 import { Repository } from 'typeorm';
 import { AppConfigService } from '../../config/app-config.service';
+import { JwtClaimsDataDto } from '../session/dto/jwt-claims-data.dto';
 import { Transaction } from './entities/transaction.entity';
 import { SmartContractService } from './smart-contract.service';
 import { TransactionService } from './transaction.service';
@@ -37,10 +39,20 @@ export class PaymentController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'This API list all transaction history' })
-  @Roles(UserRole.WIIQARE_ADMIN, UserRole.WIIQARE_MANAGER)
-  async getPaymentHistory(): Promise<Transaction[]> {
-    return this.transactionService.getTransactionHistory();
+  @ApiOperation({
+    summary:
+      'This API list all transaction history or specific payer transactions',
+  })
+  @Roles(UserRole.WIIQARE_ADMIN, UserRole.WIIQARE_MANAGER, UserRole.PAYER)
+  async getPaymentHistory(
+    @AuthUser() authUser: JwtClaimsDataDto,
+  ): Promise<Transaction[]> {
+    if (authUser.type === UserRole.PAYER) {
+      return this.transactionService.getTransactionHistoryByPayerId(
+        authUser.sub,
+      );
+    }
+    return this.transactionService.getAllTransactionHistory();
   }
 
   @Post('notification')
