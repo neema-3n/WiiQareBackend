@@ -8,6 +8,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,7 +26,7 @@ import {
 import { PatientSvcService } from '../patient-svc/patient-svc.service';
 import { User } from '../session/entities/user.entity';
 import { SessionService } from '../session/session.service';
-import { CreatePayerAccountDto } from './dto/payer.dto';
+import { CreatePayerAccountDto, SearchPatientDto } from './dto/payer.dto';
 import { Payer } from './entities/payer.entity';
 import { PayerSvcService } from './payer-svc.service';
 
@@ -41,15 +42,20 @@ export class PayerSvcController {
     private readonly patientService: PatientSvcService,
   ) {}
 
-  @Get('patient/:phoneNumber')
+  @Get('patient')
   @Roles(UserRole.PAYER)
   @ApiOperation({
     summary: 'This API is used retrieve Patient information by phoneNumber.',
   })
   async retrievePatientByPhoneNumber(
-    @Param('phoneNumber') phoneNumber: string,
-  ): Promise<PatientResponseDto> {
-    return await this.patientService.findPatientByPhoneNumber(phoneNumber);
+    @Query() SearchPatientDto: SearchPatientDto,
+  ): Promise<PatientResponseDto[]> {
+    const { phoneNumber, payerId } = SearchPatientDto;
+
+    if (phoneNumber)
+      return this.patientService.findPatientByPhoneNumber(phoneNumber);
+
+    return this.patientService.findAllPatientByPayerId(payerId);
   }
 
   @Get(':id')

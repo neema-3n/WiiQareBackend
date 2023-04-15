@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { _403, _404 } from 'src/common/constants/errors';
 import { Repository } from 'typeorm';
+import { Transaction } from '../smart-contract/entities/transaction.entity';
 import { CreatePatientDto, PatientResponseDto } from './dto/patient.dto';
 import { Patient } from './entities/patient.entity';
 
@@ -14,6 +15,8 @@ export class PatientSvcService {
   constructor(
     @InjectRepository(Patient)
     private readonly patientRepository: Repository<Patient>,
+    @InjectRepository(Transaction)
+    private readonly transactionRepository: Repository<Transaction>,
   ) {}
 
   /**
@@ -37,7 +40,7 @@ export class PatientSvcService {
    */
   async findPatientByPhoneNumber(
     phoneNumber: string,
-  ): Promise<PatientResponseDto> {
+  ): Promise<PatientResponseDto[]> {
     const patient = await this.patientRepository.findOne({
       where: { phoneNumber },
     });
@@ -46,12 +49,49 @@ export class PatientSvcService {
 
     const { phoneNumber: phone, firstName, lastName, email, id } = patient;
 
-    return {
-      phoneNumber: phone,
-      firstName,
-      lastName,
-      email,
-      id,
-    } as PatientResponseDto;
+    return [
+      {
+        phoneNumber: phone,
+        firstName,
+        lastName,
+        email,
+        id,
+      },
+    ] as PatientResponseDto[];
+  }
+
+  /**
+   * This function is used to find a patient list  by payerId
+   */
+  async findAllPatientByPayerId(
+    payerId: string,
+  ): Promise<PatientResponseDto[]> {
+    const uniquePatientIdsQuery = await this.transactionRepository
+      .createQueryBuilder('transaction')
+      .select('transaction.patientId', 'patientId')
+      .where('transaction.senderId = :payerId', { payerId })
+      .andWhere('transaction.patientId IS NOT NULL')
+      .groupBy('transaction.patientId')
+      .getRawMany();
+
+    const uniquePatientIds = uniquePatientIdsQuery.map(
+      (result) => result.patientId,
+    );
+
+    const patients = await this.patientRepository
+      .createQueryBuilder('patient')
+      .whereInIds(uniquePatientIds)
+      .getMany();
+
+    return patients.map((patient) => {
+      const { phoneNumber, firstName, lastName, email, id } = patient;
+      return {
+        phoneNumber,
+        firstName,
+        lastName,
+        email,
+        id,
+      };
+    }) as PatientResponseDto[];
   }
 }

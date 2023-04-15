@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppConfigService } from 'src/config/app-config.service';
 import { Repository } from 'typeorm';
+import { Patient } from '../patient-svc/entities/patient.entity';
+import { Payer } from '../payer-svc/entities/payer.entity';
 import { Transaction } from './entities/transaction.entity';
 
 @Injectable()
@@ -33,13 +35,23 @@ export class TransactionService {
   async getTransactionHistoryBySenderId(
     senderId: string,
   ): Promise<Transaction[]> {
-    return await this.transactionRepository.find({
-      where: {
-        senderId,
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-    });
+    const transactions = await this.transactionRepository
+      .createQueryBuilder('transaction')
+      .leftJoinAndMapOne(
+        'transaction.senderId',
+        Payer,
+        'payer',
+        'payer.id = transaction.senderId',
+      )
+      .leftJoinAndMapOne(
+        'transaction.patientId',
+        Patient,
+        'patient',
+        'patient.id = transaction.patientId',
+      )
+      .where('transaction.senderId = :senderId', { senderId })
+      .orderBy('transaction.createdAt', 'DESC')
+      .getMany();
+    return transactions;
   }
 }
