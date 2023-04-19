@@ -3,9 +3,24 @@ import { Column, Entity } from 'typeorm';
 
 @Entity()
 export class Transaction extends BaseEntity {
-  //TODO: adds other fields later!.
+  @Column({ comment: 'sent amount before conversion' })
+  senderAmount: number;
+
   @Column()
+  senderCurrency: string;
+
+  @Column({
+    comment: 'This is the actual amount in local currency patient receives',
+  })
   amount: number;
+
+  @Column({
+    comment: 'This rate of exchange at the time of the transaction',
+  })
+  conversionRate: number;
+
+  @Column({ comment: 'local currency' })
+  currency: string;
 
   @Column()
   senderId: string;
@@ -13,9 +28,6 @@ export class Transaction extends BaseEntity {
   //TODO: @remove nullable later!
   @Column({ nullable: true })
   patientId: string;
-
-  @Column()
-  currency: string;
 
   @Column()
   status: string;

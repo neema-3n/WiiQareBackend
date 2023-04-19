@@ -83,18 +83,28 @@ export class PaymentController {
 
           const {
             id: stripePaymentId,
-            amount,
-            currency,
+            amount: senderAmount,
+            currency: senderCurrency,
           } = verifiedEvent.data.object as Stripe.PaymentIntent;
 
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          const { senderId, patientId } = verifiedEvent.data.object?.metadata;
+          const { metadata } = verifiedEvent.data.object as unknown as Record<
+            string,
+            any
+          >;
+
+          //TODO: Please use our own BE exchange rate API to get the latest exchange rate!!
+          const {
+            senderId,
+            patientId,
+            currencyPatientAmount,
+            currencyPatient,
+            currencyRate,
+          } = metadata;
 
           const voucherData = await this.smartContractService.mintVoucher({
-            amount: amount / 100,
+            amount: currencyPatientAmount,
             ownerId: patientId,
-            currency: currency.toUpperCase(),
+            currency: currencyPatient,
             patientId: patientId,
           });
 
@@ -127,8 +137,11 @@ export class PaymentController {
           };
 
           const transactionToSave = this.transactionRepository.create({
-            amount: amount / 100,
-            currency,
+            senderAmount: senderAmount / 100,
+            senderCurrency,
+            amount: currencyPatientAmount,
+            currency: currencyPatient,
+            conversionRate: currencyRate,
             senderId,
             patientId,
             stripePaymentId,

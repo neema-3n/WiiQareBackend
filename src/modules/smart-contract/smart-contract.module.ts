@@ -11,7 +11,8 @@ import { TransactionService } from './transaction.service';
 @Module({
   imports: [
     StripeModule.forRoot({
-      apiKey: 'my_secret_key', // NOTICE: no keys we are using so far only webhooks!
+      // NOTICE: no keys we are using so far only webhooks!
+      apiKey: 'my_secret_key',
       apiVersion: '2022-11-15',
     }),
     TypeOrmModule.forFeature([Transaction]),
@@ -19,4 +20,4 @@ import { TransactionService } from './transaction.service';
   controllers: [SmartContractController, PaymentController],
   providers: [SmartContractService, TransactionService, nodeProvider],
 })
-export class SmartContractModule { }
+export class SmartContractModule {}
