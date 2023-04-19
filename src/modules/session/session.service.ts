@@ -74,11 +74,21 @@ export class SessionService {
         throw new UnauthorizedException(_401.INVALID_CREDENTIALS);
     }
 
+    //TODO: improve this!.
+    let names: string;
+    if (user.role === UserRole.WIIQARE_ADMIN) {
+      names = 'ADMIN';
+    } else if (user.role === UserRole.WIIQARE_MANAGER) {
+      names = 'MANAGER';
+    } else {
+      names = `${detailsInformation.firstName} ${detailsInformation.lastName}`;
+    }
+
     const jwtClaimsData: JwtClaimsDataDto = {
       sub: user.id,
       type: user.role,
       phoneNumber: user.phoneNumber,
-      names: `${detailsInformation.firstName} ${detailsInformation.lastName}`,
+      names,
       status: user.status,
     } as JwtClaimsDataDto;
 
@@ -87,7 +97,7 @@ export class SessionService {
     return {
       userId: user.id,
       phoneNumber: user.phoneNumber,
-      names: `${detailsInformation.firstName} ${detailsInformation.lastName}`,
+      names,
       email: user?.email,
       access_token: jsonWebToken,
     } as SessionResponseDto;

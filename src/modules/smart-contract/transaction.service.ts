@@ -38,17 +38,26 @@ export class TransactionService {
     const transactions = await this.transactionRepository
       .createQueryBuilder('transaction')
       .leftJoinAndMapOne(
-        'transaction.senderId',
+        'transaction.sender',
         Payer,
         'payer',
-        'payer.id = transaction.senderId',
+        'payer.user = transaction.senderId',
       )
       .leftJoinAndMapOne(
-        'transaction.patientId',
+        'transaction.patient',
         Patient,
         'patient',
         'patient.id = transaction.patientId',
       )
+      .select([
+        'transaction',
+        'payer.firstName',
+        'payer.lastName',
+        'payer.country',
+        'patient.firstName',
+        'patient.lastName',
+        'patient.phoneNumber',
+      ])
       .where('transaction.senderId = :senderId', { senderId })
       .orderBy('transaction.createdAt', 'DESC')
       .getMany();

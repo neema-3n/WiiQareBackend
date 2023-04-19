@@ -27,11 +27,11 @@ export class Transaction extends BaseEntity {
   @Column({ comment: 'local currency' })
   currency: string;
 
-  @Column()
+  @Column({ type: 'uuid', nullable: true })
   senderId: string;
 
   //TODO: @remove nullable later!
-  @Column({ nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   patientId: string;
 
   @Column()

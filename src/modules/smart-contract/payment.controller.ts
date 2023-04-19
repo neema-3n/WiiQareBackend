@@ -21,6 +21,8 @@ import { logError, logInfo } from 'src/helpers/common.helper';
 import { Stripe } from 'stripe';
 import { Repository } from 'typeorm';
 import { AppConfigService } from '../../config/app-config.service';
+import { Patient } from '../patient-svc/entities/patient.entity';
+import { Payer } from '../payer-svc/entities/payer.entity';
 import { JwtClaimsDataDto } from '../session/dto/jwt-claims-data.dto';
 import { Transaction } from './entities/transaction.entity';
 import { SmartContractService } from './smart-contract.service';
@@ -138,7 +140,7 @@ export class PaymentController {
 
           const transactionToSave = this.transactionRepository.create({
             senderAmount: senderAmount / 100,
-            senderCurrency,
+            senderCurrency: senderCurrency.toUpperCase(),
             amount: Math.round(currencyPatientAmount),
             currency: currencyPatient,
             conversionRate: currencyRate,
@@ -173,8 +175,30 @@ export class PaymentController {
   async retrieveVoucherByPaymentId(
     @Query('paymentId') paymentId: string,
   ): Promise<any> {
-    return await this.transactionRepository.findOne({
-      where: { stripePaymentId: paymentId },
-    });
+    return await this.transactionRepository
+      .createQueryBuilder('transaction')
+      .leftJoinAndMapOne(
+        'transaction.sender',
+        Payer,
+        'payer',
+        'payer.user = transaction.senderId',
+      )
+      .leftJoinAndMapOne(
+        'transaction.patient',
+        Patient,
+        'patient',
+        'patient.id = transaction.patientId',
+      )
+      .select([
+        'transaction',
+        'payer.firstName',
+        'payer.lastName',
+        'payer.country',
+        'patient.firstName',
+        'patient.lastName',
+        'patient.phoneNumber',
+      ])
+      .where('transaction.stripePaymentId = :paymentId', { paymentId })
+      .getOne();
   }
 }
