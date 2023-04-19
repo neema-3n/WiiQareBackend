@@ -3,18 +3,23 @@ import { Column, Entity } from 'typeorm';
 
 @Entity()
 export class Transaction extends BaseEntity {
-  @Column({ comment: 'sent amount before conversion' })
+  @Column({
+    type: 'double precision',
+    comment: 'sent amount before conversion',
+  })
   senderAmount: number;
 
   @Column()
   senderCurrency: string;
 
   @Column({
+    type: 'double precision',
     comment: 'This is the actual amount in local currency patient receives',
   })
   amount: number;
 
   @Column({
+    type: 'double precision',
     comment: 'This rate of exchange at the time of the transaction',
   })
   conversionRate: number;
