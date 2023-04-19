@@ -18,7 +18,7 @@ export class Patient extends BaseEntity {
   user: User;
 
   @Column({ nullable: true })
-  email: string;
+  email?: string;
 
   @Column()
   homeAddress: string;

@@ -102,7 +102,7 @@ export class PaymentController {
           } = metadata;
 
           const voucherData = await this.smartContractService.mintVoucher({
-            amount: currencyPatientAmount,
+            amount: Math.round(currencyPatientAmount),
             ownerId: patientId,
             currency: currencyPatient,
             patientId: patientId,
@@ -139,7 +139,7 @@ export class PaymentController {
           const transactionToSave = this.transactionRepository.create({
             senderAmount: senderAmount / 100,
             senderCurrency,
-            amount: currencyPatientAmount,
+            amount: Math.round(currencyPatientAmount),
             currency: currencyPatient,
             conversionRate: currencyRate,
             senderId,
