@@ -84,13 +84,9 @@ export class PatientSvcService {
       .getMany();
 
     return patients.map((patient) => {
-      const { phoneNumber, firstName, lastName, email, id } = patient;
+      const { user, ...data } = patient;
       return {
-        phoneNumber,
-        firstName,
-        lastName,
-        email,
-        id,
+        ...data,
       };
     }) as PatientResponseDto[];
   }
