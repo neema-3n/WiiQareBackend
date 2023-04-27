@@ -25,4 +25,7 @@ export class Payer extends BaseEntity {
 
   @Column({ nullable: true })
   city?: string;
+
+  @Column({ unique: true, nullable: true }) // TODO: remove this nullable later!
+  referralCode: string;
 }
