@@ -1,4 +1,11 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { _404 } from '../../common/constants/errors';
 import { Public } from '../../common/decorators/public.decorator';
@@ -9,8 +16,10 @@ import {
   SessionVerifyEmailOTPRequestDto,
 } from './dto/create-session.dto';
 import {
+  ResetPasswordDto,
   SessionResponseDto,
   SessionVerifyEmailOTPResponseDto,
+  UpdatePasswordDto,
 } from './dto/session.dto';
 import { SessionService } from './session.service';
 
@@ -54,5 +63,24 @@ export class SessionController {
   ): Promise<SessionVerifyEmailOTPResponseDto> {
     const { email, otpCode } = payload;
     return this.sessionService.validateEmailOTP(email, otpCode);
+  }
+
+  @Post('/reset-password')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<void> {
+    const { email } = resetPasswordDto;
+    return this.sessionService.resetPassword(email);
+  }
+
+  @Put('/reset-password')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  async updatePassword(
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ): Promise<Record<string, any>> {
+    return this.sessionService.updatePassword(updatePasswordDto);
   }
 }

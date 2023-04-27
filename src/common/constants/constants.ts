@@ -9,5 +9,6 @@ export const ROLES = 'Roles';
 
 export const AUTO_FORGOT_TTL = 180;
 
-
 export const SALT_ROUNDS = 10;
+
+export const DAY = 1000 * 60 * 60 * 24; // 1 day

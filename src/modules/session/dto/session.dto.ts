@@ -33,3 +33,27 @@ export class SessionVerifyEmailOTPResponseDto {
   @IsUUID()
   emailVerificationToken: string;
 }
+
+export class ResetPasswordDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+}
+
+export class UpdatePasswordDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  @IsString()
+  password: string;
+
+  @IsNotEmpty()
+  @IsString()
+  confirmPassword: string;
+
+  @IsNotEmpty()
+  @IsString()
+  token: string;
+}

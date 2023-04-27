@@ -1,26 +1,30 @@
 export const _400 = {
   MALFORMED_INPUTS_PROVIDED: {
     code: 'MALFORMED_INPUTS_PROVIDED',
-    message: 'Some of provided data are missing or not allowed',
+    description: 'Some of provided data are missing or not allowed',
+  },
+  PASSWORD_MISMATCH: {
+    code: 'PASSWORD_MISMATCH',
+    description: 'Passwords do not match!',
   },
 };
 
 export const _401 = {
   AUTH_INVALID_TOKEN: {
     code: 'AUTH_INVALID_TOKEN',
-    message: 'Invalid JWToken',
+    description: 'Invalid JWToken',
   },
   AUTH_TOKEN_EXPIRED: {
     code: 'AUTH_TOKEN_EXPIRED',
-    message: 'Provided JWToken is expired',
+    description: 'Provided JWToken is expired',
   },
   MALFORMED_TOKEN: {
     code: 'MALFORMED_TOKEN',
-    message: 'Provided JwToken is malformed.',
+    description: 'Provided JwToken is malformed.',
   },
   INVALID_CREDENTIALS: {
     code: 'INVALID_CREDENTIALS',
-    message: 'Invalid credentials was provided',
+    description: 'Invalid credentials was provided',
   },
 };
 
@@ -45,6 +49,10 @@ export const _403 = {
   PATIENT_ALREADY_EXISTS: {
     code: 'PATIENT_ALREADY_EXISTS',
     description: 'Patient already registered!',
+  },
+  INVALID_RESET_TOKEN: {
+    code: 'INVALID_RESET_TOKEN',
+    description: 'Invalid reset token provided!',
   },
 };
 

@@ -26,3 +26,11 @@ export const randomSixDigitNumber = (): number => {
   const randomNumber = randomBytes.readUIntBE(0, 3); // Read as unsigned 24-bit integer
   return randomNumber % 1000000; // Modulo to get 6 digits
 };
+
+/**
+ * This helper function generate random hex string for password reset
+ *
+ */
+export const generateRandomResetPasswordToken = (): string => {
+  return crypto.randomBytes(16).toString('hex');
+};

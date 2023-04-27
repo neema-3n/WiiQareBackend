@@ -13,7 +13,11 @@ import * as bcrypt from 'bcrypt';
 import { isEmpty } from 'class-validator';
 import * as crypto from 'crypto';
 import { _400, _401, _403, _404, _500 } from 'src/common/constants/errors';
-import { logError, randomSixDigitNumber } from 'src/helpers/common.helper';
+import {
+  generateRandomResetPasswordToken,
+  logError,
+  randomSixDigitNumber,
+} from 'src/helpers/common.helper';
 import { User } from 'src/modules/session/entities/user.entity';
 import { FindOneOptions, Repository } from 'typeorm';
 import { UserRole, UserStatus } from '../../common/constants/enums';
@@ -26,7 +30,9 @@ import { JwtClaimsDataDto } from './dto/jwt-claims-data.dto';
 import {
   SessionResponseDto,
   SessionVerifyEmailOTPResponseDto,
+  UpdatePasswordDto,
 } from './dto/session.dto';
+import { APP_NAME, DAY } from '../../common/constants/constants';
 
 @Injectable()
 export class SessionService {
@@ -195,5 +201,71 @@ export class SessionService {
    */
   generateEmailVerificationHash(email: string, otpCode: number): string {
     return this.hashDataToHex(`${email}:${otpCode}`);
+  }
+
+  /**
+   * This helper function is used to reset and send an email to reset password
+   *
+   * @param email
+   */
+  async resetPassword(email: string): Promise<void> {
+    // find user with provided password
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) throw new NotFoundException(_404.USER_NOT_FOUND);
+
+    // generate random reset password token
+    const resetToken = generateRandomResetPasswordToken();
+
+    // save reset token in cache
+    const cacheToken = `${APP_NAME}:reset:${resetToken}`;
+
+    // cache key with 1 day ttl
+    await this.cachingService.save(cacheToken, email, DAY);
+
+    // send reset password email with url with token
+    await this.mailService.sendResetPasswordEmail(email, resetToken);
+  }
+
+  /**
+   * This function is used to update password to newest
+   *
+   */
+  async updatePassword(
+    updatePasswordDto: UpdatePasswordDto,
+  ): Promise<Record<string, any>> {
+    const { email, password, confirmPassword, token } = updatePasswordDto;
+
+    const user: User = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) throw new NotFoundException(_404.USER_NOT_FOUND);
+
+    // Validate if token is valid
+    const cachedToken = `${APP_NAME}:reset:${token}`;
+
+    const cachedEmail = await this.cachingService.get<string>(cachedToken);
+
+    if (!cachedEmail) throw new ForbiddenException(_403.INVALID_RESET_TOKEN);
+
+    if (cachedEmail !== email)
+      throw new ForbiddenException(_403.INVALID_RESET_TOKEN);
+
+    // Validate if password is valid
+    if (password !== confirmPassword)
+      throw new BadRequestException(_400.PASSWORD_MISMATCH);
+
+    // Hash password
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    const updatedUser: User = await this.userRepository.save({
+      ...user,
+      password: hashedPassword,
+    });
+
+    return {
+      status: 200,
+      userId: updatedUser.id,
+      message: 'Password updated successfully',
+    };
   }
 }
