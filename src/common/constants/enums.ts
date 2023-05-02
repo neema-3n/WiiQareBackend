@@ -11,6 +11,12 @@ export enum UserRole {
   PROVIDER = 'PROVIDER',
 }
 
+export enum UserType {
+  PAYER = 'PAYER',
+  PATIENT = 'PATIENT',
+  PROVIDER = 'PROVIDER',
+}
+
 export enum VoucherStatus {
   CLAIMED = 'CLAIMED',
   UNCLAIMED = 'UNCLAIMED',

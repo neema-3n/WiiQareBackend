@@ -19,6 +19,7 @@ import { PayerSvcModule } from './modules/payer-svc/payer-svc.module';
 import { ProviderSvcModule } from './modules/provider-svc/provider-svc.module';
 import { SessionModule } from './modules/session/session.module';
 import { SmartContractModule } from './modules/smart-contract/smart-contract.module';
+import { MessagingModule } from './modules/messaging/messaging.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { SmartContractModule } from './modules/smart-contract/smart-contract.mod
     ProviderSvcModule,
     CommonModule,
     SmartContractModule,
+    MessagingModule,
   ],
   controllers: [],
   providers: [
