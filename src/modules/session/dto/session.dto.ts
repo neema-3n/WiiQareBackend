@@ -42,10 +42,6 @@ export class ResetPasswordDto {
 
 export class UpdatePasswordDto {
   @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
   @IsString()
   password: string;
 
@@ -55,5 +51,5 @@ export class UpdatePasswordDto {
 
   @IsNotEmpty()
   @IsString()
-  token: string;
+  resetPasswordToken: string;
 }

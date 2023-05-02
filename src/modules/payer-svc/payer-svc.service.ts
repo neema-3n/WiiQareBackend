@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { AppConfigService } from '../../config/app-config.service';
 import { Payer } from './entities/payer.entity';
 import { CreatePayerAccountDto } from './dto/payer.dto';
@@ -8,6 +8,7 @@ import { User } from '../session/entities/user.entity';
 import { UserRole, UserStatus } from '../../common/constants/enums';
 import { SALT_ROUNDS } from '../../common/constants/constants';
 import * as bcrypt from 'bcrypt';
+import { AppDataSource } from '../../db/data-source';
 
 @Injectable()
 export class PayerSvcService {
@@ -16,6 +17,7 @@ export class PayerSvcService {
     private readonly payerRepository: Repository<Payer>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectDataSource(AppDataSource) private readonly dataSource: DataSource,
     private readonly appConfigService: AppConfigService,
   ) {}
 
@@ -62,6 +64,16 @@ export class PayerSvcService {
 
     const hashedPassword = bcrypt.hashSync(password, SALT_ROUNDS);
 
+    // Get next sequence
+    const [result] = await this.dataSource
+      .createQueryBuilder()
+      .select(`nextval('referral_codes') as id`)
+      .execute();
+
+    const referralCode = `REF-${result.id}`;
+
+    console.log(`see ->`, referralCode);
+
     const payerToBeCreated = this.payerRepository.create({
       user: {
         phoneNumber: phoneNumber,
@@ -73,6 +85,7 @@ export class PayerSvcService {
       firstName: firstName,
       lastName: lastName,
       country,
+      referralCode,
     });
     return this.payerRepository.save(payerToBeCreated);
   }

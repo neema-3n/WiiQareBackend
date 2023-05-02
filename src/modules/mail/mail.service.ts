@@ -11,7 +11,7 @@ export class MailService {
    * @param email
    * @param token
    */
-  async sendOTPEmail(email: string, token: number) {
+  async sendOTPEmail(email: string, token: string): Promise<void> {
     const url = `https://wiiqare-app.com/auth/confirm?token=${token}`;
 
     await this.mailerService.sendMail({

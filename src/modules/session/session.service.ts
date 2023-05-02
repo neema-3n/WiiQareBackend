@@ -2,7 +2,6 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -12,14 +11,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { isEmpty } from 'class-validator';
 import * as crypto from 'crypto';
-import { _400, _401, _403, _404, _500 } from 'src/common/constants/errors';
+import { _400, _401, _403, _404 } from 'src/common/constants/errors';
 import {
   generateRandomResetPasswordToken,
-  logError,
-  randomSixDigitNumber,
+  randomSixDigit,
 } from 'src/helpers/common.helper';
 import { User } from 'src/modules/session/entities/user.entity';
 import { FindOneOptions, Repository } from 'typeorm';
+import { APP_NAME, DAY } from '../../common/constants/constants';
 import { UserRole, UserStatus } from '../../common/constants/enums';
 import { AppConfigService } from '../../config/app-config.service';
 import { CachingService } from '../caching/caching.service';
@@ -32,7 +31,6 @@ import {
   SessionVerifyEmailOTPResponseDto,
   UpdatePasswordDto,
 } from './dto/session.dto';
-import { APP_NAME, DAY } from '../../common/constants/constants';
 
 @Injectable()
 export class SessionService {
@@ -131,17 +129,12 @@ export class SessionService {
     if (userExist)
       throw new ForbiddenException(_403.USER_ACCOUNT_ALREADY_EXIST);
 
-    const randomSixDigitsNumber = randomSixDigitNumber();
+    const randomSixDigits = randomSixDigit();
 
-    if (isEmpty(randomSixDigitsNumber)) {
-      logError(`see -> ${randomSixDigitsNumber}`);
-      throw new InternalServerErrorException(_500.INTERNAL_SERVER_ERROR);
-    }
-
-    const key = `wiiQare:otp:${randomSixDigitsNumber}`;
+    const key = `wiiQare:otp:${randomSixDigits}`;
     await this.cachingService.save(key, email, 180_000); //TTL 3min in mms
 
-    return this.mailService.sendOTPEmail(email, randomSixDigitsNumber);
+    return this.mailService.sendOTPEmail(email, randomSixDigits);
   }
 
   /**
@@ -234,21 +227,20 @@ export class SessionService {
   async updatePassword(
     updatePasswordDto: UpdatePasswordDto,
   ): Promise<Record<string, any>> {
-    const { email, password, confirmPassword, token } = updatePasswordDto;
+    const { password, confirmPassword, resetPasswordToken } = updatePasswordDto;
 
-    const user: User = await this.userRepository.findOne({ where: { email } });
-
-    if (!user) throw new NotFoundException(_404.USER_NOT_FOUND);
-
-    // Validate if token is valid
-    const cachedToken = `${APP_NAME}:reset:${token}`;
+    // validate if token is valid
+    const cachedToken = `${APP_NAME}:reset:${resetPasswordToken}`;
 
     const cachedEmail = await this.cachingService.get<string>(cachedToken);
 
     if (!cachedEmail) throw new ForbiddenException(_403.INVALID_RESET_TOKEN);
 
-    if (cachedEmail !== email)
-      throw new ForbiddenException(_403.INVALID_RESET_TOKEN);
+    const user: User = await this.userRepository.findOne({
+      where: { email: cachedEmail },
+    });
+
+    if (!user) throw new NotFoundException(_404.USER_NOT_FOUND);
 
     // Validate if password is valid
     if (password !== confirmPassword)

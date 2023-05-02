@@ -15,6 +15,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       username: this.appConfigService.dbUser,
       password: this.appConfigService.dbPass,
       database: this.appConfigService.dbName,
+      schema: 'public',
       synchronize: this.appConfigService.isProduction !== true,
       dropSchema: false,
       keepConnectionAlive: true,
