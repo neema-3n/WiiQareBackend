@@ -99,4 +99,8 @@ export class EnvironmentVariables {
   @Expose()
   @IsNotEmpty()
   SMTP_PASSWORD: string;
+
+  @Expose()
+  @IsNotEmpty()
+  SMS_API_KEY: string;
 }

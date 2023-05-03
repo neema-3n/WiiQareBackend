@@ -5,9 +5,8 @@ import {
   IsISO31661Alpha2,
   IsNotEmpty,
   IsOptional,
-  IsPhoneNumber,
   IsString,
-  IsUUID,
+  IsUUID
 } from 'class-validator';
 import { InviteType } from 'src/common/constants/enums';
 
@@ -62,7 +61,6 @@ export class SendInviteDto {
   emails?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsPhoneNumber()
+  @IsString({ each: true })
   phoneNumbers: string[];
 }

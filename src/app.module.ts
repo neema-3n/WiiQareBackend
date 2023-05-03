@@ -14,12 +14,13 @@ import { TypeOrmConfigService } from './db/typeorm-config.service';
 import { AdministrationSvcModule } from './modules/administration-svc/adminstration-svc.module';
 import { CachingModule } from './modules/caching/caching.module';
 import { MailModule } from './modules/mail/mail.module';
+import { MessagingModule } from './modules/messaging/messaging.module';
 import { PatientSvcModule } from './modules/patient-svc/patient-svc.module';
 import { PayerSvcModule } from './modules/payer-svc/payer-svc.module';
 import { ProviderSvcModule } from './modules/provider-svc/provider-svc.module';
 import { SessionModule } from './modules/session/session.module';
 import { SmartContractModule } from './modules/smart-contract/smart-contract.module';
-import { MessagingModule } from './modules/messaging/messaging.module';
+import { SMSModule } from './modules/sms/sms.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { MessagingModule } from './modules/messaging/messaging.module';
     CommonModule,
     SmartContractModule,
     MessagingModule,
+    SMSModule,
   ],
   controllers: [],
   providers: [
@@ -50,4 +52,4 @@ import { MessagingModule } from './modules/messaging/messaging.module';
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
-export class AppModule {}
+export class AppModule { }

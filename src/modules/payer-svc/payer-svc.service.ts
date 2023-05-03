@@ -13,6 +13,7 @@ import { InviteType, UserRole, UserStatus } from '../../common/constants/enums';
 import { MailService } from '../mail/mail.service';
 import { JwtClaimsDataDto } from '../session/dto/jwt-claims-data.dto';
 import { User } from '../session/entities/user.entity';
+import { SmsService } from '../sms/sms.service';
 import { CreatePayerAccountDto, SendInviteDto } from './dto/payer.dto';
 import { Payer } from './entities/payer.entity';
 
@@ -24,6 +25,7 @@ export class PayerSvcService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly mailService: MailService,
+    private readonly smsService: SmsService,
   ) { }
 
   /**
@@ -138,6 +140,6 @@ export class PayerSvcService {
     names: string,
     referralCode: string,
   ): Promise<void> {
-    return;
+    return this.smsService.sendSmsTOFriend(phoneNumbers, names, referralCode);
   }
 }

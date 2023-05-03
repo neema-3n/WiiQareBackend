@@ -105,4 +105,8 @@ export class AppConfigService {
   get smtpPassword(): string {
     return this.configService.get('SMTP_PASSWORD');
   }
+
+  get smsApiKey(): string {
+    return this.configService.get('SMS_API_KEY');
+  }
 }
