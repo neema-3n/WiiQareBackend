@@ -7,6 +7,14 @@ export const _400 = {
     code: 'PASSWORD_MISMATCH',
     description: 'Passwords do not match!',
   },
+  EMAIL_REQUIRED: {
+    code: 'EMAIL_REQUIRED',
+    description: 'Email is required!',
+  },
+  PHONE_NUMBER_REQUIRED: {
+    code: 'PHONE_NUMBER_REQUIRED',
+    description: 'Phone number is required!',
+  },
 };
 
 export const _401 = {

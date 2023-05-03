@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {}
+  constructor(private mailerService: MailerService) { }
 
   /**
    * This method sends  OTP email during registration
@@ -43,6 +43,27 @@ export class MailService {
       context: {
         email,
         resetUrl,
+        year: `© ${new Date().getFullYear()}`,
+      },
+    });
+  }
+
+  /**
+   * This method sends an Invite email to join wiiqare
+   *
+   */
+  async sendInviteEmail(
+    emails: string | string[],
+    names: string,
+    referralCode: string,
+  ): Promise<void> {
+    await this.mailerService.sendMail({
+      to: emails,
+      subject: 'You have been invited to join WiiQare',
+      template: './send-invite',
+      context: {
+        names,
+        referralCode,
         year: `© ${new Date().getFullYear()}`,
       },
     });

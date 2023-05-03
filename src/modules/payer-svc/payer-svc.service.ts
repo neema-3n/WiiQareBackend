@@ -1,14 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
-import { AppConfigService } from '../../config/app-config.service';
-import { Payer } from './entities/payer.entity';
-import { CreatePayerAccountDto } from './dto/payer.dto';
-import { User } from '../session/entities/user.entity';
-import { UserRole, UserStatus } from '../../common/constants/enums';
-import { SALT_ROUNDS } from '../../common/constants/constants';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { AppDataSource } from '../../db/data-source';
+import { customAlphabet } from 'nanoid';
+import { _400, _404 } from 'src/common/constants/errors';
+import { Repository } from 'typeorm';
+import { SALT_ROUNDS } from '../../common/constants/constants';
+import { InviteType, UserRole, UserStatus } from '../../common/constants/enums';
+import { MailService } from '../mail/mail.service';
+import { JwtClaimsDataDto } from '../session/dto/jwt-claims-data.dto';
+import { User } from '../session/entities/user.entity';
+import { CreatePayerAccountDto, SendInviteDto } from './dto/payer.dto';
+import { Payer } from './entities/payer.entity';
 
 @Injectable()
 export class PayerSvcService {
@@ -17,9 +23,8 @@ export class PayerSvcService {
     private readonly payerRepository: Repository<Payer>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectDataSource(AppDataSource) private readonly dataSource: DataSource,
-    private readonly appConfigService: AppConfigService,
-  ) {}
+    private readonly mailService: MailService,
+  ) { }
 
   /**
    * This function retrieve payer account related by Entity Id
@@ -64,15 +69,9 @@ export class PayerSvcService {
 
     const hashedPassword = bcrypt.hashSync(password, SALT_ROUNDS);
 
-    // Get next sequence
-    const [result] = await this.dataSource
-      .createQueryBuilder()
-      .select(`nextval('referral_codes') as id`)
-      .execute();
+    const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10);
 
-    const referralCode = `REF-${result.id}`;
-
-    console.log(`see ->`, referralCode);
+    const referralCode = `REF-${nanoid(6)}`; //=> "REF-f01a2f"
 
     const payerToBeCreated = this.payerRepository.create({
       user: {
@@ -88,5 +87,57 @@ export class PayerSvcService {
       referralCode,
     });
     return this.payerRepository.save(payerToBeCreated);
+  }
+
+  /**
+   * This method is used to send invite to friend to join wiiqare
+   *
+   */
+  async sendInviteToFriend(
+    sendInviteDto: SendInviteDto,
+    authUser: JwtClaimsDataDto,
+  ): Promise<void> {
+    const { inviteType, emails, phoneNumbers } = sendInviteDto;
+
+    const inviteFromUser = await this.payerRepository
+      .createQueryBuilder('payer')
+      .leftJoinAndSelect('payer.user', 'user')
+      .where('user.id = :userId', { userId: authUser.sub })
+      .getOne();
+
+    if (!inviteFromUser) throw new NotFoundException(_404.USER_NOT_FOUND);
+
+    if (inviteType === InviteType.EMAIL && emails.length == 0)
+      throw new BadRequestException(_400.EMAIL_REQUIRED);
+
+    if (inviteType === InviteType.SMS && phoneNumbers.length == 0)
+      throw new BadRequestException(_400.PHONE_NUMBER_REQUIRED);
+
+    if (inviteType === InviteType.EMAIL && emails.length > 0) {
+      await this.mailService.sendInviteEmail(
+        emails,
+        authUser.names,
+        inviteFromUser.referralCode,
+      );
+    }
+
+    if (inviteType === InviteType.SMS && phoneNumbers.length > 0) {
+      await this.sendSMSInviteToFriend(
+        phoneNumbers,
+        authUser.names,
+        inviteFromUser.referralCode,
+      );
+    }
+  }
+
+  /**
+   * This function is used to send SMS Invite to friend by phone numbers
+   */
+  async sendSMSInviteToFriend(
+    phoneNumbers: string[],
+    names: string,
+    referralCode: string,
+  ): Promise<void> {
+    return;
   }
 }

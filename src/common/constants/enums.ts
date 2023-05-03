@@ -22,3 +22,8 @@ export enum VoucherStatus {
   UNCLAIMED = 'UNCLAIMED',
   BURNED = 'BURNED',
 }
+
+export enum InviteType {
+  SMS = 'SMS',
+  EMAIL = 'EMAIL',
+}

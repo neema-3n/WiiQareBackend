@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MailModule } from '../mail/mail.module';
 import { PatientSvcModule } from '../patient-svc/patient-svc.module';
 import { User } from '../session/entities/user.entity';
 import { SessionModule } from '../session/session.module';
@@ -11,10 +12,11 @@ import { PayerSvcService } from './payer-svc.service';
   imports: [
     TypeOrmModule.forFeature([Payer, User]),
     forwardRef(() => SessionModule),
+    MailModule,
     PatientSvcModule,
   ],
   controllers: [PayerSvcController],
   providers: [PayerSvcService],
   exports: [PayerSvcService],
 })
-export class PayerSvcModule {}
+export class PayerSvcModule { }

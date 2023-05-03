@@ -14,6 +14,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isEmpty } from 'class-validator';
 import { UserRole } from 'src/common/constants/enums';
+import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { Public } from 'src/common/decorators/public.decorator';
 import { Roles } from 'src/common/decorators/user-role.decorator';
 import { Repository } from 'typeorm';
@@ -24,9 +25,14 @@ import {
   PatientResponseDto,
 } from '../patient-svc/dto/patient.dto';
 import { PatientSvcService } from '../patient-svc/patient-svc.service';
+import { JwtClaimsDataDto } from '../session/dto/jwt-claims-data.dto';
 import { User } from '../session/entities/user.entity';
 import { SessionService } from '../session/session.service';
-import { CreatePayerAccountDto, SearchPatientDto } from './dto/payer.dto';
+import {
+  CreatePayerAccountDto,
+  SearchPatientDto,
+  SendInviteDto,
+} from './dto/payer.dto';
 import { Payer } from './entities/payer.entity';
 import { PayerSvcService } from './payer-svc.service';
 
@@ -40,7 +46,7 @@ export class PayerSvcController {
     private readonly cachingService: CachingService,
     private readonly sessionService: SessionService,
     private readonly patientService: PatientSvcService,
-  ) {}
+  ) { }
 
   @Get('patient')
   @Roles(UserRole.PAYER)
@@ -114,5 +120,18 @@ export class PayerSvcController {
     @Body() createPatientAccountDto: CreatePatientDto,
   ): Promise<PatientResponseDto> {
     return await this.patientService.registerPatient(createPatientAccountDto);
+  }
+
+  @Post('send-invite')
+  @Roles(UserRole.PAYER)
+  @ApiOperation({
+    summary:
+      'This API is used by PAYER to send invitation to friends to join WiiQare.',
+  })
+  async sendInviteToFriend(
+    @Body() sendInviteDto: SendInviteDto,
+    @AuthUser() authUser: JwtClaimsDataDto,
+  ): Promise<void> {
+    await this.payerService.sendInviteToFriend(sendInviteDto, authUser);
   }
 }
