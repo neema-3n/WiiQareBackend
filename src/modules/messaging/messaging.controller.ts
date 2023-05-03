@@ -39,12 +39,12 @@ export class MessagingController {
 
   @Post('send')
   @ApiOperation({ summary: 'Send a message to WiiQare Team' })
-  @Roles(UserRole.PATIENT)
+  @Roles(UserRole.PATIENT, UserRole.PROVIDER, UserRole.PAYER)
   send(
     @Body() sendMessageDto: SendMessageDto,
     @AuthUser() authUser: JwtClaimsDataDto,
   ) {
     const { senderId, message } = sendMessageDto;
-    return this.messagingService.sendMessage(senderId, message);
+    return this.messagingService.sendMessage(senderId, message, authUser);
   }
 }
