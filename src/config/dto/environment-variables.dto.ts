@@ -1,5 +1,11 @@
-import { Exclude, Expose } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { Exclude, Expose, Type } from 'class-transformer';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export enum Environment {
   Development = 'development',
@@ -103,4 +109,24 @@ export class EnvironmentVariables {
   @Expose()
   @IsNotEmpty()
   SMS_API_KEY: string;
+
+  @Expose()
+  @IsNotEmpty()
+  MINIO_ENDPOINT: string;
+
+  @Expose()
+  @IsNotEmpty()
+  @IsNumber()
+  @Type(() => Number)
+  MINIO_PORT: number;
+
+  @Expose()
+  @IsString()
+  @IsNotEmpty()
+  MINIO_ACCESS_KEY: string;
+
+  @Expose()
+  @IsString()
+  @IsNotEmpty()
+  MINIO_SECRET_KEY: string;
 }

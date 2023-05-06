@@ -12,10 +12,7 @@ import * as bcrypt from 'bcrypt';
 import { isEmpty } from 'class-validator';
 import * as crypto from 'crypto';
 import { _400, _401, _403, _404 } from 'src/common/constants/errors';
-import {
-  generateRandomResetPasswordToken,
-  randomSixDigit,
-} from 'src/helpers/common.helper';
+import { generateToken, randomSixDigit } from 'src/helpers/common.helper';
 import { User } from 'src/modules/session/entities/user.entity';
 import { FindOneOptions, Repository } from 'typeorm';
 import { APP_NAME, DAY } from '../../common/constants/constants';
@@ -208,7 +205,7 @@ export class SessionService {
     if (!user) throw new NotFoundException(_404.USER_NOT_FOUND);
 
     // generate random reset password token
-    const resetToken = generateRandomResetPasswordToken();
+    const resetToken = generateToken();
 
     // save reset token in cache
     const cacheToken = `${APP_NAME}:reset:${resetToken}`;

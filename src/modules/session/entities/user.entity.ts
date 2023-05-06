@@ -24,5 +24,4 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   password: string;
 
-  //TODO: adds fields for google and apple authentication!
 }

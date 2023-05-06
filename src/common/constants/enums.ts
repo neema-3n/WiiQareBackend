@@ -27,3 +27,10 @@ export enum InviteType {
   SMS = 'SMS',
   EMAIL = 'EMAIL',
 }
+export enum BusinessType {
+  CLINIC = 'CLINIC',
+  PHARMACY = 'PHARMACY',
+  HOSPITAL = 'HOSPITAL',
+  DENTIST = 'DENTIST',
+  MEDICAL_CABINET = 'MEDICAL_CABINET',
+}

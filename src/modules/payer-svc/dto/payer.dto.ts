@@ -6,7 +6,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID
+  IsUUID,
 } from 'class-validator';
 import { InviteType } from 'src/common/constants/enums';
 
@@ -42,7 +42,6 @@ export class CreatePayerAccountDto {
 
 export class SearchPatientDto {
   @IsOptional()
-  @IsEmail()
   phoneNumber?: string;
 
   @IsOptional()

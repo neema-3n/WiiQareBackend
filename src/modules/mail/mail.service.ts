@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) { }
+  constructor(private mailerService: MailerService) {}
 
   /**
    * This method sends  OTP email during registration
@@ -64,6 +64,27 @@ export class MailService {
       context: {
         names,
         referralCode,
+        year: `© ${new Date().getFullYear()}`,
+      },
+    });
+  }
+
+  /**
+   * This method sends a email for verifying Provider account
+   */
+  async sendProviderVerificationEmail(
+    email: string,
+    token: string,
+  ): Promise<void> {
+    const verifyEmail = `https://wiiqare-app.com/register?email-verification=${token}`;
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'WiiQare, Please validate email to continue registration',
+      template: './verify-provider', // `.hbs` extension is appended automatically
+      context: {
+        email,
+        verifyEmail,
         year: `© ${new Date().getFullYear()}`,
       },
     });

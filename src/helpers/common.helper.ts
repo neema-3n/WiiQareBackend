@@ -28,6 +28,6 @@ export const randomSixDigit = (): string => {
  * This helper function generate random hex string for password reset
  *
  */
-export const generateRandomResetPasswordToken = (): string => {
+export const generateToken = (): string => {
   return crypto.randomBytes(16).toString('hex');
 };

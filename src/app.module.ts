@@ -15,6 +15,7 @@ import { AdministrationSvcModule } from './modules/administration-svc/adminstrat
 import { CachingModule } from './modules/caching/caching.module';
 import { MailModule } from './modules/mail/mail.module';
 import { MessagingModule } from './modules/messaging/messaging.module';
+import { ObjectStorageModule } from './modules/object-storage/object-storage.module';
 import { PatientSvcModule } from './modules/patient-svc/patient-svc.module';
 import { PayerSvcModule } from './modules/payer-svc/payer-svc.module';
 import { ProviderSvcModule } from './modules/provider-svc/provider-svc.module';
@@ -44,6 +45,7 @@ import { SMSModule } from './modules/sms/sms.module';
     SmartContractModule,
     MessagingModule,
     SMSModule,
+    ObjectStorageModule,
   ],
   controllers: [],
   providers: [

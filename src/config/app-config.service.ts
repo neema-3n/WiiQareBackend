@@ -109,4 +109,19 @@ export class AppConfigService {
   get smsApiKey(): string {
     return this.configService.get('SMS_API_KEY');
   }
+
+  get objectStorageUrl(): string {
+    return this.configService.get('MINIO_ENDPOINT');
+  }
+  get objectStoragePort(): number {
+    return this.configService.get('MINIO_PORT');
+  }
+
+  get objectStorageAccessKey(): string {
+    return this.configService.get('MINIO_ACCESS_KEY');
+  }
+
+  get objectStorageSecretKey(): string {
+    return this.configService.get('MINIO_SECRET_KEY');
+  }
 }

@@ -25,9 +25,21 @@ services:
       - .env
     volumes:
       - 'redis_data:/bitnami/redis/data'
+  minio:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    ports:
+      - 9000:9000
+    volumes:
+      - 'minio_data:/data'
 
 volumes:
   redis_data:
     driver: local
   data:
     driver: local
+  minio_data:
+    driver: local  

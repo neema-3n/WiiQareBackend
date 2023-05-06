@@ -62,6 +62,10 @@ export const _403 = {
     code: 'INVALID_RESET_TOKEN',
     description: 'Invalid reset token provided!',
   },
+  INVALID_EMAIL_VERIFICATION_TOKEN: {
+    code: 'INVALID_EMAIL_VERIFICATION_TOKEN',
+    description: 'Invalid email verification token provided!',
+  },
   ACCESS_NOT_ALLOWED: {
     code: 'ACCESS_NOT_ALLOWED',
     description: 'Access not allowed!',
