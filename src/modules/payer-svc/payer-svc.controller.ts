@@ -32,6 +32,7 @@ import {
   CreatePayerAccountDto,
   SearchPatientDto,
   SendInviteDto,
+  SendSmsVoucherDto
 } from './dto/payer.dto';
 import { Payer } from './entities/payer.entity';
 import { PayerSvcService } from './payer-svc.service';
@@ -141,9 +142,10 @@ export class PayerSvcController {
     summary: 'This API is used by PAYER to send SMS voucher.',
   })
   async sendSmsVoucher(
-    @Body('shortenHash') shortenHash: string,
+    @Body() sendSmsVoucherDto: SendSmsVoucherDto,
     @AuthUser() authUser: JwtClaimsDataDto,
   ): Promise<void> {
+    const { shortenHash } = sendSmsVoucherDto;
     return await this.payerService.sendSmsVoucher(shortenHash, authUser);
   }
 }

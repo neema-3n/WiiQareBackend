@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Length,
 } from 'class-validator';
 import { InviteType } from 'src/common/constants/enums';
 
@@ -62,4 +63,11 @@ export class SendInviteDto {
   @IsOptional()
   @IsString({ each: true })
   phoneNumbers: string[];
+}
+
+export class SendSmsVoucherDto {
+  @IsNotEmpty()
+  @IsString()
+  @Length(8, 8)
+  shortenHash: string;
 }
