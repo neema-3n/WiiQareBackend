@@ -10,7 +10,7 @@ import {
 
 export class CreatePatientDto {
   @IsOptional()
-  phoneNumber: string;
+  phoneNumber?: string;
 
   @IsNotEmpty()
   @IsString()

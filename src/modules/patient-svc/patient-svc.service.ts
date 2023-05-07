@@ -17,7 +17,7 @@ export class PatientSvcService {
     private readonly patientRepository: Repository<Patient>,
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
-  ) {}
+  ) { }
 
   /**
    * This function is used to register a patient account
