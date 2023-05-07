@@ -40,7 +40,8 @@ export class Transaction extends BaseEntity {
   @Column()
   transactionHash: string;
 
-  @Column()
+  //TODO: @remove nullable later!
+  @Column({ nullable: true })
   shortenHash: string;
 
   @Column()
