@@ -1,18 +1,21 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { customAlphabet } from 'nanoid';
-import { _400, _404 } from 'src/common/constants/errors';
+import { _400, _403, _404 } from 'src/common/constants/errors';
 import { Repository } from 'typeorm';
 import { SALT_ROUNDS } from '../../common/constants/constants';
 import { InviteType, UserRole, UserStatus } from '../../common/constants/enums';
 import { MailService } from '../mail/mail.service';
+import { Patient } from '../patient-svc/entities/patient.entity';
 import { JwtClaimsDataDto } from '../session/dto/jwt-claims-data.dto';
 import { User } from '../session/entities/user.entity';
+import { Transaction } from '../smart-contract/entities/transaction.entity';
 import { SmsService } from '../sms/sms.service';
 import { CreatePayerAccountDto, SendInviteDto } from './dto/payer.dto';
 import { Payer } from './entities/payer.entity';
@@ -20,10 +23,14 @@ import { Payer } from './entities/payer.entity';
 @Injectable()
 export class PayerSvcService {
   constructor(
+    @InjectRepository(Patient)
+    private readonly patientRepository: Repository<Patient>,
     @InjectRepository(Payer)
     private readonly payerRepository: Repository<Payer>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Transaction)
+    private readonly transactionRepository: Repository<Transaction>,
     private readonly mailService: MailService,
     private readonly smsService: SmsService,
   ) { }
@@ -141,5 +148,44 @@ export class PayerSvcService {
     referralCode: string,
   ): Promise<void> {
     return this.smsService.sendSmsTOFriend(phoneNumbers, names, referralCode);
+  }
+
+  /**
+   * This function is used to send voucher by SMS
+   *
+   */
+  async sendSmsVoucher(
+    shortenHash: string,
+    authUser: JwtClaimsDataDto,
+  ): Promise<void> {
+    const [payer, transaction] = await Promise.all([
+      this.payerRepository
+        .createQueryBuilder('payer')
+        .leftJoinAndSelect('payer.user', 'user')
+        .where('user.id = :userId', { userId: authUser.sub })
+        .getOne(),
+      this.transactionRepository.findOne({ where: { shortenHash } }),
+    ]);
+
+    if (!payer) throw new NotFoundException(_404.PAYER_NOT_FOUND);
+
+    if (!transaction)
+      throw new NotFoundException(_404.INVALID_TRANSACTION_HASH);
+
+    if (transaction.senderId !== authUser.sub)
+      throw new ForbiddenException(_403.ONLY_OWNER_CAN_SEND_VOUCHER);
+
+    const patient = await this.patientRepository.findOne({
+      where: { id: transaction.patientId },
+    });
+
+    if (!patient) throw new NotFoundException(_404.PATIENT_NOT_FOUND);
+
+    await this.smsService.sendVoucherAsAnSMS(
+      transaction.shortenHash,
+      patient.phoneNumber,
+      authUser.names,
+      transaction.amount,
+    );
   }
 }

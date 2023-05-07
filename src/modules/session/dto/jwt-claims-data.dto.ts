@@ -1,10 +1,10 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
-import { UserRole, UserStatus } from "src/common/constants/enums";
+import { IsEnum, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
+import { UserRole, UserStatus } from 'src/common/constants/enums';
 
 export class JwtClaimsDataDto {
-
-  @IsUUID() @IsNotEmpty()
-  sub: string
+  @IsUUID()
+  @IsNotEmpty()
+  sub: string;
 
   @IsNotEmpty()
   type: UserRole;
@@ -18,5 +18,4 @@ export class JwtClaimsDataDto {
   @IsNotEmpty()
   @IsEnum(UserStatus)
   status: UserStatus;
-
 }

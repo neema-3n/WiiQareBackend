@@ -134,4 +134,16 @@ export class PayerSvcController {
   ): Promise<void> {
     await this.payerService.sendInviteToFriend(sendInviteDto, authUser);
   }
+
+  @Post('send-sms-voucher')
+  @Roles(UserRole.PAYER)
+  @ApiOperation({
+    summary: 'This API is used by PAYER to send SMS voucher.',
+  })
+  async sendSmsVoucher(
+    @Body('shortenHash') shortenHash: string,
+    @AuthUser() authUser: JwtClaimsDataDto,
+  ): Promise<void> {
+    return await this.payerService.sendSmsVoucher(shortenHash, authUser);
+  }
 }

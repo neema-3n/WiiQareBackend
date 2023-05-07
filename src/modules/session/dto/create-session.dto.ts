@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
@@ -21,7 +22,8 @@ export class CreateSessionDto {
   readonly username?: string;
 
   @IsOptional()
-  @IsString()
+  @IsEmail()
+  @Transform(({ value }) => value.toLowerCase().trim())
   readonly email?: string;
 }
 

@@ -41,6 +41,9 @@ export class Transaction extends BaseEntity {
   transactionHash: string;
 
   @Column()
+  shortenHash: string;
+
+  @Column()
   stripePaymentId: string;
 
   @Column({ type: 'jsonb' })

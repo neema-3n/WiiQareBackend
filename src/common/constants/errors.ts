@@ -70,6 +70,10 @@ export const _403 = {
     code: 'ACCESS_NOT_ALLOWED',
     description: 'Access not allowed!',
   },
+  ONLY_OWNER_CAN_SEND_VOUCHER: {
+    code: 'ONLY_OWNER_CAN_SEND_VOUCHER',
+    description: 'Only owner can send voucher!',
+  },
 };
 
 export const _404 = {
@@ -81,6 +85,10 @@ export const _404 = {
   PATIENT_NOT_FOUND: {
     code: 'PATIENT_NOT_FOUND',
     description: 'Patient not found!',
+  },
+  INVALID_TRANSACTION_HASH: {
+    code: 'INVALID_TRANSACTION_HASH',
+    description: 'Invalid transaction hash provided!',
   },
 };
 

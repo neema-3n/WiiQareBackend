@@ -38,7 +38,7 @@ export class PaymentController {
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
     private readonly transactionService: TransactionService,
-  ) {}
+  ) { }
 
   @Get()
   @ApiOperation({
@@ -138,6 +138,13 @@ export class PaymentController {
             ),
           };
 
+          const transactionHash = _.get(
+            voucherData,
+            'events.mintVoucherEvent.transactionHash',
+          );
+
+          const shortenHash = transactionHash.slice(0, 8);
+
           const transactionToSave = this.transactionRepository.create({
             senderAmount: senderAmount / 100,
             senderCurrency: senderCurrency.toUpperCase(),
@@ -147,10 +154,8 @@ export class PaymentController {
             senderId,
             patientId,
             stripePaymentId,
-            transactionHash: _.get(
-              voucherData,
-              'events.mintVoucherEvent.transactionHash',
-            ),
+            transactionHash,
+            shortenHash,
             voucher: voucherToSave,
             status: 'success', //TODO: adds status to transaction
           });

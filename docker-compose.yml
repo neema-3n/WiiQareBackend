@@ -12,6 +12,8 @@ services:
       POSTGRES_DB: wiiQare-db
     volumes:
       - data:/var/lib/postgresql/data
+    networks:
+      - wiiqare-net
   redis:
     container_name: wiiQare-redis
     image: 'bitnami/redis:latest'
@@ -25,6 +27,8 @@ services:
       - .env
     volumes:
       - 'redis_data:/bitnami/redis/data'
+    networks:
+      - wiiqare-net
   minio:
     image: minio/minio
     command: server /data
@@ -35,6 +39,8 @@ services:
       - 9000:9000
     volumes:
       - 'minio_data:/data'
+    networks:
+      - wiiqare-net
 
 volumes:
   redis_data:
@@ -42,4 +48,8 @@ volumes:
   data:
     driver: local
   minio_data:
-    driver: local  
+    driver: local
+
+networks:
+  wiiqare-net:
+    driver: bridge
