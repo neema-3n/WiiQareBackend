@@ -1,28 +1,25 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   HttpCode,
   HttpStatus,
   Post,
   UploadedFile,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { _400 } from 'src/common/constants/errors';
 import { Public } from '../../common/decorators/public.decorator';
 import {
   ProviderValidateEmailDto,
   RegisterProviderDto,
 } from './dto/provider.dto';
-import { Provider } from './entities/provider.entity';
 import { ProviderService } from './provider-svc.service';
 
 @ApiTags('Provider')
 @Controller('provider')
 export class ProviderController {
-  constructor(private providerService: ProviderService) {}
+  constructor(private providerService: ProviderService) { }
 
   @Post()
   @Public()
@@ -37,7 +34,7 @@ export class ProviderController {
   registerNewProvider(
     @UploadedFile() logo: Express.Multer.File,
     @Body() registerProviderDto: RegisterProviderDto,
-  ): Promise<Provider> {
+  ): Promise<Record<string, any>> {
     return this.providerService.registerNewProvider(logo, registerProviderDto);
   }
 
@@ -48,11 +45,6 @@ export class ProviderController {
   verifyProviderEmail(
     @Body() providerValidateEmailDto: ProviderValidateEmailDto,
   ): Promise<void> {
-    const { password, confirmPassword } = providerValidateEmailDto;
-
-    if (password !== confirmPassword)
-      throw new BadRequestException(_400.PASSWORD_MISMATCH);
-
     return this.providerService.providerVerifyEmail(providerValidateEmailDto);
   }
 }

@@ -52,8 +52,4 @@ export class ProviderValidateEmailDto {
   @IsNotEmpty()
   @IsString()
   password: string;
-
-  @IsNotEmpty()
-  @IsString()
-  confirmPassword: string;
 }
