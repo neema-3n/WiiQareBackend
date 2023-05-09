@@ -53,7 +53,7 @@ export class SmsService {
       recipients: [phoneNumber],
       body: `
       Vous avez reçu le pass de santé de ${senderName} d'une valeur de ${amount} de pass santé WiiQare.
-      \n Votre code pass santé et ${shortenHash}. pour plus d'info contactez : +243 979 544 127.
+      \n Votre code pass santé et ${shortenHash}. \n\n pour plus d'info contactez : +243 979 544 127
       `,
     };
 
