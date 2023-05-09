@@ -59,7 +59,7 @@ export class MailService {
   ): Promise<void> {
     await this.mailerService.sendMail({
       to: emails,
-      subject: 'You have been invited to join WiiQare',
+      subject: 'Vous avez été invité à rejoindre WiiQare',
       template: './send-invite',
       context: {
         names,
