@@ -24,7 +24,7 @@ export class SmsService {
     const params = {
       originator: 'WiiQare',
       recipients: phoneNumbers,
-      body: `You have been invite by ${names} to join WiiQare. Please sign-up with the following link https://wiiqare-app.com/register?referralCode=${referralCode}`,
+      body: `Vous avez été invité par ${names} pour rejoindre WiiQare. Merci de vous inscrire avec le lien suivant https://wiiqare-app.com/register?referralCode=${referralCode}`,
     };
 
     this.messageBird.messages.create(params, function (err, response) {
@@ -52,8 +52,8 @@ export class SmsService {
       originator: 'WiiQare',
       recipients: [phoneNumber],
       body: `
-      You have been received health pass from ${senderName} for ${amount} worth of voucher on WiiQare.
-      \n Your voucher Id is ${shortenHash}.
+      Vous avez reçu le pass de santé de ${senderName} d'une valeur de ${amount} de pass santé WiiQare.
+      \n Votre code pass santé et ${shortenHash}. pour plus d'info contactez : +243 979 544 127.
       `,
     };
 
