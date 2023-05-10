@@ -83,6 +83,12 @@ export class RegisterProviderDto {
   @IsEnum(BusinessType)
   businessType: BusinessType;
 
+  @ApiProperty({
+    description: 'ContactPersonDto',
+    required: true,
+    isArray: false,
+    type: ContactPersonDto,
+  })
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => ContactPersonDto)
