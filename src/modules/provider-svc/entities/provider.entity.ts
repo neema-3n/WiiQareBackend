@@ -1,6 +1,7 @@
 import { BusinessType } from 'src/common/constants/enums';
 import { BaseEntity } from 'src/db/base-entity';
 import { Column, Entity } from 'typeorm';
+import { ContactPersonDto } from '../dto/provider.dto';
 
 @Entity()
 export class Provider extends BaseEntity {
@@ -33,4 +34,7 @@ export class Provider extends BaseEntity {
 
   @Column()
   logoLink: string;
+
+  @Column({ type: 'json', nullable: true })
+  contactPerson?: ContactPersonDto;
 }

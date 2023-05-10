@@ -69,6 +69,7 @@ export class ProviderService {
       postalCode,
       logo,
       emailVerificationToken,
+      contactPerson,
     } = payload;
 
     // const result = await this.objectStorageService.saveObject(file);
@@ -89,7 +90,6 @@ export class ProviderService {
     const hashedPassword = bcrypt.hashSync(password, 10);
     // TODO: use transaction to save both user and provider!
     const [_, provider] = await Promise.all([
-
       // Save a user account!
       this.userRepository.save({
         email,
@@ -113,6 +113,7 @@ export class ProviderService {
         postalCode,
         logo,
         emailVerificationToken,
+        contactPerson,
       }),
     ]);
     return {

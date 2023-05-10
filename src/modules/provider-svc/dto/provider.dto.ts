@@ -1,6 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsISO31661Alpha2,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested
+} from 'class-validator';
 import { BusinessType } from '../../../common/constants/enums';
 export class RegisterProviderDto {
   @ApiProperty({ type: 'string', format: 'binary' })
@@ -42,6 +51,10 @@ export class RegisterProviderDto {
   @IsNotEmpty()
   @IsEnum(BusinessType)
   businessType: BusinessType;
+
+  @IsNotEmpty()
+  @ValidateNested()
+  contactPerson: ContactPersonDto;
 }
 
 export class ProviderValidateEmailDto {
@@ -52,4 +65,34 @@ export class ProviderValidateEmailDto {
   @IsNotEmpty()
   @IsString()
   password: string;
+}
+
+export class ContactPersonDto {
+  @IsNotEmpty()
+  @IsString()
+  firstName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  lastName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  phone: string;
+
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  @IsString()
+  occupation: string;
+
+  @IsNotEmpty()
+  @IsISO31661Alpha2()
+  country: string;
+
+  @IsOptional()
+  @IsString()
+  homeAddress?: string;
 }
