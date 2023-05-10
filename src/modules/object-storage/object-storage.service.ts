@@ -5,18 +5,9 @@ import { MinioService } from 'nestjs-minio-client';
 @Injectable()
 export class ObjectStorageService {
   bucketName = 'logos';
-  constructor(private readonly minioService: MinioService) {}
-
-  async createBucket() {
-    return await this.minioService.client.makeBucket(this.bucketName);
-  }
-
-  async listAllBuckets() {
-    return this.minioService.client.listBuckets();
-  }
+  constructor(private readonly minioService: MinioService) { }
 
   async saveObject(file: Express.Multer.File): Promise<UploadedObjectInfo> {
-    await this.createBucket();
     return this.minioService.client.putObject(
       this.bucketName,
       file.originalname,

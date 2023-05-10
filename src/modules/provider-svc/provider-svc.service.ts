@@ -72,7 +72,7 @@ export class ProviderService {
       contactPerson,
     } = payload;
 
-    // const result = await this.objectStorageService.saveObject(file);
+    const result = await this.objectStorageService.saveObject(file);
 
     // Get the email and user of the creator!.
     const cacheToken = `${APP_NAME}:email:${emailVerificationToken}`;
