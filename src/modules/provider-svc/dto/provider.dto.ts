@@ -8,9 +8,40 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  ValidateNested
+  ValidateNested,
 } from 'class-validator';
 import { BusinessType } from '../../../common/constants/enums';
+
+export class ContactPersonDto {
+  @IsNotEmpty()
+  @IsString()
+  firstName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  lastName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  phone: string;
+
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  @IsString()
+  occupation: string;
+
+  @IsNotEmpty()
+  @IsISO31661Alpha2()
+  country: string;
+
+  @IsOptional()
+  @IsString()
+  homeAddress?: string;
+}
+
 export class RegisterProviderDto {
   @ApiProperty({ type: 'string', format: 'binary' })
   logo: any;
@@ -65,34 +96,4 @@ export class ProviderValidateEmailDto {
   @IsNotEmpty()
   @IsString()
   password: string;
-}
-
-export class ContactPersonDto {
-  @IsNotEmpty()
-  @IsString()
-  firstName: string;
-
-  @IsNotEmpty()
-  @IsString()
-  lastName: string;
-
-  @IsNotEmpty()
-  @IsString()
-  phone: string;
-
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
-  @IsString()
-  occupation: string;
-
-  @IsNotEmpty()
-  @IsISO31661Alpha2()
-  country: string;
-
-  @IsOptional()
-  @IsString()
-  homeAddress?: string;
 }
