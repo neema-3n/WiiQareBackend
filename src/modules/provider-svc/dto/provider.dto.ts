@@ -85,6 +85,7 @@ export class RegisterProviderDto {
 
   @IsNotEmpty()
   @ValidateNested()
+  @Type(() => ContactPersonDto)
   contactPerson: ContactPersonDto;
 }
 
