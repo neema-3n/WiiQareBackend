@@ -76,7 +76,6 @@ export class RegisterProviderDto {
 
   @IsNotEmpty()
   @IsNumber()
-  @Type(() => Number)
   businessRegistrationNo: number;
 
   @IsNotEmpty()
