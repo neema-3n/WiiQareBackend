@@ -10,10 +10,12 @@ import {
   Length,
 } from 'class-validator';
 import { InviteType } from 'src/common/constants/enums';
+import { Transform } from 'class-transformer';
 
 export class CreatePayerAccountDto {
   @IsNotEmpty()
   @IsEmail()
+  @Transform(({ value }) => value.toLowerCase())
   email: string;
 
   @IsNotEmpty()
@@ -58,6 +60,7 @@ export class SendInviteDto {
   @IsOptional()
   @IsArray()
   @IsEmail({}, { each: true })
+  @Transform(({ value }) => value.toLowerCase())
   emails?: string[];
 
   @IsOptional()
