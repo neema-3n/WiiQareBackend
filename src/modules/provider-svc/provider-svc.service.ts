@@ -28,7 +28,7 @@ export class ProviderService {
     private sessionService: SessionService,
     private cachingService: CachingService,
     private mailService: MailService,
-  ) { }
+  ) {}
 
   async providerVerifyEmail(payload: ProviderValidateEmailDto): Promise<void> {
     const { email, password } = payload;
@@ -55,7 +55,7 @@ export class ProviderService {
   }
 
   async registerNewProvider(
-    file: Express.Multer.File,
+    logo: Express.Multer.File,
     payload: RegisterProviderDto,
   ): Promise<Record<string, any>> {
     const {
@@ -67,12 +67,11 @@ export class ProviderService {
       phone,
       city,
       postalCode,
-      logo,
       emailVerificationToken,
       contactPerson,
     } = payload;
 
-    const result = await this.objectStorageService.saveObject(file);
+    const result = await this.objectStorageService.saveObject(logo);
 
     // Get the email and user of the creator!.
     const cacheToken = `${APP_NAME}:email:${emailVerificationToken}`;
@@ -111,7 +110,6 @@ export class ProviderService {
         phone,
         city,
         postalCode,
-        logo,
         emailVerificationToken,
         contactPerson,
       }),

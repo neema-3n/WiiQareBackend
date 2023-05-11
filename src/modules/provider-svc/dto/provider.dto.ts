@@ -43,9 +43,6 @@ export class ContactPersonDto {
 }
 
 export class RegisterProviderDto {
-  @ApiProperty({ type: 'string', format: 'binary' })
-  logo: any;
-
   @IsNotEmpty()
   @IsString()
   name: string;
