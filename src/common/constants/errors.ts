@@ -77,7 +77,7 @@ export const _403 = {
 };
 
 export const _404 = {
-  USER_NOT_FOUND: { code: 'USER_NOT_FOUND', description: 'User not found!' },
+  USER_NOT_FOUND: { code: 'USER_NOT_FOUND', description: 'Utilisateur non trouvé!' },
   PAYER_NOT_FOUND: {
     code: 'PAYER_NOT_FOUND',
     description: 'Expart introuvable!',
