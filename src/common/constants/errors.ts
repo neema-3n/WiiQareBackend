@@ -32,7 +32,7 @@ export const _401 = {
   },
   INVALID_CREDENTIALS: {
     code: 'INVALID_CREDENTIALS',
-    description: 'Invalid credentials was provided',
+    description: 'Les informations fournies sont invalides',
   },
 };
 
