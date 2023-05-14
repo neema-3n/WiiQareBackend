@@ -1,19 +1,19 @@
 export const _400 = {
   MALFORMED_INPUTS_PROVIDED: {
     code: 'MALFORMED_INPUTS_PROVIDED',
-    description: 'Some of provided data are missing or not allowed',
+    description: 'Certaines des données fournies sont manquantes ou non autorisées',
   },
   PASSWORD_MISMATCH: {
     code: 'PASSWORD_MISMATCH',
-    description: 'Passwords do not match!',
+    description: 'Les mots de passe ne correspondent pas!',
   },
   EMAIL_REQUIRED: {
     code: 'EMAIL_REQUIRED',
-    description: 'Email is required!',
+    description: 'L\'e-mail est requis!',
   },
   PHONE_NUMBER_REQUIRED: {
     code: 'PHONE_NUMBER_REQUIRED',
-    description: 'Phone number is required!',
+    description: 'Le numéro de téléphone est requis!',
   },
 };
 
@@ -32,47 +32,47 @@ export const _401 = {
   },
   INVALID_CREDENTIALS: {
     code: 'INVALID_CREDENTIALS',
-    description: 'Les informations fournies sont invalides',
+    description: 'Les informations fournies sont incorrectes',
   },
 };
 
 export const _403 = {
   EMAIL_VERIFICATION_REQUIRED: {
     code: 'EMAIL_VERIFICATION_REQUIRED',
-    description: 'Email is not verified or verification expired!',
+    description: 'L\'e-mail n\'est pas vérifié ou la vérification a expiré!',
   },
   OTP_VERIFICATION_FAILED: {
     code: 'OTP_VERIFICATION_FAILED',
     description:
-      'One time password verification failed, needs to verify again!',
+      'La vérification du mot de passe une fois a échoué, doit être vérifiée à nouveau!',
   },
   USER_ACCOUNT_NOT_ACTIVE: {
     code: 'USER_ACCOUNT_NOT_ACTIVE',
-    description: 'User account not active!',
+    description: 'Compte utilisateur non actif!',
   },
   USER_ACCOUNT_ALREADY_EXIST: {
     code: 'USER_ACCOUNT_ALREADY_EXIST',
-    description: 'User account already exist!',
+    description: 'Le compte utilisateur existe déjà!',
   },
   PATIENT_ALREADY_EXISTS: {
     code: 'PATIENT_ALREADY_EXISTS',
-    description: 'Patient already registered!',
+    description: 'Patient déjà inscrit!',
   },
   INVALID_RESET_TOKEN: {
     code: 'INVALID_RESET_TOKEN',
-    description: 'Invalid reset token provided!',
+    description: 'Le code de réinitialisation fourni non valide !',
   },
   INVALID_EMAIL_VERIFICATION_TOKEN: {
     code: 'INVALID_EMAIL_VERIFICATION_TOKEN',
-    description: 'Invalid email verification token provided!',
+    description: 'Le lien de vérification d\'e-mail fourni non valide!',
   },
   ACCESS_NOT_ALLOWED: {
     code: 'ACCESS_NOT_ALLOWED',
-    description: 'Access not allowed!',
+    description: 'Accès non autorisé!',
   },
   ONLY_OWNER_CAN_SEND_VOUCHER: {
     code: 'ONLY_OWNER_CAN_SEND_VOUCHER',
-    description: 'Only owner can send voucher!',
+    description: 'Seul le propriétaire du compte peut envoyer un bon!',
   },
 };
 
@@ -80,28 +80,28 @@ export const _404 = {
   USER_NOT_FOUND: { code: 'USER_NOT_FOUND', description: 'User not found!' },
   PAYER_NOT_FOUND: {
     code: 'PAYER_NOT_FOUND',
-    description: 'Expart not found!',
+    description: 'Expart introuvable!',
   },
   PATIENT_NOT_FOUND: {
     code: 'PATIENT_NOT_FOUND',
-    description: 'Patient not found!',
+    description: 'Patient introuvable!',
   },
   INVALID_TRANSACTION_HASH: {
     code: 'INVALID_TRANSACTION_HASH',
-    description: 'Invalid transaction hash provided!',
+    description: 'Le code de transaction fourni est invalide!',
   },
 };
 
 export const _409 = {
   USER_ALREADY_EXISTS: {
     code: 'USER_ALREADY_EXISTS',
-    description: 'User already registered!',
+    description: 'Utilisateur déjà enregistré!',
   },
 };
 
 export const _500 = {
   INTERNAL_SERVER_ERROR: {
     code: 'INTERNAL_SERVER_ERROR',
-    description: 'Something went Unexpectedly!',
+    description: 'Quelque chose s\'est passé de manière inattendue!',
   },
 };
