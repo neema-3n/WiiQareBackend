@@ -33,7 +33,7 @@ export class PayerSvcService {
     private readonly transactionRepository: Repository<Transaction>,
     private readonly mailService: MailService,
     private readonly smsService: SmsService,
-  ) { }
+  ) {}
 
   /**
    * This function retrieve payer account related by Entity Id
@@ -176,7 +176,7 @@ export class PayerSvcService {
       throw new ForbiddenException(_403.ONLY_OWNER_CAN_SEND_VOUCHER);
 
     const patient = await this.patientRepository.findOne({
-      where: { id: transaction.patientId },
+      where: { id: transaction.ownerId },
     });
 
     if (!patient) throw new NotFoundException(_404.PATIENT_NOT_FOUND);

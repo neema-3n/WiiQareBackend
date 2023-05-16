@@ -1,10 +1,14 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { APP_NAME, DAY } from 'src/common/constants/constants';
-import { UserRole, UserStatus } from 'src/common/constants/enums';
-import { _403 } from 'src/common/constants/errors';
-import { generateToken } from 'src/helpers/common.helper';
+import { APP_NAME, DAY, HOUR } from 'src/common/constants/constants';
+import { UserRole, UserStatus, UserType } from 'src/common/constants/enums';
+import { _403, _404 } from 'src/common/constants/errors';
+import { generateToken, randomSixDigit } from 'src/helpers/common.helper';
 import { Repository } from 'typeorm';
 import { CachingService } from '../caching/caching.service';
 import { MailService } from '../mail/mail.service';
@@ -16,18 +20,28 @@ import {
   RegisterProviderDto,
 } from './dto/provider.dto';
 import { Provider } from './entities/provider.entity';
+import { Transaction } from '../smart-contract/entities/transaction.entity';
+import { SmsService } from '../sms/sms.service';
+import { Patient } from '../patient-svc/entities/patient.entity';
 
 @Injectable()
 export class ProviderService {
   constructor(
     @InjectRepository(Provider)
     private readonly providerRepository: Repository<Provider>,
+    @InjectRepository(Transaction)
+    private readonly transactionRepository: Repository<Transaction>,
+
+    @InjectRepository(Patient)
+    private readonly patientRepository: Repository<Patient>,
+
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private objectStorageService: ObjectStorageService,
     private sessionService: SessionService,
     private cachingService: CachingService,
     private mailService: MailService,
+    private smsService: SmsService,
   ) {}
 
   async providerVerifyEmail(payload: ProviderValidateEmailDto): Promise<void> {
@@ -123,5 +137,38 @@ export class ProviderService {
       city: provider.city,
       email: provider.email,
     };
+  }
+
+  /**
+   * This method is used by the system to send verification OTP to patient to authorize the transfer of the voucher to provider
+   *
+   * @param shortenHash
+   */
+  async sendTxVerificationOTP(shortenHash: string): Promise<void> {
+    const transaction = await this.transactionRepository.findOne({
+      where: { shortenHash, ownerType: UserType.PATIENT },
+    });
+
+    if (!transaction)
+      throw new NotFoundException(_404.INVALID_TRANSACTION_HASH);
+
+    const patient = await this.patientRepository.findOne({
+      where: { id: transaction.ownerId },
+    });
+
+    if (!patient) throw new NotFoundException(_404.PATIENT_NOT_FOUND);
+
+    // generate random reset password token
+    const verifyToken = randomSixDigit();
+    // save reset token in cache
+    const cacheToken = `${APP_NAME}:transaction:${shortenHash}`;
+    await this.cachingService.save<string>(cacheToken, verifyToken, HOUR);
+
+    // send SMS to the patient
+    await this.smsService.sendTransactionVerificationTokenBySmsToAPatient(
+      verifyToken,
+      patient.phoneNumber,
+      transaction.amount,
+    );
   }
 }

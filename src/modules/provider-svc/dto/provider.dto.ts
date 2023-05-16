@@ -100,3 +100,9 @@ export class ProviderValidateEmailDto {
   @IsString()
   password: string;
 }
+
+export class SendTxVerificationRequestDto {
+  @IsNotEmpty()
+  @IsString()
+  shortenHash: string;
+}

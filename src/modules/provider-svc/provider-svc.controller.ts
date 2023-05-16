@@ -5,7 +5,7 @@ import {
   HttpStatus,
   Post,
   UploadedFile,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -13,13 +13,16 @@ import { Public } from '../../common/decorators/public.decorator';
 import {
   ProviderValidateEmailDto,
   RegisterProviderDto,
+  SendTxVerificationRequestDto,
 } from './dto/provider.dto';
 import { ProviderService } from './provider-svc.service';
+import { Roles } from '../../common/decorators/user-role.decorator';
+import { UserRole } from '../../common/constants/enums';
 
 @ApiTags('Provider')
 @Controller('provider')
 export class ProviderController {
-  constructor(private providerService: ProviderService) { }
+  constructor(private providerService: ProviderService) {}
 
   @Post()
   @Public()
@@ -46,5 +49,19 @@ export class ProviderController {
     @Body() providerValidateEmailDto: ProviderValidateEmailDto,
   ): Promise<void> {
     return this.providerService.providerVerifyEmail(providerValidateEmailDto);
+  }
+
+  @Post('send-otp-verification')
+  @Roles(UserRole.PROVIDER)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'API endpoint for sending the transaction verification OTP to patient',
+  })
+  sendTransactionVerificationOTPToPatient(
+    @Body() payload: SendTxVerificationRequestDto,
+  ): Promise<void> {
+    const { shortenHash } = payload;
+    return this.providerService.sendTxVerificationOTP(shortenHash);
   }
 }

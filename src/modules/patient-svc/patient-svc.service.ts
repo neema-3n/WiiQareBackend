@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { Transaction } from '../smart-contract/entities/transaction.entity';
 import { CreatePatientDto, PatientResponseDto } from './dto/patient.dto';
 import { Patient } from './entities/patient.entity';
+import { UserType } from '../../common/constants/enums';
 
 @Injectable()
 export class PatientSvcService {
@@ -17,7 +18,7 @@ export class PatientSvcService {
     private readonly patientRepository: Repository<Patient>,
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
-  ) { }
+  ) {}
 
   /**
    * This function is used to register a patient account
@@ -68,10 +69,13 @@ export class PatientSvcService {
   ): Promise<PatientResponseDto[]> {
     const uniquePatientIdsQuery = await this.transactionRepository
       .createQueryBuilder('transaction')
-      .select('transaction.patientId', 'patientId')
+      .select('transaction.ownerId', 'ownerId')
       .where('transaction.senderId = :payerId', { payerId })
-      .andWhere('transaction.patientId IS NOT NULL')
-      .groupBy('transaction.patientId')
+      .andWhere('transaction.ownerId IS NOT NULL')
+      .andWhere('transaction.ownerType = :ownerType', {
+        ownerType: UserType.PATIENT,
+      })
+      .groupBy('transaction.ownerId')
       .getRawMany();
 
     const uniquePatientIds = uniquePatientIdsQuery.map(

@@ -38,7 +38,7 @@ export class PaymentController {
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
     private readonly transactionService: TransactionService,
-  ) { }
+  ) {}
 
   @Get()
   @ApiOperation({
@@ -152,7 +152,7 @@ export class PaymentController {
             currency: currencyPatient,
             conversionRate: currencyRate,
             senderId,
-            patientId,
+            ownerId: patientId,
             stripePaymentId,
             transactionHash,
             shortenHash,

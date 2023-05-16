@@ -1,5 +1,6 @@
 import { BaseEntity } from 'src/db/base-entity';
 import { Column, Entity } from 'typeorm';
+import { UserType } from '../../../common/constants/enums';
 
 @Entity()
 export class Transaction extends BaseEntity {
@@ -30,9 +31,21 @@ export class Transaction extends BaseEntity {
   @Column({ type: 'uuid', nullable: true })
   senderId: string;
 
-  //TODO: @remove nullable later!
-  @Column({ type: 'uuid', nullable: true })
-  patientId: string;
+  @Column({
+    type: 'uuid',
+    nullable: true,
+    comment:
+      'This is the uuid of who current own the voucher for this transaction',
+  })
+  ownerId: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserType,
+    nullable: true,
+    default: UserType.PATIENT,
+  })
+  ownerType: UserType;
 
   @Column()
   status: string;
