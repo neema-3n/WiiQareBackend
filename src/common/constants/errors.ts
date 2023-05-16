@@ -74,6 +74,10 @@ export const _403 = {
     code: 'ONLY_OWNER_CAN_SEND_VOUCHER',
     description: 'Only owner can send voucher!',
   },
+  INVALID_VOUCHER_TRANSFER_VERIFICATION_CODE: {
+    code: 'INVALID_VOUCHER_TRANSFER_VERIFICATION_CODE',
+    description: 'Invalid voucher transfer verification code provided!',
+  },
 };
 
 export const _404 = {
@@ -85,6 +89,10 @@ export const _404 = {
   PATIENT_NOT_FOUND: {
     code: 'PATIENT_NOT_FOUND',
     description: 'Patient not found!',
+  },
+  PROVIDER_NOT_FOUND: {
+    code: 'PROVIDER_NOT_FOUND',
+    description: 'Provider not found!',
   },
   INVALID_TRANSACTION_HASH: {
     code: 'INVALID_TRANSACTION_HASH',

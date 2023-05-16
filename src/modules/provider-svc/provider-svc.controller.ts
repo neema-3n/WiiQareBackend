@@ -13,9 +13,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '../../common/decorators/public.decorator';
 import {
+  AuthorizeVoucherTransferDto,
   ProviderValidateEmailDto,
   RegisterProviderDto,
-  SendTxVerificationRequestDto,
 } from './dto/provider.dto';
 import { ProviderService } from './provider-svc.service';
 import { Roles } from '../../common/decorators/user-role.decorator';
@@ -52,31 +52,34 @@ export class ProviderController {
   ): Promise<void> {
     return this.providerService.providerVerifyEmail(providerValidateEmailDto);
   }
-
-  @Post('send-otp-verification')
+  @Get('provider-voucher-details')
   @Roles(UserRole.PROVIDER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary:
-      'API endpoint for sending the transaction verification OTP to patient',
-  })
-  sendTransactionVerificationOTPToPatient(
-    @Body() payload: SendTxVerificationRequestDto,
-  ): Promise<void> {
-    const { shortenHash } = payload;
-    return this.providerService.sendTxVerificationOTP(shortenHash);
-  }
-
-  @Get('voucher-details')
-  @Roles(UserRole.PROVIDER)
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary:
-      'API endpoint to retrieve the voucher details  by TxNo shortened hash',
+      'API endpoint is used to retrieve the voucher details  by TxNo shortened hash, It sends also the transaction verification code to patient',
   })
   getVoucherDetailsByTxNoShortenedHash(
     @Query('shortenHash') shortenHash: string,
   ): Promise<Record<string, any>> {
     return this.providerService.getTransactionByShortenHash(shortenHash);
+  }
+
+  @Post('provider-authorize-voucher-transfer')
+  @Roles(UserRole.PROVIDER)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'API endpoint is used to voucher transfer from Patient to Provider',
+  })
+  providerAuthorizeVoucherTransfer(
+    @Body() payload: AuthorizeVoucherTransferDto,
+  ): Promise<Record<string, any>> {
+    const { shortenHash, providerId, securityCode } = payload;
+    return this.providerService.authorizeVoucherTransfer(
+      shortenHash,
+      providerId,
+      securityCode,
+    );
   }
 }
