@@ -6,7 +6,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SendMessageDto } from './dto/message.dto';
 import { Roles } from '../../common/decorators/user-role.decorator';
 import { UserRole } from '../../common/constants/enums';
@@ -15,6 +15,7 @@ import { JwtClaimsDataDto } from '../session/dto/jwt-claims-data.dto';
 import { MessagingService } from './messaging.service';
 import { _403 } from '../../common/constants/errors';
 
+@ApiTags('Messaging')
 @Controller('messaging')
 export class MessagingController {
   constructor(private readonly messagingService: MessagingService) {}

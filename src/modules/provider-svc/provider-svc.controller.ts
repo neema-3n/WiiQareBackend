@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -63,5 +65,18 @@ export class ProviderController {
   ): Promise<void> {
     const { shortenHash } = payload;
     return this.providerService.sendTxVerificationOTP(shortenHash);
+  }
+
+  @Get('voucher-details')
+  @Roles(UserRole.PROVIDER)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'API endpoint to retrieve the voucher details  by TxNo shortened hash',
+  })
+  getVoucherDetailsByTxNoShortenedHash(
+    @Query('shortenHash') shortenHash: string,
+  ): Promise<Record<string, any>> {
+    return this.providerService.getTransactionByShortenHash(shortenHash);
   }
 }

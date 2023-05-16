@@ -171,4 +171,34 @@ export class ProviderService {
       transaction.amount,
     );
   }
+
+  /**
+   * Get short details about the transaction
+   * @param shortenHash
+   */
+  async getTransactionByShortenHash(
+    shortenHash: string,
+  ): Promise<Record<string, any>> {
+    const transaction = await this.transactionRepository.findOne({
+      where: { shortenHash, ownerType: UserType.PATIENT },
+    });
+
+    if (!transaction)
+      throw new NotFoundException(_404.INVALID_TRANSACTION_HASH);
+
+    const patient = await this.patientRepository.findOne({
+      where: { id: transaction.ownerId },
+    });
+
+    if (!patient) throw new NotFoundException(_404.PATIENT_NOT_FOUND);
+
+    return {
+      hash: transaction.transactionHash,
+      shortenHash: transaction.shortenHash,
+      amount: transaction.amount,
+      currency: transaction.currency,
+      patientNames: `${patient.firstName} ${patient.lastName}`,
+      patientPhoneNumber: patient.phoneNumber,
+    };
+  }
 }
