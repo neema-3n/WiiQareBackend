@@ -9,7 +9,6 @@ import {
   IsOptional,
   IsString,
   IsUUID,
-  ValidateNested,
 } from 'class-validator';
 import { BusinessType } from '../../../common/constants/enums';
 
@@ -80,16 +79,35 @@ export class RegisterProviderDto {
   @IsEnum(BusinessType)
   businessType: BusinessType;
 
-  @ApiProperty({
-    description: 'ContactPersonDto',
-    required: true,
-    isArray: false,
-    type: ContactPersonDto,
-  })
+  // contact person details
   @IsNotEmpty()
-  @ValidateNested()
-  @Type(() => ContactPersonDto)
-  contactPerson: ContactPersonDto;
+  @IsString()
+  contactPersonFirstName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  contactPersonLastName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  contactPersonPhone: string;
+
+  @IsNotEmpty()
+  @IsEmail()
+  contactPersonEmail: string;
+
+  @IsNotEmpty()
+  @IsString()
+  contactPersonOccupation: string;
+
+  @IsNotEmpty()
+  @IsISO31661Alpha2()
+  contactPersonCountry: string;
+
+  @IsOptional()
+  @IsString()
+  contactPersonHomeAddress?: string;
+  // end of contact person details
 }
 
 export class ProviderValidateEmailDto {

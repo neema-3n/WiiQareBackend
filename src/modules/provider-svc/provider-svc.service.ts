@@ -16,6 +16,7 @@ import { ObjectStorageService } from '../object-storage/object-storage.service';
 import { User } from '../session/entities/user.entity';
 import { SessionService } from '../session/session.service';
 import {
+  ContactPersonDto,
   ProviderValidateEmailDto,
   RegisterProviderDto,
 } from './dto/provider.dto';
@@ -80,8 +81,17 @@ export class ProviderService {
       city,
       postalCode,
       emailVerificationToken,
-      contactPerson,
     } = payload;
+
+    const contactPerson = {
+      email: payload?.contactPersonEmail,
+      country: payload?.contactPersonCountry,
+      firstName: payload?.contactPersonFirstName,
+      lastName: payload?.contactPersonLastName,
+      homeAddress: payload?.contactPersonHomeAddress,
+      phone: payload?.contactPersonPhone,
+      occupation: payload?.contactPersonOccupation,
+    } as ContactPersonDto;
 
     const result = await this.objectStorageService.saveObject(logo);
 
@@ -109,7 +119,6 @@ export class ProviderService {
         role: UserRole.PROVIDER,
         status: UserStatus.INACTIVE,
       }),
-
       // register new provider
       this.providerRepository.save({
         email,
