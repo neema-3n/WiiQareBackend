@@ -20,7 +20,7 @@ import { UserRole, UserStatus } from '../../common/constants/enums';
 import { AppConfigService } from '../../config/app-config.service';
 import { CachingService } from '../caching/caching.service';
 import { MailService } from '../mail/mail.service';
-import { PayerSvcService } from '../payer-svc/payer-svc.service';
+import { PayerService } from '../payer-svc/payer.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { JwtClaimsDataDto } from './dto/jwt-claims-data.dto';
 import {
@@ -28,6 +28,7 @@ import {
   SessionVerifyEmailOTPResponseDto,
   UpdatePasswordDto,
 } from './dto/session.dto';
+import { ProviderService } from '../provider-svc/provider-svc.service';
 
 @Injectable()
 export class SessionService {
@@ -36,7 +37,8 @@ export class SessionService {
     private jwtService: JwtService,
     //TODO: Update this DataSource Later!.
     private readonly appConfigService: AppConfigService,
-    private readonly payerService: PayerSvcService,
+    private readonly payerService: PayerService,
+    private readonly providerService: ProviderService,
     private mailService: MailService,
     private cachingService: CachingService,
   ) {}
@@ -75,12 +77,26 @@ export class SessionService {
         throw new UnauthorizedException(_401.INVALID_CREDENTIALS);
     }
 
+    if (user.role === UserRole.PROVIDER) {
+      detailsInformation = await this.providerService.findProviderById(user.id);
+
+      if (!detailsInformation)
+        throw new NotFoundException(_404.PROVIDER_NOT_FOUND);
+
+      const isValidPassword = bcrypt.compareSync(password, user.password);
+
+      if (!isValidPassword)
+        throw new UnauthorizedException(_401.INVALID_CREDENTIALS);
+    }
+
     //TODO: improve this!.
     let names: string;
     if (user.role === UserRole.WIIQARE_ADMIN) {
       names = 'ADMIN';
     } else if (user.role === UserRole.WIIQARE_MANAGER) {
       names = 'MANAGER';
+    } else if (user.role === UserRole.PROVIDER) {
+      names = detailsInformation.name;
     } else {
       names = `${detailsInformation.firstName} ${detailsInformation.lastName}`;
     }

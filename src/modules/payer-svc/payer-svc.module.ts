@@ -9,7 +9,7 @@ import { Transaction } from '../smart-contract/entities/transaction.entity';
 import { SMSModule } from '../sms/sms.module';
 import { Payer } from './entities/payer.entity';
 import { PayerSvcController } from './payer-svc.controller';
-import { PayerSvcService } from './payer-svc.service';
+import { PayerService } from './payer.service';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { PayerSvcService } from './payer-svc.service';
     SMSModule,
   ],
   controllers: [PayerSvcController],
-  providers: [PayerSvcService],
-  exports: [PayerSvcService],
+  providers: [PayerService],
+  exports: [PayerService],
 })
-export class PayerSvcModule { }
+export class PayerSvcModule {}

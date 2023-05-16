@@ -14,7 +14,6 @@ import { CachingService } from '../caching/caching.service';
 import { MailService } from '../mail/mail.service';
 import { ObjectStorageService } from '../object-storage/object-storage.service';
 import { User } from '../session/entities/user.entity';
-import { SessionService } from '../session/session.service';
 import {
   ContactPersonDto,
   ProviderValidateEmailDto,
@@ -37,11 +36,23 @@ export class ProviderService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private objectStorageService: ObjectStorageService,
-    private sessionService: SessionService,
     private cachingService: CachingService,
     private mailService: MailService,
     private smsService: SmsService,
   ) {}
+
+  /**
+   * This function retrieve provider account related by the provider id
+   *
+   * @param providerId
+   */
+  async findProviderById(providerId: string): Promise<Provider> {
+    return this.providerRepository.findOne({
+      where: {
+        id: providerId,
+      },
+    });
+  }
 
   async providerVerifyEmail(payload: ProviderValidateEmailDto): Promise<void> {
     const { email, password } = payload;
@@ -109,32 +120,30 @@ export class ProviderService {
     const { email, password } = dataCached;
 
     const hashedPassword = bcrypt.hashSync(password, 10);
+
     // TODO: use transaction to save both user and provider!
-    const [_, provider] = await Promise.all([
-      // Save a user account!
-      this.userRepository.save({
+    const provider = await this.providerRepository.save({
+      email,
+      logoLink: 'https://google.com/logo',
+      name,
+      address,
+      businessRegistrationNo,
+      nationalId,
+      businessType,
+      phone,
+      city,
+      postalCode,
+      emailVerificationToken,
+      contactPerson,
+      user: {
         email,
         password: hashedPassword,
         phoneNumber: phone,
         role: UserRole.PROVIDER,
         status: UserStatus.INACTIVE,
-      }),
-      // register new provider
-      this.providerRepository.save({
-        email,
-        logoLink: 'https://google.com/logo',
-        name,
-        address,
-        businessRegistrationNo,
-        nationalId,
-        businessType,
-        phone,
-        city,
-        postalCode,
-        emailVerificationToken,
-        contactPerson,
-      }),
-    ]);
+      },
+    });
+
     return {
       id: provider.id,
       providerName: provider.name,
