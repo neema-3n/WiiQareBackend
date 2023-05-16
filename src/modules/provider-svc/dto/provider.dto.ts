@@ -8,6 +8,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   ValidateNested,
 } from 'class-validator';
 import { BusinessType } from '../../../common/constants/enums';
@@ -99,4 +100,18 @@ export class ProviderValidateEmailDto {
   @IsNotEmpty()
   @IsString()
   password: string;
+}
+
+export class AuthorizeVoucherTransferDto {
+  @IsNotEmpty()
+  @IsString()
+  shortenHash: string;
+
+  @IsNotEmpty()
+  @IsUUID()
+  providerId: string;
+
+  @IsNotEmpty()
+  @IsString()
+  securityCode: string;
 }

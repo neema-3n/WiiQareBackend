@@ -6,17 +6,21 @@ import { User } from '../session/entities/user.entity';
 import { SessionModule } from '../session/session.module';
 import { Provider } from './entities/provider.entity';
 import { ProviderService } from './provider-svc.service';
-import { ProviderController } from './proviser-svc.controller';
+import { ProviderController } from './provider-svc.controller';
+import { Transaction } from '../smart-contract/entities/transaction.entity';
+import { Patient } from '../patient-svc/entities/patient.entity';
+import { SMSModule } from '../sms/sms.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Provider, User]),
+    TypeOrmModule.forFeature([Provider, User, Transaction, Patient]),
     ObjectStorageModule,
     SessionModule,
     MailModule,
+    SMSModule,
   ],
   controllers: [ProviderController],
   providers: [ProviderService],
   exports: [ProviderService],
 })
-export class ProviderSvcModule { }
+export class ProviderSvcModule {}

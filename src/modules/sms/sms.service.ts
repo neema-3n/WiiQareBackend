@@ -39,8 +39,10 @@ export class SmsService {
   /**
    * This method sends  voucher as an SMS to a patient
    *
-   * @param email
-   * @param token
+   * @param shortenHash
+   * @param phoneNumber
+   * @param senderName
+   * @param amount
    */
   async sendVoucherAsAnSMS(
     shortenHash: string,
@@ -54,6 +56,35 @@ export class SmsService {
       body: `
       Vous avez reçu le pass de santé de ${senderName} d'une valeur de ${amount} de pass santé WiiQare.
       \n Votre code pass santé et ${shortenHash}. \n\n pour plus d'info contactez : +243 979 544 127
+      `,
+    };
+
+    this.messageBird.messages.create(params, function (err, response) {
+      if (err) {
+        return console.log(err);
+      }
+      console.log(response);
+    });
+    return;
+  }
+
+  /**
+   * This method sends transaction verification Token by SMS to a patient
+   *
+   * @param token
+   * @param phoneNumber
+   * @param amount
+   */
+  async sendTransactionVerificationTokenBySmsToAPatient(
+    token: string,
+    phoneNumber: string,
+    amount: number,
+  ): Promise<void> {
+    const params = {
+      originator: 'WiiQare',
+      recipients: [phoneNumber],
+      body: `
+      Votre code the verification de la transaction de ${amount} de WiiQare pass santé est ${token}.
       `,
     };
 
