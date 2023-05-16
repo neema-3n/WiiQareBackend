@@ -37,8 +37,8 @@ export class ProviderController {
   })
   @ApiOperation({ summary: 'API endpoint for registering provider' })
   registerNewProvider(
-    @UploadedFile() logo: Express.Multer.File,
     @Body() registerProviderDto: RegisterProviderDto,
+    @UploadedFile() logo?: Express.Multer.File,
   ): Promise<Record<string, any>> {
     return this.providerService.registerNewProvider(logo, registerProviderDto);
   }
