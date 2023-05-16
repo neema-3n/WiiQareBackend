@@ -44,12 +44,12 @@ export class ProviderService {
   /**
    * This function retrieve provider account related by the provider id
    *
-   * @param providerId
+   * @param userId
    */
-  async findProviderById(providerId: string): Promise<Provider> {
+  async findProviderByUserId(userId: string): Promise<Provider> {
     return this.providerRepository.findOne({
       where: {
-        id: providerId,
+        user: { id: userId },
       },
     });
   }

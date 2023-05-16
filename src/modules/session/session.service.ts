@@ -78,7 +78,9 @@ export class SessionService {
     }
 
     if (user.role === UserRole.PROVIDER) {
-      detailsInformation = await this.providerService.findProviderById(user.id);
+      detailsInformation = await this.providerService.findProviderByUserId(
+        user.id,
+      );
 
       if (!detailsInformation)
         throw new NotFoundException(_404.PROVIDER_NOT_FOUND);
