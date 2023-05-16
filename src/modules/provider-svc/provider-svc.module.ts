@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailModule } from '../mail/mail.module';
 import { ObjectStorageModule } from '../object-storage/object-storage.module';
 import { User } from '../session/entities/user.entity';
-import { SessionModule } from '../session/session.module';
 import { Provider } from './entities/provider.entity';
 import { ProviderService } from './provider-svc.service';
 import { ProviderController } from './provider-svc.controller';
@@ -15,7 +14,6 @@ import { SMSModule } from '../sms/sms.module';
   imports: [
     TypeOrmModule.forFeature([Provider, User, Transaction, Patient]),
     ObjectStorageModule,
-    SessionModule,
     MailModule,
     SMSModule,
   ],

@@ -1,7 +1,8 @@
 import { BusinessType } from 'src/common/constants/enums';
 import { BaseEntity } from 'src/db/base-entity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { ContactPersonDto } from '../dto/provider.dto';
+import { User } from '../../session/entities/user.entity';
 
 @Entity()
 export class Provider extends BaseEntity {
@@ -25,6 +26,10 @@ export class Provider extends BaseEntity {
 
   @Column()
   nationalId: string;
+
+  @OneToOne(() => User, { cascade: ['insert', 'update'], nullable: true })
+  @JoinColumn()
+  user?: User;
 
   @Column({ comment: 'registered company number' })
   businessRegistrationNo: number;

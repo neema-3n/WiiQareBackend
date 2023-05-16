@@ -32,10 +32,10 @@ import {
   CreatePayerAccountDto,
   SearchPatientDto,
   SendInviteDto,
-  SendSmsVoucherDto
+  SendSmsVoucherDto,
 } from './dto/payer.dto';
 import { Payer } from './entities/payer.entity';
-import { PayerSvcService } from './payer-svc.service';
+import { PayerService } from './payer.service';
 
 @ApiTags('Payer')
 @Controller('payer')
@@ -43,11 +43,11 @@ export class PayerSvcController {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly payerService: PayerSvcService,
+    private readonly payerService: PayerService,
     private readonly cachingService: CachingService,
     private readonly sessionService: SessionService,
     private readonly patientService: PatientSvcService,
-  ) { }
+  ) {}
 
   @Get('patient')
   @Roles(UserRole.PAYER)

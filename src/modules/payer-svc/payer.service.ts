@@ -21,7 +21,7 @@ import { CreatePayerAccountDto, SendInviteDto } from './dto/payer.dto';
 import { Payer } from './entities/payer.entity';
 
 @Injectable()
-export class PayerSvcService {
+export class PayerService {
   constructor(
     @InjectRepository(Patient)
     private readonly patientRepository: Repository<Patient>,
