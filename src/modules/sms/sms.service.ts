@@ -83,9 +83,7 @@ export class SmsService {
     const params = {
       originator: 'WiiQare',
       recipients: [phoneNumber],
-      body: `
-      Votre code the verification de la transaction de ${amount} de WiiQare pass santé est ${token}.
-      `,
+      body: `Votre code the verification de pass santé WiiQare est ${token}.`,
     };
 
     this.messageBird.messages.create(params, function (err, response) {
