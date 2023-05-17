@@ -192,7 +192,7 @@ export class PaymentController {
         'transaction.patient',
         Patient,
         'patient',
-        'patient.id = transaction.patientId',
+        'patient.id = transaction.ownerId',
       )
       .select([
         'transaction',
