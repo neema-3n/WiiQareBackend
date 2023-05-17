@@ -1,5 +1,6 @@
 import {
   IsEmail,
+  IsEnum,
   IsJWT,
   IsNotEmpty,
   IsOptional,
@@ -7,8 +8,13 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
+import { UserRole } from 'src/common/constants/enums';
 
 export class SessionResponseDto {
+  @IsNotEmpty()
+  @IsEnum(UserRole)
+  type: UserRole;
+
   @IsNotEmpty()
   @IsUUID(4)
   userId: string;

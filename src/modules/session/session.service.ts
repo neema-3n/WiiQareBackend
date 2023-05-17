@@ -21,6 +21,7 @@ import { AppConfigService } from '../../config/app-config.service';
 import { CachingService } from '../caching/caching.service';
 import { MailService } from '../mail/mail.service';
 import { PayerService } from '../payer-svc/payer.service';
+import { ProviderService } from '../provider-svc/provider-svc.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { JwtClaimsDataDto } from './dto/jwt-claims-data.dto';
 import {
@@ -28,7 +29,6 @@ import {
   SessionVerifyEmailOTPResponseDto,
   UpdatePasswordDto,
 } from './dto/session.dto';
-import { ProviderService } from '../provider-svc/provider-svc.service';
 
 @Injectable()
 export class SessionService {
@@ -114,6 +114,7 @@ export class SessionService {
     const jsonWebToken = this.jwtService.sign(jwtClaimsData);
 
     return {
+      type: user.role,
       userId: user.id,
       phoneNumber: user.phoneNumber,
       names,

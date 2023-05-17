@@ -6,10 +6,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { _403, _404 } from 'src/common/constants/errors';
 import { Repository } from 'typeorm';
+import { UserType } from '../../common/constants/enums';
 import { Transaction } from '../smart-contract/entities/transaction.entity';
 import { CreatePatientDto, PatientResponseDto } from './dto/patient.dto';
 import { Patient } from './entities/patient.entity';
-import { UserType } from '../../common/constants/enums';
 
 @Injectable()
 export class PatientSvcService {
@@ -79,7 +79,7 @@ export class PatientSvcService {
       .getRawMany();
 
     const uniquePatientIds = uniquePatientIdsQuery.map(
-      (result) => result.patientId,
+      (result) => result.ownerId,
     );
 
     const patients = await this.patientRepository
