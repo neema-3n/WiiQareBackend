@@ -11,20 +11,20 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UserRole } from '../../common/constants/enums';
 import { Public } from '../../common/decorators/public.decorator';
+import { Roles } from '../../common/decorators/user-role.decorator';
 import {
   AuthorizeVoucherTransferDto,
   ProviderValidateEmailDto,
   RegisterProviderDto,
 } from './dto/provider.dto';
 import { ProviderService } from './provider-svc.service';
-import { Roles } from '../../common/decorators/user-role.decorator';
-import { UserRole } from '../../common/constants/enums';
 
 @ApiTags('Provider')
 @Controller('provider')
 export class ProviderController {
-  constructor(private providerService: ProviderService) {}
+  constructor(private providerService: ProviderService) { }
 
   @Post()
   @Public()
@@ -81,5 +81,19 @@ export class ProviderController {
       providerId,
       securityCode,
     );
+  }
+
+  @Get('transactions')
+  @Roles(UserRole.PROVIDER)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'API endpoint is used to retrieve all transaction for a given provider',
+  })
+  getAllTransactionByProviderId(
+    @Query() providerId: string,
+  ): Promise<Record<string, any>> {
+    //TODO: make sure we the owner only can retrieve he's own transactions!
+    return this.providerService.getAllTransactions(providerId);
   }
 }

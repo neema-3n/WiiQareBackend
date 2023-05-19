@@ -13,16 +13,16 @@ import { Repository } from 'typeorm';
 import { CachingService } from '../caching/caching.service';
 import { MailService } from '../mail/mail.service';
 import { ObjectStorageService } from '../object-storage/object-storage.service';
+import { Patient } from '../patient-svc/entities/patient.entity';
 import { User } from '../session/entities/user.entity';
+import { Transaction } from '../smart-contract/entities/transaction.entity';
+import { SmsService } from '../sms/sms.service';
 import {
   ContactPersonDto,
   ProviderValidateEmailDto,
   RegisterProviderDto,
 } from './dto/provider.dto';
 import { Provider } from './entities/provider.entity';
-import { Transaction } from '../smart-contract/entities/transaction.entity';
-import { SmsService } from '../sms/sms.service';
-import { Patient } from '../patient-svc/entities/patient.entity';
 
 @Injectable()
 export class ProviderService {
@@ -39,7 +39,7 @@ export class ProviderService {
     private cachingService: CachingService,
     private mailService: MailService,
     private smsService: SmsService,
-  ) {}
+  ) { }
 
   /**
    * This function retrieve provider account related by the provider id
@@ -261,5 +261,19 @@ export class ProviderService {
       code: 200,
       message: 'Voucher transfer authorized successfully',
     };
+  }
+
+  /**
+   * This method is used to retrieve all transactions for a given
+   * Provider
+   * @param providerId
+   *
+   */
+  async getAllTransactions(providerId: string): Promise<Transaction[]> {
+    const transactions = await this.transactionRepository.find({
+      where: { ownerId: providerId },
+    });
+
+    return transactions;
   }
 }
