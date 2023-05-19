@@ -41,7 +41,7 @@ export class SessionService {
     private readonly providerService: ProviderService,
     private mailService: MailService,
     private cachingService: CachingService,
-  ) {}
+  ) { }
 
   async authenticateUser(
     payload: CreateSessionDto,
@@ -63,13 +63,18 @@ export class SessionService {
     if (user.status !== UserStatus.ACTIVE)
       throw new ForbiddenException(_403.USER_ACCOUNT_NOT_ACTIVE);
 
-    let detailsInformation;
+    let detailsInformation, otherData;
 
     if (user.role === UserRole.PAYER) {
       detailsInformation = await this.payerService.findPayerByUserId(user.id);
 
       if (!detailsInformation)
         throw new NotFoundException(_404.PAYER_NOT_FOUND);
+
+      otherData = {
+        ...otherData,
+        payerId: detailsInformation.id,
+      };
 
       const isValidPassword = bcrypt.compareSync(password, user.password);
 
@@ -84,6 +89,11 @@ export class SessionService {
 
       if (!detailsInformation)
         throw new NotFoundException(_404.PROVIDER_NOT_FOUND);
+
+      otherData = {
+        ...otherData,
+        providerId: detailsInformation.id,
+      };
 
       const isValidPassword = bcrypt.compareSync(password, user.password);
 
@@ -109,6 +119,7 @@ export class SessionService {
       phoneNumber: user.phoneNumber,
       names,
       status: user.status,
+      ...otherData,
     } as JwtClaimsDataDto;
 
     const jsonWebToken = this.jwtService.sign(jwtClaimsData);
@@ -120,6 +131,7 @@ export class SessionService {
       names,
       email: user?.email,
       access_token: jsonWebToken,
+      ...otherData,
     } as SessionResponseDto;
   }
 
