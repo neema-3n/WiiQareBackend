@@ -1,5 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsEnum,
@@ -132,4 +130,10 @@ export class AuthorizeVoucherTransferDto {
   @IsNotEmpty()
   @IsString()
   securityCode: string;
+}
+
+export class SearchTransactionDto {
+  @IsNotEmpty()
+  @IsUUID()
+  providerId: string;
 }

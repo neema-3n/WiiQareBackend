@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import * as _ from 'lodash';
 import { APP_NAME, DAY, HOUR } from 'src/common/constants/constants';
 import { UserRole, UserStatus, UserType } from 'src/common/constants/enums';
 import { _403, _404 } from 'src/common/constants/errors';
@@ -269,11 +270,16 @@ export class ProviderService {
    * @param providerId
    *
    */
-  async getAllTransactions(providerId: string): Promise<Transaction[]> {
-    const transactions = await this.transactionRepository.find({
-      where: { ownerId: providerId },
-    });
+  async getAllTransactions(providerId: string): Promise<Record<string, any>> {
+    const transactions = await this.transactionRepository
+      .createQueryBuilder('transaction')
+      .where('transaction.ownerId = :providerId', { providerId })
+      .getMany();
 
-    return transactions;
+    return {
+      totalAmount: _.sumBy(transactions, 'amount'),
+      totalUniquePatients: _.uniqBy(transactions, 'voucher.patientId').length,
+      transactions,
+    };
   }
 }

@@ -18,6 +18,7 @@ import {
   AuthorizeVoucherTransferDto,
   ProviderValidateEmailDto,
   RegisterProviderDto,
+  SearchTransactionDto,
 } from './dto/provider.dto';
 import { ProviderService } from './provider-svc.service';
 
@@ -91,8 +92,9 @@ export class ProviderController {
       'API endpoint is used to retrieve all transaction for a given provider',
   })
   getAllTransactionByProviderId(
-    @Query() providerId: string,
+    @Query() payload: SearchTransactionDto,
   ): Promise<Record<string, any>> {
+    const { providerId } = payload;
     //TODO: make sure we the owner only can retrieve he's own transactions!
     return this.providerService.getAllTransactions(providerId);
   }
