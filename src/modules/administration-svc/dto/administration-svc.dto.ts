@@ -39,10 +39,6 @@ export class createAdminAccountDTO {
 
   @IsNotEmpty()
   @IsString()
-  username: string;
-
-  @IsNotEmpty()
-  @IsString()
   password: string;
 }
 

@@ -6,7 +6,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from '../smart-contract/entities/transaction.entity';
 import { createAdminAccountDTO } from './dto/administration-svc.dto';
 import { User } from '../session/entities/user.entity';
-import { UserRole, UserStatus } from 'src/common/constants/enums';
+import {
+  UserRole,
+  UserStatus,
+  VoucherStatus,
+} from 'src/common/constants/enums';
 import { SALT_ROUNDS } from 'src/common/constants/constants';
 
 @Injectable()
@@ -23,11 +27,34 @@ export class AdministrationSvcService {
   ) {}
 
   /**
-   * This method is used to get summary of payers information
+   * This method is used to get global summary of payers related vouchers information
    * @returns
    */
-  getPayersSummary() {
-    return 'payers summary';
+  async getPayersSummary() {
+    const numberOfRegisteredPayers = await this.PayerRepository.count();
+
+    const totalNumberOfPurchasedVouchers =
+      await this.TransactionRepository.count();
+    const totalNumberOfPendingVouchers = await this.TransactionRepository.count(
+      {
+        where: {
+          status: VoucherStatus.PENDING,
+        },
+      },
+    );
+    const totalNumberOfRedeemedVouchers =
+      await this.TransactionRepository.count({
+        where: {
+          status: VoucherStatus.CLAIMED,
+        },
+      });
+
+    return {
+      numberOfRegisteredPayers,
+      totalNumberOfPurchasedVouchers,
+      totalNumberOfPendingVouchers,
+      totalNumberOfRedeemedVouchers,
+    };
   }
 
   /**
@@ -35,14 +62,13 @@ export class AdministrationSvcService {
    * @param payload
    * @returns User
    */
-  registerNewAdminAccount(payload: createAdminAccountDTO): Promise<User> {
-    const { email, username, password } = payload;
+  async registerNewAdminAccount(payload: createAdminAccountDTO): Promise<User> {
+    const { email, password } = payload;
 
     const hashedPassword = bcrypt.hashSync(password, SALT_ROUNDS);
 
     const adminUserTobeCreated = {
       email,
-      username,
       password: hashedPassword,
       role: UserRole.WIIQARE_ADMIN,
       status: UserStatus.ACTIVE,

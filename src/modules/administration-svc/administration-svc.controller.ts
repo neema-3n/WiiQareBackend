@@ -23,7 +23,8 @@ export class AdministrationSvcController {
   ) {}
 
   @Get('payers/summary')
-  @Roles(UserRole.WIIQARE_ADMIN)
+  //@Roles(UserRole.WIIQARE_ADMIN)
+  @Public()
   @ApiOperation({
     summary: 'API endpoint to get summary list of all Payers informations',
   })
