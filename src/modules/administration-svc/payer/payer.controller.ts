@@ -2,6 +2,7 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { PayerService } from './payer.service';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {Public} from 'src/common/decorators/public.decorator';
+import { PayerListDto } from './dto/payers.dto';
 
 @ApiTags('admin/payers')
 @Controller('payers')
@@ -22,10 +23,12 @@ export class PayerController {
     @Get()
     //@Roles(UserRole.WIIQARE_ADMIN)
     @Public()
-    getAllPayers(){
+    @ApiOperation({
+      summary: 'This API is used retrieve Migrant Payers List.',
+    })
+    async getAllPayers(): Promise<PayerListDto[]>{
         return  this.payerService.findAllPayers();
     }
-
     
     @Get(':id')
     //@Roles(UserRole.WIIQARE_ADMIN)
