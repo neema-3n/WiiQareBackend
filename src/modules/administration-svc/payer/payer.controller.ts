@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { PayerService } from './payers.service';
+import { PayerService } from './payer.service';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {Public} from 'src/common/decorators/public.decorator';
 
