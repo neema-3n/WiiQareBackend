@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, RouterModule } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
@@ -46,6 +46,11 @@ import { SMSModule } from './modules/sms/sms.module';
     MessagingModule,
     SMSModule,
     //ObjectStorageModule,
+
+    RouterModule.register([{
+      path:'admin',
+      module:AdministrationSvcModule
+    }]),
   ],
   controllers: [],
   providers: [
