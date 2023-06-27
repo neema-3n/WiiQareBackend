@@ -3,26 +3,26 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import * as _ from 'lodash';
-import {APP_NAME, DAY, HOUR} from '../../common/constants/constants';
+import { APP_NAME, DAY, HOUR } from '../../common/constants/constants';
 import {
   UserRole,
   UserStatus,
   UserType,
   VoucherStatus,
 } from '../../common/constants/enums';
-import {_403, _404} from '../../common/constants/errors';
-import {generateToken, randomSixDigit} from '../../helpers/common.helper';
-import {Repository} from 'typeorm';
-import {CachingService} from '../caching/caching.service';
-import {MailService} from '../mail/mail.service';
-import {ObjectStorageService} from '../object-storage/object-storage.service';
-import {Patient} from '../patient-svc/entities/patient.entity';
-import {User} from '../session/entities/user.entity';
-import {Transaction} from '../smart-contract/entities/transaction.entity';
-import {SmsService} from '../sms/sms.service';
+import { _403, _404 } from '../../common/constants/errors';
+import { generateToken, randomSixDigit } from '../../helpers/common.helper';
+import { Repository } from 'typeorm';
+import { CachingService } from '../caching/caching.service';
+import { MailService } from '../mail/mail.service';
+import { ObjectStorageService } from '../object-storage/object-storage.service';
+import { Patient } from '../patient-svc/entities/patient.entity';
+import { User } from '../session/entities/user.entity';
+import { Transaction } from '../smart-contract/entities/transaction.entity';
+import { SmsService } from '../sms/sms.service';
 import {
   AddServiceToPackageDto,
   ContactPersonDto,
@@ -31,13 +31,13 @@ import {
   ProviderValidateEmailDto,
   RegisterProviderDto,
 } from './dto/provider.dto';
-import {Package} from './entities/package.entity';
-import {Provider} from './entities/provider.entity';
-import {Service} from './entities/service.entity';
+import { Package } from './entities/package.entity';
+import { Provider } from './entities/provider.entity';
+import { Service } from './entities/service.entity';
 
 @Injectable()
 export class ProviderService {
-  constructor (
+  constructor(
     @InjectRepository(Provider)
     private readonly providerRepository: Repository<Provider>,
     @InjectRepository(Transaction)
@@ -54,7 +54,7 @@ export class ProviderService {
     private cachingService: CachingService,
     private mailService: MailService,
     private smsService: SmsService,
-  ) { }
+  ) {}
 
   /**
    * This function retrieve provider account related by the provider id
@@ -64,26 +64,26 @@ export class ProviderService {
   async findProviderByUserId(userId: string): Promise<Provider> {
     return this.providerRepository.findOne({
       where: {
-        user: {id: userId},
+        user: { id: userId },
       },
     });
   }
 
   async providerVerifyEmail(payload: ProviderValidateEmailDto): Promise<void> {
-    const {email, password} = payload;
+    const { email, password } = payload;
     // generate random reset password token
     const verifyToken = generateToken();
 
     // save reset token in cache
     const cacheToken = `${APP_NAME}:email:${verifyToken}`;
 
-    const dataToSave: {email: string; password: string;} = {
+    const dataToSave: { email: string; password: string } = {
       email,
       password,
     };
 
     // cache key with 1 day ttl
-    await this.cachingService.save<{email: string; password: string;}>(
+    await this.cachingService.save<{ email: string; password: string }>(
       cacheToken,
       dataToSave,
       DAY,
@@ -119,12 +119,12 @@ export class ProviderService {
       occupation: payload?.contactPersonOccupation,
     } as ContactPersonDto;
 
-    // const result = await this.objectStorageService.saveObject(logo);
+    const result = await this.objectStorageService.saveObject(logo);
 
     // Get the email and user of the creator!.
     const cacheToken = `${APP_NAME}:email:${emailVerificationToken}`;
 
-    const dataCached: {email: string; password: string;} =
+    const dataCached: { email: string; password: string } =
       await this.cachingService.get<{
         email: string;
         password: string;
@@ -132,7 +132,7 @@ export class ProviderService {
     if (!dataCached)
       throw new ForbiddenException(_403.INVALID_EMAIL_VERIFICATION_TOKEN);
 
-    const {email, password} = dataCached;
+    const { email, password } = dataCached;
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
@@ -204,14 +204,14 @@ export class ProviderService {
     shortenHash: string,
   ): Promise<Record<string, any>> {
     const transaction = await this.transactionRepository.findOne({
-      where: {shortenHash, ownerType: UserType.PATIENT},
+      where: { shortenHash, ownerType: UserType.PATIENT },
     });
 
     if (!transaction)
       throw new NotFoundException(_404.INVALID_TRANSACTION_HASH);
 
     const patient = await this.patientRepository.findOne({
-      where: {id: transaction.ownerId},
+      where: { id: transaction.ownerId },
     });
 
     if (!patient) throw new NotFoundException(_404.PATIENT_NOT_FOUND);
@@ -244,9 +244,9 @@ export class ProviderService {
     // verify the transaction exists and if securityCode is right!
     const [transaction, provider] = await Promise.all([
       this.transactionRepository.findOne({
-        where: {shortenHash, ownerType: UserType.PATIENT},
+        where: { shortenHash, ownerType: UserType.PATIENT },
       }),
-      this.providerRepository.findOne({where: {id: providerId}}),
+      this.providerRepository.findOne({ where: { id: providerId } }),
     ]);
 
     if (!transaction)
@@ -287,7 +287,7 @@ export class ProviderService {
   async getAllTransactions(providerId: string): Promise<Record<string, any>[]> {
     const transactions = await this.transactionRepository
       .createQueryBuilder('transaction')
-      .where('transaction.ownerId = :providerId', {providerId})
+      .where('transaction.ownerId = :providerId', { providerId })
       .getMany();
     //TODO: paginate this!.
     return transactions;
@@ -303,7 +303,7 @@ export class ProviderService {
   ): Promise<Record<string, any>> {
     const transactions = await this.transactionRepository
       .createQueryBuilder('transaction')
-      .where('transaction.ownerId = :providerId', {providerId})
+      .where('transaction.ownerId = :providerId', { providerId })
       .getMany();
 
     let totalRedeemedAmount = 0,
@@ -335,7 +335,7 @@ export class ProviderService {
   async redeemVoucher(hashes: string[]): Promise<Record<string, any>[]> {
     const transactions = await this.transactionRepository
       .createQueryBuilder('transaction')
-      .where(`transaction.transactionHash In (:...hashes)`, {hashes})
+      .where(`transaction.transactionHash In (:...hashes)`, { hashes })
       .andWhere(`transaction.status = :status`, {
         status: VoucherStatus.UNCLAIMED,
       })
@@ -355,7 +355,7 @@ export class ProviderService {
   // Add service to provider
   async addServiceToProvider(payload: CreateServiceDto): Promise<Service> {
     const provider = await this.providerRepository.findOne({
-      where: {id: payload.providerId},
+      where: { id: payload.providerId },
     });
 
     if (!provider) throw new ForbiddenException(_404.PROVIDER_NOT_FOUND);
@@ -375,12 +375,10 @@ export class ProviderService {
   // Get services of provider
   async getServicesByProviderId(providerId: string): Promise<Service[]> {
 
-
-  const services = await this.servicesRepository.find({
+    const services = await this.servicesRepository.find({
       where: {provider: {id: providerId}},
       relations: ['provider'],
       select: ['id', 'createdAt', 'description', 'price', 'name']
-
     });
 
     return services;
@@ -389,7 +387,7 @@ export class ProviderService {
   // Add package to provider
   async addPackageToProvider(payload: CreatePackageDto): Promise<void> {
     const provider = await this.providerRepository.findOne({
-      where: {id: payload.providerId},
+      where: { id: payload.providerId },
     });
 
     if (!provider) throw new ForbiddenException(_404.PROVIDER_NOT_FOUND);
@@ -408,14 +406,14 @@ export class ProviderService {
   // Group services into package
   async addServiceToPackage(payload: AddServiceToPackageDto): Promise<void> {
     const provider = await this.providerRepository.findOne({
-      where: {id: payload.providerId},
+      where: { id: payload.providerId },
     });
 
     if (!provider) throw new ForbiddenException(_404.PROVIDER_NOT_FOUND);
 
     // Find package
     const pkg = await this.packageRepository.findOne({
-      where: {id: payload.package.id},
+      where: { id: payload.package.id },
     });
 
     if (!pkg) throw new ForbiddenException(_404.PACKAGE_NOT_FOUND);

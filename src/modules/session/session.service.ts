@@ -5,11 +5,11 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import {JwtService} from '@nestjs/jwt';
-import {InjectRepository} from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 
 import * as bcrypt from 'bcrypt';
-import {isEmpty} from 'class-validator';
+import { isEmpty } from 'class-validator';
 import * as crypto from 'crypto';
 import { _400, _401, _403, _404 } from '../../common/constants/errors';
 import { generateToken, randomSixDigit } from '../../helpers/common.helper';
@@ -32,7 +32,7 @@ import {
 
 @Injectable()
 export class SessionService {
-  constructor (
+  constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private jwtService: JwtService,
     //TODO: Update this DataSource Later!.
@@ -46,7 +46,7 @@ export class SessionService {
   async authenticateUser(
     payload: CreateSessionDto,
   ): Promise<SessionResponseDto> {
-    const {password, phoneNumber, username, email} = payload;
+    const { password, phoneNumber, username, email } = payload;
 
     if (isEmpty(phoneNumber) && isEmpty(username) && isEmpty(email))
       throw new BadRequestException({
@@ -55,7 +55,7 @@ export class SessionService {
       });
 
     const user: User = await this.userRepository.findOne({
-      where: [{username}, {email}, {phoneNumber}],
+      where: [{ username }, { email }, { phoneNumber }],
     });
 
     if (!user) throw new NotFoundException(_404.USER_NOT_FOUND);
@@ -78,8 +78,8 @@ export class SessionService {
 
       const isValidPassword = bcrypt.compareSync(password, user.password);
 
-      //if (!isValidPassword)
-      //  throw new UnauthorizedException(_401.INVALID_CREDENTIALS);
+      if (!isValidPassword)
+        throw new UnauthorizedException(_401.INVALID_CREDENTIALS);
     }
 
     if (user.role === UserRole.PROVIDER) {
@@ -152,7 +152,7 @@ export class SessionService {
    */
   async emailVerification(email: string): Promise<void> {
     // check if user exist
-    const userExist = await this.userRepository.findOne({where: {email}});
+    const userExist = await this.userRepository.findOne({ where: { email } });
 
     if (userExist)
       throw new ForbiddenException(_403.USER_ACCOUNT_ALREADY_EXIST);
@@ -231,7 +231,7 @@ export class SessionService {
    */
   async resetPassword(email: string): Promise<void> {
     // find user with provided password
-    const user = await this.userRepository.findOne({where: {email}});
+    const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) throw new NotFoundException(_404.USER_NOT_FOUND);
 
@@ -255,7 +255,7 @@ export class SessionService {
   async updatePassword(
     updatePasswordDto: UpdatePasswordDto,
   ): Promise<Record<string, any>> {
-    const {password, confirmPassword, resetPasswordToken} = updatePasswordDto;
+    const { password, confirmPassword, resetPasswordToken } = updatePasswordDto;
 
     // validate if token is valid
     const cachedToken = `${APP_NAME}:reset:${resetPasswordToken}`;
@@ -265,7 +265,7 @@ export class SessionService {
     if (!cachedEmail) throw new ForbiddenException(_403.INVALID_RESET_TOKEN);
 
     const user: User = await this.userRepository.findOne({
-      where: {email: cachedEmail},
+      where: { email: cachedEmail },
     });
 
     if (!user) throw new NotFoundException(_404.USER_NOT_FOUND);
