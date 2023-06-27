@@ -31,6 +31,8 @@ services:
 #      - wiiqare-net
   minio:
     image: bitnami/minio:latest
+    env_file:
+      - .env
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
