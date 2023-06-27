@@ -11,19 +11,19 @@ import {InjectRepository} from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import {isEmpty} from 'class-validator';
 import * as crypto from 'crypto';
-import {_400, _401, _403, _404} from 'src/common/constants/errors';
-import {generateToken, randomSixDigit} from 'src/helpers/common.helper';
-import {User} from 'src/modules/session/entities/user.entity';
-import {FindOneOptions, Repository} from 'typeorm';
-import {APP_NAME, DAY} from '../../common/constants/constants';
-import {UserRole, UserStatus} from '../../common/constants/enums';
-import {AppConfigService} from '../../config/app-config.service';
-import {CachingService} from '../caching/caching.service';
-import {MailService} from '../mail/mail.service';
-import {PayerService} from '../payer-svc/payer.service';
-import {ProviderService} from '../provider-svc/provider-svc.service';
-import {CreateSessionDto} from './dto/create-session.dto';
-import {JwtClaimsDataDto} from './dto/jwt-claims-data.dto';
+import { _400, _401, _403, _404 } from '../../common/constants/errors';
+import { generateToken, randomSixDigit } from '../../helpers/common.helper';
+import { User } from '../../modules/session/entities/user.entity';
+import { FindOneOptions, Repository } from 'typeorm';
+import { APP_NAME, DAY } from '../../common/constants/constants';
+import { UserRole, UserStatus } from '../../common/constants/enums';
+import { AppConfigService } from '../../config/app-config.service';
+import { CachingService } from '../caching/caching.service';
+import { MailService } from '../mail/mail.service';
+import { PayerService } from '../payer-svc/payer.service';
+import { ProviderService } from '../provider-svc/provider-svc.service';
+import { CreateSessionDto } from './dto/create-session.dto';
+import { JwtClaimsDataDto } from './dto/jwt-claims-data.dto';
 import {
   SessionResponseDto,
   SessionVerifyEmailOTPResponseDto,
@@ -41,7 +41,7 @@ export class SessionService {
     private readonly providerService: ProviderService,
     private mailService: MailService,
     private cachingService: CachingService,
-  ) { }
+  ) {}
 
   async authenticateUser(
     payload: CreateSessionDto,
