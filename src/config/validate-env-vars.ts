@@ -1,6 +1,6 @@
-import {plainToClass} from 'class-transformer';
-import {validateSync} from 'class-validator';
-import {EnvironmentVariables} from './dto/environment-variables.dto';
+import { plainToClass } from 'class-transformer';
+import { validateSync } from 'class-validator';
+import { EnvironmentVariables } from './dto/environment-variables.dto';
 
 export function validateEnvVars(config: Record<string, unknown>) {
   const validationConfigs = plainToClass(EnvironmentVariables, config, {
@@ -14,7 +14,7 @@ export function validateEnvVars(config: Record<string, unknown>) {
     whitelist: true,
   });
 
-  //if (errors.length > 0) throw new Error(errors.toString());
+  if (errors.length > 0) throw new Error(errors.toString());
 
   return validationConfigs;
 }
