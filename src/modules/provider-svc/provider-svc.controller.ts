@@ -109,7 +109,7 @@ export class ProviderController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary:
-      'API endpoint is used to retrieve all transaction for a given provider',
+      'API endpoint is used to retrieve all transaction for a given provider.',
   })
   getAllTransactionByProviderId(
     @Query() payload: SearchTransactionDto,
@@ -132,14 +132,13 @@ export class ProviderController {
   }
 
   @Post('service')
-  @Post(':providerId/service')
+  @Post('/service')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'API endpoint for Provider to create service' })
   createService(
-    @Param('providerId') providerId: string,
     @Body() serviceDto: CreateServiceDto,
-  ): Promise<void> {
-    serviceDto.providerId = providerId;
+  ): Promise<Service> {
+
     return this.providerService.addServiceToProvider(serviceDto);
   }
 
