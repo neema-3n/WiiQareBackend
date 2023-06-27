@@ -14,7 +14,7 @@ export function validateEnvVars(config: Record<string, unknown>) {
     whitelist: true,
   });
 
-  if (errors.length > 0) throw new Error(errors.toString());
+  //if (errors.length > 0) throw new Error(errors.toString());
 
   return validationConfigs;
 }

@@ -30,4 +30,4 @@ import { ProviderService } from './provider-svc.service';
   providers: [ProviderService],
   exports: [ProviderService],
 })
-export class ProviderSvcModule { }
+export class ProviderSvcModule {}

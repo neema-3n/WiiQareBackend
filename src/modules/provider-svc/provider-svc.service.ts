@@ -119,7 +119,7 @@ export class ProviderService {
       occupation: payload?.contactPersonOccupation,
     } as ContactPersonDto;
 
-    const result = await this.objectStorageService.saveObject(logo);
+    // const result = await this.objectStorageService.saveObject(logo);
 
     // Get the email and user of the creator!.
     const cacheToken = `${APP_NAME}:email:${emailVerificationToken}`;
@@ -369,16 +369,15 @@ export class ProviderService {
 
     // Save service
     service = await this.servicesRepository.save(service);
-    return service
+    return service;
   }
 
   // Get services of provider
   async getServicesByProviderId(providerId: string): Promise<Service[]> {
-
     const services = await this.servicesRepository.find({
-      where: {provider: {id: providerId}},
+      where: { provider: { id: providerId } },
       relations: ['provider'],
-      select: ['id', 'createdAt', 'description', 'price', 'name']
+      select: ['id', 'createdAt', 'description', 'price', 'name'],
     });
 
     return services;
@@ -402,15 +401,14 @@ export class ProviderService {
 
     // Save package
     newPackage = await this.packageRepository.save(newPackage);
-    return newPackage
+    return newPackage;
   }
 
   // Get services of provider
   async getPackagesByProviderId(providerId: string): Promise<Package[]> {
-
     const packages = await this.packageRepository.find({
-      where: {provider: {id: providerId}},
-      relations: ['provider', 'services']
+      where: { provider: { id: providerId } },
+      relations: ['provider', 'services'],
     });
 
     return packages;
@@ -434,7 +432,7 @@ export class ProviderService {
     // Create and save new services
     const services = await Promise.all(
       payload.services.map(async (serviceDto) => {
-        let service = new Service();
+        const service = new Service();
         service.name = serviceDto.name;
         service.description = serviceDto.description;
         service.price = serviceDto.price;

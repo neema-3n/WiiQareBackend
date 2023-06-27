@@ -42,7 +42,7 @@ import { SMSModule } from './modules/sms/sms.module';
     PayerSvcModule,
     ProviderSvcModule,
     CommonModule,
-    SmartContractModule,
+    // SmartContractModule,
     MessagingModule,
     SMSModule,
     ObjectStorageModule,
@@ -54,4 +54,4 @@ import { SMSModule } from './modules/sms/sms.module';
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
-export class AppModule { }
+export class AppModule {}

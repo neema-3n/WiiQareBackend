@@ -32,7 +32,7 @@ import { Package } from './entities/package.entity';
 @ApiTags('Provider')
 @Controller('provider')
 export class ProviderController {
-  constructor(private providerService: ProviderService) { }
+  constructor(private providerService: ProviderService) {}
 
   @Post()
   @Public()
@@ -136,10 +136,7 @@ export class ProviderController {
   @Post('/service')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'API endpoint for Provider to create service' })
-  createService(
-    @Body() serviceDto: CreateServiceDto,
-  ): Promise<Service> {
-
+  createService(@Body() serviceDto: CreateServiceDto): Promise<Service> {
     return this.providerService.addServiceToProvider(serviceDto);
   }
 
