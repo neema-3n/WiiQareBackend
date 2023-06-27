@@ -1,12 +1,12 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { StripeModule } from 'nestjs-stripe';
-import { Transaction } from './entities/transaction.entity';
-import { PaymentController } from './payment.controller';
-import { SmartContractController } from './smart-contract.controller';
-import { nodeProvider } from './smart-contract.providers';
-import { SmartContractService } from './smart-contract.service';
-import { TransactionService } from './transaction.service';
+import {Module} from '@nestjs/common';
+import {TypeOrmModule} from '@nestjs/typeorm';
+import {StripeModule} from 'nestjs-stripe';
+import {Transaction} from './entities/transaction.entity';
+import {PaymentController} from './payment.controller';
+import {SmartContractController} from './smart-contract.controller';
+import {nodeProvider} from './smart-contract.providers';
+import {SmartContractService} from './smart-contract.service';
+import {TransactionService} from './transaction.service';
 
 @Module({
   imports: [
@@ -20,4 +20,4 @@ import { TransactionService } from './transaction.service';
   controllers: [SmartContractController, PaymentController],
   providers: [SmartContractService, TransactionService, nodeProvider],
 })
-export class SmartContractModule {}
+export class SmartContractModule { }
