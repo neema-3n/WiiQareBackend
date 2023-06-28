@@ -1,6 +1,51 @@
 version: '3.7'
 
 services:
+  # api-dev:
+  #     container_name: wiiqare-backend-dev
+  #     image: wiiqare-api-dev.0.0.1
+  #     build:
+  #       dockerfile: Dockerfile
+  #       context: .
+  #       # Only will build development stage from our dockerfile
+  #       target: development
+  #     volumes:
+  #       - .:/usr/src/app
+  #       - /usr/src/app/node_modules
+  #     restart: unless-stopped
+  #     env_file:
+  #     - .env
+  #     # Run a command against the development stage of the image
+  #     command: yarn run start:dev
+  #     ports:
+  #       - 3001:3000
+  #     depends_on:
+  #       - minio
+  #     networks:
+  #       - wiiqare-net
+     
+  # api-prod:
+  #     container_name: wiiqare-backend-prod
+  #     image: wiiqare-api-prod.0.0.1
+  #     build:
+  #       dockerfile: Dockerfile
+  #       context: .
+  #       # Only will build development stage from our dockerfile
+  #       target: production
+  #     volumes:
+  #       - .:/usr/src/app
+  #       - /usr/src/app/node_modules
+  #     restart: unless-stopped
+  #     env_file:
+  #     - .env
+  #     # Run a command against the development stage of the image
+  #     command: yarn run start:prod
+  #     ports:
+  #       - 3002:3001
+  #     depends_on:
+  #       - minio
+  #     networks:
+  #       - wiiqare-net
   # db:
   #   image: postgres
   #   container_name: wiiQare-db
