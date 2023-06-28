@@ -134,7 +134,7 @@ export class PayerService {
       payers.push({
         'payerId': payerTotalBeneficiaries[_i].id, 
         'payerName': payerTotalBeneficiaries[_i].lastName,
-        'registredDate': payerTotalBeneficiaries[_i].createdAt,
+        'registredDate': new Date(payerTotalBeneficiaries[_i].createdAt).toDateString(),
         'payerCountry': lookup.byFips(payerTotalBeneficiaries[_i].countryISO2).country,
         'totalBeneficiaries': payerTotalBeneficiaries[_i].totalBeneficiaries,
         'totalPurchasedVouchers': payerTotalBeneficiaries[_i].totalPurchasedVouchers,
