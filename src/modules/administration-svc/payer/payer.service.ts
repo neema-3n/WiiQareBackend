@@ -134,13 +134,13 @@ export class PayerService {
       payers.push({
         'payerId': payerTotalBeneficiaries[_i].id, 
         'payerName': payerTotalBeneficiaries[_i].lastName,
-        'registredDate': new Date(payerTotalBeneficiaries[_i].createdAt).toDateString(),
+        'registeredDate': new Date(payerTotalBeneficiaries[_i].createdAt).toLocaleDateString(),
         'payerCountry': lookup.byFips(payerTotalBeneficiaries[_i].countryISO2).country,
-        'totalBeneficiaries': payerTotalBeneficiaries[_i].totalBeneficiaries,
-        'totalPurchasedVouchers': payerTotalBeneficiaries[_i].totalPurchasedVouchers,
-        'totalUnspentVouchers': this.getTotal(payerTotalUnspentVouchers, payerTotalBeneficiaries[_i].id, "totalUnspentVouchers"),
-        'totalOpenVouchers': this.getTotal(payerTotalOpenVouchers, payerTotalBeneficiaries[_i].id, "totalOpenVouchers"),
-        'totalRedeemedVouchers': this.getTotal(payerTotalRedeemedVouchers, payerTotalBeneficiaries[_i].id, "totalRedeemedVouchers")
+        'beneficiaries': payerTotalBeneficiaries[_i].totalBeneficiaries,
+        'purchasedVouchers': payerTotalBeneficiaries[_i].totalPurchasedVouchers,
+        'unspentVouchers': this.getTotal(payerTotalUnspentVouchers, payerTotalBeneficiaries[_i].id, "totalUnspentVouchers"),
+        'openVouchers': this.getTotal(payerTotalOpenVouchers, payerTotalBeneficiaries[_i].id, "totalOpenVouchers"),
+        'redeemedVouchers': this.getTotal(payerTotalRedeemedVouchers, payerTotalBeneficiaries[_i].id, "totalRedeemedVouchers")
       });
     }
     return payers as PayerListDto[];
@@ -155,3 +155,4 @@ export class PayerService {
      return 0;
    } 
 }
+ 
