@@ -7,6 +7,8 @@ import { Transaction } from 'src/modules/smart-contract/entities/transaction.ent
 import { Repository } from 'typeorm';
 import { PayerListDto } from './dto/payers.dto';
 
+const lookup = require('country-code-lookup');
+
 @Injectable()
 export class PayerService {
   constructor(
@@ -61,115 +63,95 @@ export class PayerService {
     return `Payer with id : ${id}`;
   }
 
-  //TODO  \payers
+  /**
+   * This method is used to get all recap of all payers like name, country, all beneficiaries of every payer, etc
+   * @returns
+   */
   async findAllPayers(): Promise<PayerListDto[]> {
-    const payerTotalBeneficiaries: any =
-      await this.TransactionRepository.createQueryBuilder('transaction')
-        .leftJoinAndMapMany(
-          'transaction.sender',
-          Payer,
-          'payer',
-          'payer.user = transaction.senderId',
-        )
-        .groupBy('payer.id')
-        .select('payer.id', 'id')
-        .addSelect('payer.lastName', 'lastName')
-        .addSelect('payer.createdAt', 'createdAt')
-        .addSelect('COUNT(*)', 'totalBeneficiaries')
-        .addSelect('SUM(transaction.amount)', 'totalPurchasedVouchers')
-        .getRawMany();
+    // First request and get id, name, 
+    const payerTotalBeneficiaries: any = await this.TransactionRepository
+      .createQueryBuilder('transaction')
+      .leftJoinAndMapMany(
+        'transaction.sender',
+        Payer,
+        'payer',
+        'payer.user = transaction.senderId',
+      )
+      .groupBy("payer.id")
+      .select('payer.id', 'id')
+      .addSelect('payer.lastName', 'lastName')
+      .addSelect('payer.country', 'countryISO2')
+      .addSelect('payer.createdAt', 'createdAt')
+      .addSelect("COUNT(DISTINCT(voucher->>'patientId'))", "totalBeneficiaries")
+      .addSelect("COUNT(*)", "totalPurchasedVouchers")
+      .getRawMany();
 
-    const payerTotalUnspentVouchers: any =
-      await this.TransactionRepository.createQueryBuilder('transaction')
-        .leftJoinAndMapMany(
-          'transaction.sender',
-          Payer,
-          'payer',
-          'payer.user = transaction.senderId',
-        )
-        .select('payer.id', 'id')
-        .groupBy('payer.id')
-        .addSelect('SUM(transaction.amount)', 'totalUnspentVouchers')
-        .where("transaction.ownerType = 'PATIENT'")
-        .getRawMany();
+    
+    const payerTotalUnspentVouchers: any = await this.TransactionRepository
+      .createQueryBuilder('transaction')
+      .leftJoinAndMapMany(
+        'transaction.sender',
+        Payer,
+        'payer',
+        'payer.user = transaction.senderId',
+      )
+      .select("payer.id", "id")
+      .groupBy("payer.id")
+      .addSelect("COUNT(*)", "totalUnspentVouchers")
+      .where("(transaction.ownerType = 'PATIENT' AND transaction.status = 'UNCLAIMED')")
+      .getRawMany();
 
-    const payerTotalOpenVouchers: any =
-      await this.TransactionRepository.createQueryBuilder('transaction')
-        .leftJoinAndMapMany(
-          'transaction.sender',
-          Payer,
-          'payer',
-          'payer.user = transaction.senderId',
-        )
-        .select('payer.id', 'id')
-        .groupBy('payer.id')
-        .addSelect('SUM(transaction.amount)', 'totalOpenVouchers')
-        .where(
-          "(transaction.ownerType = 'PROVIDER' AND transaction.status = 'UNCLAIMED')",
-        )
-        .getRawMany();
+      const payerTotalOpenVouchers: any = await this.TransactionRepository
+      .createQueryBuilder('transaction')
+      .leftJoinAndMapMany(
+        'transaction.sender',
+        Payer,
+        'payer',
+        'payer.user = transaction.senderId',
+      )
+      .select("payer.id", "id")
+      .groupBy("payer.id")
+      .addSelect("COUNT(*)", "totalOpenVouchers")
+      .where("(transaction.ownerType = 'PROVIDER' AND transaction.status = 'UNCLAIMED')")
+      .getRawMany();
+      
+      const payerTotalRedeemedVouchers: any = await this.TransactionRepository
+      .createQueryBuilder('transaction')
+      .leftJoinAndMapMany(
+        'transaction.sender',
+        Payer,
+        'payer',
+        'payer.user = transaction.senderId',
+      )
+      .select("payer.id", "id")
+      .groupBy("payer.id")
+      .addSelect("COUNT(*)", "totalRedeemedVouchers")
+      .where("(transaction.ownerType = 'PROVIDER' AND transaction.status = 'PENDING')")
+      .getRawMany();
 
-    const payerTotalRedeemedVouchers: any =
-      await this.TransactionRepository.createQueryBuilder('transaction')
-        .leftJoinAndMapMany(
-          'transaction.sender',
-          Payer,
-          'payer',
-          'payer.user = transaction.senderId',
-        )
-        .select('payer.id', 'id')
-        .groupBy('payer.id')
-        .addSelect('SUM(transaction.amount)', 'totalRedeemedVouchers')
-        .where(
-          "(transaction.ownerType = 'PROVIDER' AND transaction.status = 'PENDING')",
-        )
-        .getRawMany();
-
-    const payers = [];
-    for (let _i = 0; _i < payerTotalBeneficiaries.length; _i++) {
+    const payers = []; 
+    for (var _i = 0; _i < payerTotalBeneficiaries.length; _i++) {
       payers.push({
-        payerId: payerTotalBeneficiaries[_i].id,
-        payerName: payerTotalBeneficiaries[_i].lastName,
-        registredDate: payerTotalBeneficiaries[_i].createdAt,
-        totalBeneficiaries: payerTotalBeneficiaries[_i].totalBeneficiaries,
-        totalPurchasedVouchers:
-          payerTotalBeneficiaries[_i].totalPurchasedVouchers,
-        totalUnspentVouchers: this.getTotal(
-          payerTotalUnspentVouchers,
-          payerTotalBeneficiaries[_i].id,
-          'totalUnspentVouchers',
-        ),
-        totalOpenVouchers: this.getTotal(
-          payerTotalOpenVouchers,
-          payerTotalBeneficiaries[_i].id,
-          'totalOpenVouchers',
-        ),
-        totalRedeemedVouchers: this.getTotal(
-          payerTotalRedeemedVouchers,
-          payerTotalBeneficiaries[_i].id,
-          'totalRedeemedVouchers',
-        ),
+        'payerId': payerTotalBeneficiaries[_i].id, 
+        'payerName': payerTotalBeneficiaries[_i].lastName,
+        'registredDate': new Date(payerTotalBeneficiaries[_i].createdAt).toDateString(),
+        'payerCountry': lookup.byFips(payerTotalBeneficiaries[_i].countryISO2).country,
+        'totalBeneficiaries': payerTotalBeneficiaries[_i].totalBeneficiaries,
+        'totalPurchasedVouchers': payerTotalBeneficiaries[_i].totalPurchasedVouchers,
+        'totalUnspentVouchers': this.getTotal(payerTotalUnspentVouchers, payerTotalBeneficiaries[_i].id, "totalUnspentVouchers"),
+        'totalOpenVouchers': this.getTotal(payerTotalOpenVouchers, payerTotalBeneficiaries[_i].id, "totalOpenVouchers"),
+        'totalRedeemedVouchers': this.getTotal(payerTotalRedeemedVouchers, payerTotalBeneficiaries[_i].id, "totalRedeemedVouchers")
       });
     }
     return payers as PayerListDto[];
-
-    /*
-    return payerTotalBeneficiaries.map((payer) => {
-      return {
-        'payerId': payer.id,
-        'payerName': payer.lastName,
-        'registredDate': payer.createdAt,
-        'totalBeneficiaries': payer.totalBeneficiaries,
-        'totalPurchasedVouchers': payer.totalPurchasedVouchers
-      }
-    }) as PayerListDto[];
-    */
   }
 
-  getTotal(totalObjet: [], id: string, _key: string): number {
-    for (const total of totalObjet) {
-      if (total['id'] === id) return total[_key];
-    }
-    return 0;
-  }
+  
+  getTotal(totalObjet : [], _id: string, _key : string): number {
+      for(var total of totalObjet){
+       if (total["id"] === _id)
+         return total[_key];
+     }
+     return 0;
+   } 
 }
