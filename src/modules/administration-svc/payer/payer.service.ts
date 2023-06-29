@@ -33,12 +33,9 @@ export class PayerService {
 
     const totalNumberOfPendingVouchers =
       await this.TransactionRepository.createQueryBuilder('transaction')
-        .where('transaction.status = :status1', {
-          status1: VoucherStatus.PENDING,
-        })
-        .orWhere('transaction.status = :status2', {
-          status2: VoucherStatus.UNCLAIMED,
-        })
+        .where(
+          "(transaction.ownerType = 'PATIENT' AND transaction.status = 'UNCLAIMED')",
+        )
         .getCount();
 
     const totalNumberOfRedeemedVouchers =
