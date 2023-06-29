@@ -70,13 +70,13 @@ export class PayerService {
   async findAllPayers(): Promise<PayerListDto[]> {
     // First request and get id, name,
     const payerTotalBeneficiaries: any =
-      await this.TransactionRepository.createQueryBuilder('transaction')
-        .leftJoinAndMapMany(
-          'transaction.sender',
-          Payer,
-          'payer',
-          'payer.user = transaction.senderId',
-        )
+      await this.PayerRepository.createQueryBuilder('payer')
+      .leftJoinAndMapMany(
+        'payer.user',
+        Transaction,
+        'transaction',
+        'transaction.senderId = payer.user',
+      )
         .groupBy('payer.id')
         .select('payer.id', 'id')
         .addSelect('payer.lastName', 'lastName')
@@ -89,75 +89,76 @@ export class PayerService {
         .addSelect('COUNT(*)', 'totalPurchasedVouchers')
         .getRawMany();
 
-    const payerTotalUnspentVouchers: any =
-      await this.TransactionRepository.createQueryBuilder('transaction')
-        .leftJoinAndMapMany(
-          'transaction.sender',
-          Payer,
-          'payer',
-          'payer.user = transaction.senderId',
-        )
+    const payerTotalPendingVouchers: any =
+      await this.PayerRepository.createQueryBuilder('payer')
+      .leftJoinAndMapMany(
+        'payer.user',
+        Transaction,
+        'transaction',
+        'transaction.senderId = payer.user',
+      )
         .select('payer.id', 'id')
         .groupBy('payer.id')
-        .addSelect('COUNT(*)', 'totalUnspentVouchers')
+        .addSelect('COUNT(*)', 'totalPendingVouchers')
         .where(
           "(transaction.ownerType = 'PATIENT' AND transaction.status = 'UNCLAIMED')",
         )
         .getRawMany();
 
-    const payerTotalOpenVouchers: any =
-      await this.TransactionRepository.createQueryBuilder('transaction')
-        .leftJoinAndMapMany(
-          'transaction.sender',
-          Payer,
-          'payer',
-          'payer.user = transaction.senderId',
-        )
+    const payerTotalUnclaimedVouchers: any =
+      await this.PayerRepository.createQueryBuilder('payer')
+      .leftJoinAndMapMany(
+        'payer.user',
+        Transaction,
+        'transaction',
+        'transaction.senderId = payer.user',
+      )
         .select('payer.id', 'id')
         .groupBy('payer.id')
-        .addSelect('COUNT(*)', 'totalOpenVouchers')
+        .addSelect('COUNT(*)', 'totalUnclaimedVouchers')
         .where(
           "(transaction.ownerType = 'PROVIDER' AND transaction.status = 'UNCLAIMED')",
         )
         .getRawMany();
 
     const payerTotalRedeemedVouchers: any =
-      await this.TransactionRepository.createQueryBuilder('transaction')
-        .leftJoinAndMapMany(
-          'transaction.sender',
-          Payer,
-          'payer',
-          'payer.user = transaction.senderId',
-        )
+      await this.PayerRepository.createQueryBuilder('payer')
+      .leftJoinAndMapMany(
+        'payer.user',
+        Transaction,
+        'transaction',
+        'transaction.senderId = payer.user',
+      )
         .select('payer.id', 'id')
         .groupBy('payer.id')
         .addSelect('COUNT(*)', 'totalRedeemedVouchers')
-        .where(
-          "(transaction.ownerType = 'PROVIDER' AND transaction.status = 'PENDING')",
-        )
+        .where("transaction.status = 'CLAIMED'")
+        // .where(
+        //   "(transaction.ownerType = 'PROVIDER' AND transaction.status = 'PENDING')",
+        // )
         .getRawMany();
 
     const payers = [];
     for (let _i = 0; _i < payerTotalBeneficiaries.length; _i++) {
+      var _country = lookup.byFips(payerTotalBeneficiaries[_i].countryISO2);
       payers.push({
         payerId: payerTotalBeneficiaries[_i].id,
         payerName: payerTotalBeneficiaries[_i].lastName,
         registeredDate: new Date(
           payerTotalBeneficiaries[_i].createdAt,
         ).toLocaleDateString(),
-        payerCountry: lookup.byFips(payerTotalBeneficiaries[_i].countryISO2)
-          .country,
+        payerCountry: (_country != null)?_country.country:"",
         beneficiaries: payerTotalBeneficiaries[_i].totalBeneficiaries,
         purchasedVouchers: payerTotalBeneficiaries[_i].totalPurchasedVouchers,
-        unspentVouchers: this.getTotal(
-          payerTotalUnspentVouchers,
+        pendingVouchers: this.getTotal(
+          payerTotalPendingVouchers,
           payerTotalBeneficiaries[_i].id,
-          'totalUnspentVouchers',
+          'totalPendingVouchers',
         ),
-        openVouchers: this.getTotal(
-          payerTotalOpenVouchers,
+        unclaimedVouchers: this.getTotal(
+          payerTotalUnclaimedVouchers,
           payerTotalBeneficiaries[_i].id,
-          'totalOpenVouchers',
+          'totalUnclaimedVouchers',
         ),
         redeemedVouchers: this.getTotal(
           payerTotalRedeemedVouchers,
@@ -169,7 +170,7 @@ export class PayerService {
     return payers as PayerListDto[];
   }
 
-  getTotal(totalObjet: [], _id: string, _key: string): number {
+  private getTotal(totalObjet: [], _id: string, _key: string): number {
     for (const total of totalObjet) {
       if (total['id'] === _id) return total[_key];
     }
