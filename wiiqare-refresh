@@ -7,5 +7,5 @@ if [ -z "$output" ];then
  echo "empty"
 else
  echo "not empty"
- git pull && yarn build && yarn start:prod
+ git pull && yarn build && yarn pm2 restart
 fi
