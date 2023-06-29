@@ -71,12 +71,12 @@ export class PayerService {
     // First request and get id, name,
     const payerTotalBeneficiaries: any =
       await this.PayerRepository.createQueryBuilder('payer')
-      .leftJoinAndMapMany(
-        'payer.user',
-        Transaction,
-        'transaction',
-        'transaction.senderId = payer.user',
-      )
+        .leftJoinAndMapMany(
+          'payer.user',
+          Transaction,
+          'transaction',
+          'transaction.senderId = payer.user',
+        )
         .groupBy('payer.id')
         .select('payer.id', 'id')
         .addSelect('payer.lastName', 'lastName')
@@ -91,12 +91,12 @@ export class PayerService {
 
     const payerTotalPendingVouchers: any =
       await this.PayerRepository.createQueryBuilder('payer')
-      .leftJoinAndMapMany(
-        'payer.user',
-        Transaction,
-        'transaction',
-        'transaction.senderId = payer.user',
-      )
+        .leftJoinAndMapMany(
+          'payer.user',
+          Transaction,
+          'transaction',
+          'transaction.senderId = payer.user',
+        )
         .select('payer.id', 'id')
         .groupBy('payer.id')
         .addSelect('COUNT(*)', 'totalPendingVouchers')
@@ -107,12 +107,12 @@ export class PayerService {
 
     const payerTotalUnclaimedVouchers: any =
       await this.PayerRepository.createQueryBuilder('payer')
-      .leftJoinAndMapMany(
-        'payer.user',
-        Transaction,
-        'transaction',
-        'transaction.senderId = payer.user',
-      )
+        .leftJoinAndMapMany(
+          'payer.user',
+          Transaction,
+          'transaction',
+          'transaction.senderId = payer.user',
+        )
         .select('payer.id', 'id')
         .groupBy('payer.id')
         .addSelect('COUNT(*)', 'totalUnclaimedVouchers')
@@ -123,12 +123,12 @@ export class PayerService {
 
     const payerTotalRedeemedVouchers: any =
       await this.PayerRepository.createQueryBuilder('payer')
-      .leftJoinAndMapMany(
-        'payer.user',
-        Transaction,
-        'transaction',
-        'transaction.senderId = payer.user',
-      )
+        .leftJoinAndMapMany(
+          'payer.user',
+          Transaction,
+          'transaction',
+          'transaction.senderId = payer.user',
+        )
         .select('payer.id', 'id')
         .groupBy('payer.id')
         .addSelect('COUNT(*)', 'totalRedeemedVouchers')
@@ -140,14 +140,14 @@ export class PayerService {
 
     const payers = [];
     for (let _i = 0; _i < payerTotalBeneficiaries.length; _i++) {
-      var _country = lookup.byFips(payerTotalBeneficiaries[_i].countryISO2);
+      const _country = lookup.byFips(payerTotalBeneficiaries[_i].countryISO2);
       payers.push({
         payerId: payerTotalBeneficiaries[_i].id,
         payerName: payerTotalBeneficiaries[_i].lastName,
         registeredDate: new Date(
           payerTotalBeneficiaries[_i].createdAt,
         ).toLocaleDateString(),
-        payerCountry: (_country != null)?_country.country:"",
+        payerCountry: _country != null ? _country.country : '',
         beneficiaries: payerTotalBeneficiaries[_i].totalBeneficiaries,
         purchasedVouchers: payerTotalBeneficiaries[_i].totalPurchasedVouchers,
         pendingVouchers: this.getTotal(
