@@ -6,8 +6,13 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+<<<<<<< HEAD
     "yarn:ci": "rm -rf node_modules && yarn install --frozen-lockfile --production",
     "start:dev:full": "sudo docker compose down  && sudo docker compose up -d && nest start --watch",
+=======
+    "yarn:ci": "rm -rf node_modules && yarn install ",
+    "prod": "docker compose down  && docker compose up -d",
+>>>>>>> f55f98468e5151499656fa0a287d1773737fe3aa
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
