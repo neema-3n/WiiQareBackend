@@ -82,6 +82,7 @@ export class PayerService {
         .groupBy('payer.id')
         .select('payer.id', 'id')
         .addSelect('payer.lastName', 'lastName')
+        .addSelect('payer.firstName', 'firstName')
         .addSelect('payer.country', 'countryISO2')
         .addSelect('payer.createdAt', 'createdAt')
         .addSelect(
@@ -145,7 +146,7 @@ export class PayerService {
       const _country = lookup.byFips(payerTotalBeneficiaries[_i].countryISO2);
       payers.push({
         payerId: payerTotalBeneficiaries[_i].id,
-        payerName: payerTotalBeneficiaries[_i].lastName,
+        payerName: payerTotalBeneficiaries[_i].firstName + ' ' + payerTotalBeneficiaries[_i].lastName,
         registeredDate: new Date(
           payerTotalBeneficiaries[_i].createdAt,
         ).toLocaleDateString(),
