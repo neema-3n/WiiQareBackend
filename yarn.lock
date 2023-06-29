@@ -4024,6 +4024,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"country-code-lookup@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "country-code-lookup@npm:0.1.0"
+  checksum: 4c5bae6cd2ddcb5b004d260c48dfb980f0eebbc10f2a6dffaebea2199901ff167f1c96d41eddcd1ba88baf59434fd6a4c86ac5c8e5450a141ae4c4a35ac411bc
+  languageName: node
+  linkType: hard
+
 "crc-32@npm:^1.2.0":
   version: 1.2.2
   resolution: "crc-32@npm:1.2.2"
@@ -12589,6 +12596,7 @@ __metadata:
     class-transformer: ^0.5.1
     class-validator: ^0.14.0
     codecov: ^3.8.3
+    country-code-lookup: ^0.1.0
     dotenv: ^16.0.3
     eslint: ^8.0.1
     eslint-config-prettier: ^8.3.0
