@@ -9,3 +9,4 @@ else
  echo "not empty"
  git pull && yarn build && yarn pm2 restart
 fi
+
