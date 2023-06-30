@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { VoucherStatus } from 'src/common/constants/enums';
+import { UserType, VoucherStatus } from 'src/common/constants/enums';
 import { Payer } from 'src/modules/payer-svc/entities/payer.entity';
 import { User } from 'src/modules/session/entities/user.entity';
 import { Transaction } from 'src/modules/smart-contract/entities/transaction.entity';
 import { Repository } from 'typeorm';
-import { PayerListDto } from './dto/payers.dto';
+import { PayerListDto, PayerSummaryDto } from './dto/payers.dto';
 
 import lookup from 'country-code-lookup';
+import { subMonths } from 'date-fns';
 
 @Injectable()
 export class PayerService {
@@ -25,19 +26,24 @@ export class PayerService {
    * This method is used to get global summary of payers related vouchers information
    * @returns
    */
-  async getSummary() {
+  async getSummary(): Promise<PayerSummaryDto> {
+    // total number of registered payers
     const numberOfRegisteredPayers = await this.PayerRepository.count();
 
+    //number of purchased vouchers
     const totalNumberOfPurchasedVouchers =
       await this.TransactionRepository.count();
 
-    const totalNumberOfPendingVouchers =
-      await this.TransactionRepository.createQueryBuilder('transaction')
-        .where(
-          "(transaction.ownerType = 'PATIENT' AND transaction.status = 'UNCLAIMED')",
-        )
-        .getCount();
+    //total number of pending vouchers
+    const result = await this.TransactionRepository.findAndCount({
+      where: {
+        ownerType: UserType.PATIENT,
+        status: VoucherStatus.UNCLAIMED,
+      },
+    });
+    const totalNumberOfPendingVouchers = result[1];
 
+    // total Number of redeemed vouchers
     const totalNumberOfRedeemedVouchers =
       await this.TransactionRepository.count({
         where: {
@@ -45,8 +51,21 @@ export class PayerService {
         },
       });
 
-    // TODO : use date-fns to get active payers dates from the last 6months
-    const numberOfActivePayers = 0;
+    // Total number of Active Payers
+
+    const numberOfActivePayers = await this.PayerRepository.createQueryBuilder(
+      'payer',
+    )
+      .leftJoinAndMapMany(
+        'payer.user',
+        Transaction,
+        'transaction',
+        'transaction.senderId = payer.user',
+      )
+      .where('transaction.createdAt >= :datePrior', {
+        datePrior: subMonths(Date.now(), 6),
+      })
+      .getCount();
 
     return {
       numberOfRegisteredPayers,
@@ -54,12 +73,7 @@ export class PayerService {
       totalNumberOfPendingVouchers,
       totalNumberOfRedeemedVouchers,
       numberOfActivePayers,
-    };
-  }
-
-  //TODO :  \payers\id
-  findPayer(id) {
-    return `Payer with id : ${id}`;
+    } as PayerSummaryDto;
   }
 
   /**
@@ -143,7 +157,10 @@ export class PayerService {
       const _country = lookup.byFips(payerTotalBeneficiaries[_i].countryISO2);
       payers.push({
         payerId: payerTotalBeneficiaries[_i].id,
-        payerName: payerTotalBeneficiaries[_i].firstName + ' ' + payerTotalBeneficiaries[_i].lastName,
+        payerName:
+          payerTotalBeneficiaries[_i].firstName +
+          ' ' +
+          payerTotalBeneficiaries[_i].lastName,
         registeredDate: new Date(
           payerTotalBeneficiaries[_i].createdAt,
         ).toLocaleDateString(),
