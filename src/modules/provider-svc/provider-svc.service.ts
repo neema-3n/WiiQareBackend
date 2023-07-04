@@ -452,6 +452,13 @@ export class ProviderService {
   }
 
   async listProvider(): Promise<any> {
-    return await this.providerRepository.find({order: {createdAt: 'DESC'}, take: 5, })
+
+    let providers = await this.providerRepository.createQueryBuilder('providers')
+    .leftJoinAndSelect('providers.packages', 'packages')
+    .orderBy('providers.createdAt', 'DESC').take(5)
+    .getMany();
+
+    return providers
+
   }
 }
