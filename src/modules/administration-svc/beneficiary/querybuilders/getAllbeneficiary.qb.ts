@@ -16,7 +16,10 @@ async function getPatientInfoQueryBuilder(
     .addSelect('patient.id::text', 'patientId')
     .addSelect("concat_ws(' ',patient.first_name, patient.last_name)", 'name')
     .addSelect('patient.country', 'country')
-    .addSelect("to_char(patient.created_at,'dd/mm/yyyy')", 'registrationDate');
+    .addSelect("to_char(patient.created_at,'dd/mm/yyyy')", 'registrationDate')
+    .orderBy(`"name"`)
+    .take(10)
+    .skip(10);
 }
 async function getUniqueProviderCountPerPatientQueryBuilder(
   dataSource: DataSource,
@@ -230,6 +233,5 @@ export async function getAllBeneficiariesQueryBuilder(
     .addSelect(
       `"rv"."totalAmountOfRedeemedVouchers"::real`,
       'totalAmountOfRedeemedVouchers',
-    )
-    .orderBy(`"name"`);
+    );
 }

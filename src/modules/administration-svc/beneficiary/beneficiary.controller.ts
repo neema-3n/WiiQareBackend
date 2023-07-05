@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { BeneficiaryService } from './beneficiary.service';
 import { Public } from 'src/common/decorators/public.decorator';
@@ -25,7 +25,8 @@ export class BeneficiaryController {
   @ApiOperation({
     summary: 'API endpoint to get summary  of all Beneficiaries informations',
   })
-  getSummary() {
-    return this.beneficiaryService.getSummary();
+  getSummary(@Query() query) {
+    return { query };
+    //return this.beneficiaryService.getSummary();
   }
 }

@@ -6,7 +6,14 @@ import {
 
 import { DataSource } from 'typeorm';
 import { BeneficiaryDTO } from './dto/beneficiary.dto';
-import { getAllBeneficiariesQueryBuilder } from './beneficiary.querybuilder';
+import { getAllBeneficiariesQueryBuilder } from './querybuilders/getAllbeneficiary.qb';
+import {
+  getActiveBeneficiariesQueryBuilder,
+  getBeneficiaryToProviderTransactionsQueryBuilder,
+  getNumberOfRegisteredBeneficiariesQueryBuilder,
+  getPendingVouchersForAllBeneficiariesQueryBuilder,
+  getRedeemedVouchersForAllBeneficiariesQueryBuilder,
+} from './querybuilders/getSummary.qb';
 
 @Injectable()
 export class BeneficiaryService {
@@ -90,7 +97,24 @@ export class BeneficiaryService {
     return beneficiaries;
   }
 
-  getSummary() {
-    return;
+  async getSummary() {
+    const result1 = await (
+      await getNumberOfRegisteredBeneficiariesQueryBuilder(this.dataSource)
+    ).getRawOne();
+
+    const result2 = await (
+      await getPendingVouchersForAllBeneficiariesQueryBuilder(this.dataSource)
+    ).getRawMany();
+
+    const result3 = await (
+      await getRedeemedVouchersForAllBeneficiariesQueryBuilder(this.dataSource)
+    ).getRawMany();
+    const result4 = await (
+      await getBeneficiaryToProviderTransactionsQueryBuilder(this.dataSource)
+    ).getRawMany();
+    const result5 = await (
+      await getActiveBeneficiariesQueryBuilder(this.dataSource)
+    ).getRawOne();
+    return { result1, result2, result3, result4, result5 };
   }
 }
