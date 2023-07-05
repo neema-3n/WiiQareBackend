@@ -3544,7 +3544,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cheerio@npm:1.0.0-rc.12, cheerio@npm:^1.0.0-rc.10, cheerio@npm:^1.0.0-rc.12, cheerio@npm:^1.0.0-rc.3":
+"cheerio@npm:1.0.0-rc.12, cheerio@npm:^1.0.0-rc.10, cheerio@npm:^1.0.0-rc.12, cheerio@npm:^1.0.0-rc.3, cheerio@npm:latest":
   version: 1.0.0-rc.12
   resolution: "cheerio@npm:1.0.0-rc.12"
   dependencies:
@@ -4178,6 +4178,16 @@ __metadata:
   version: 0.5.0
   resolution: "cssom@npm:0.5.0"
   checksum: 823471aa30091c59e0a305927c30e7768939b6af70405808f8d2ce1ca778cddcb24722717392438329d1691f9a87cb0183b64b8d779b56a961546d54854fde01
+  languageName: node
+  linkType: hard
+
+"currency-converter-lt@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "currency-converter-lt@npm:2.0.0"
+  dependencies:
+    cheerio: latest
+    request: ^2.88.2
+  checksum: 8e6631f7e5a2913533ce512160daedd5faf2160a2ce308652592f165aa5f34a24ef8254f228f21ff2d6cbf0ddc3064032628a2f517ecde84c28acdbce6b91663
   languageName: node
   linkType: hard
 
@@ -10332,7 +10342,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"request@npm:^2.79.0":
+"request@npm:^2.79.0, request@npm:^2.88.2":
   version: 2.88.2
   resolution: "request@npm:2.88.2"
   dependencies:
@@ -12615,6 +12625,7 @@ __metadata:
     class-validator: ^0.14.0
     codecov: ^3.8.3
     country-code-lookup: ^0.1.0
+    currency-converter-lt: ^2.0.0
     date-fns: ^2.30.0
     dotenv: ^16.0.3
     eslint: ^8.0.1
