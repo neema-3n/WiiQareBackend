@@ -17,9 +17,7 @@ async function getPatientInfoQueryBuilder(
     .addSelect("concat_ws(' ',patient.first_name, patient.last_name)", 'name')
     .addSelect('patient.country', 'country')
     .addSelect("to_char(patient.created_at,'dd/mm/yyyy')", 'registrationDate')
-    .orderBy(`"name"`)
-    .take(10)
-    .skip(10);
+    .orderBy(`"name"`);
 }
 async function getUniqueProviderCountPerPatientQueryBuilder(
   dataSource: DataSource,
@@ -59,15 +57,13 @@ async function getTotalPaymentPerPatientQueryBuilder(
     .addSelect("transaction.voucher->>'patientId'", 'patientId')
     .addSelect('COUNT(transaction.senderAmount)', 'totalPaymentCount')
     .addSelect('SUM(transaction.senderAmount)', 'totalPayment')
-    .addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
+    //.addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
     .where(
-      "(transaction.status ='PENDING' AND transaction.ownerType ='PATIENT')",
+      "((transaction.status ='PENDING' AND transaction.ownerType ='PATIENT') OR (transaction.status IN ('UNCLAIMED','CLAIMED','BURNED') AND transaction.ownerType='PROVIDER'))",
     )
-    .orWhere(
-      "(transaction.status IN ('UNCLAIMED','CLAIMED','BURNED') AND transaction.ownerType='PROVIDER')",
-    )
-    .groupBy(`"patientId"`)
-    .addGroupBy(`"senderCurrency"`);
+    .andWhere("transaction.senderCurrency IN ('eur','EUR')")
+    .groupBy(`"patientId"`);
+  //.addGroupBy(`"senderCurrency"`);
 }
 
 async function getActiveVoucherPerPatientQueryBuilder(
@@ -78,7 +74,7 @@ async function getActiveVoucherPerPatientQueryBuilder(
     .from(Transaction, 'transaction')
     .addSelect("transaction.voucher->>'patientId'", 'patientId')
     .addSelect('COUNT(transaction.voucher)', 'numberOfActiveVouchers')
-    .addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
+    //.addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
     .addSelect('SUM(transaction.senderAmount)', 'totalAmountOfActiveVouchers')
     .where(
       "(transaction.status ='PENDING' AND transaction.ownerType ='PATIENT')",
@@ -86,8 +82,9 @@ async function getActiveVoucherPerPatientQueryBuilder(
     .orWhere(
       "(transaction.status IN ('UNCLAIMED','CLAIMED') AND transaction.ownerType='PROVIDER')",
     )
-    .groupBy(`"patientId"`)
-    .addGroupBy(`"senderCurrency"`);
+    .andWhere("transaction.senderCurrency IN ('eur','EUR')")
+    .groupBy(`"patientId"`);
+  //.addGroupBy(`"senderCurrency"`);
 }
 
 async function getPendingVoucherPerPatientQueryBuilder(
@@ -98,13 +95,14 @@ async function getPendingVoucherPerPatientQueryBuilder(
     .from(Transaction, 'transaction')
     .addSelect("transaction.voucher->>'patientId'", 'patientId')
     .addSelect('COUNT(transaction.voucher)', 'numberOfPendingVouchers')
-    .addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
+    // .addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
     .addSelect('SUM(transaction.senderAmount)', 'totalAmountOfPendingVouchers')
 
     .where("transaction.status='PENDING'")
     .andWhere("transaction.ownerType='PATIENT'")
-    .groupBy(`"patientId"`)
-    .addGroupBy(`"senderCurrency"`);
+    .andWhere("transaction.senderCurrency IN ('eur','EUR')")
+    .groupBy(`"patientId"`);
+  // .addGroupBy(`"senderCurrency"`);
 }
 
 async function getUnclaimedVoucherPerPatientQueryBuilder(
@@ -115,15 +113,16 @@ async function getUnclaimedVoucherPerPatientQueryBuilder(
     .from(Transaction, 'transaction')
     .addSelect("transaction.voucher->>'patientId'", 'patientId')
     .addSelect('COUNT(transaction.voucher)', 'numberOfUnclaimedVouchers')
-    .addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
+    //.addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
     .addSelect(
       'SUM(transaction.senderAmount)',
       'totalAmountOfUnclaimedVouchers',
     )
     .where("transaction.status='UNCLAIMED'")
     .andWhere("transaction.ownerType='PROVIDER'")
-    .groupBy(`"patientId"`)
-    .addGroupBy(`"senderCurrency"`);
+    .andWhere("transaction.senderCurrency IN ('eur','EUR')")
+    .groupBy(`"patientId"`);
+  //.addGroupBy(`"senderCurrency"`);
 }
 
 async function getRedeemedVoucherPerPatientQueryBuilder(
@@ -134,104 +133,119 @@ async function getRedeemedVoucherPerPatientQueryBuilder(
     .from(Transaction, 'transaction')
     .addSelect("transaction.voucher->>'patientId'", 'patientId')
     .addSelect('COUNT(transaction.voucher)', 'numberOfRedeemedVouchers')
-    .addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
+    // .addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
     .addSelect('SUM(transaction.senderAmount)', 'totalAmountOfRedeemedVouchers')
     .where("transaction.status='CLAIMED'")
     .andWhere("transaction.ownerType='PROVIDER'")
-    .groupBy(`"patientId"`)
-    .addGroupBy(`"senderCurrency"`);
+    .andWhere("transaction.senderCurrency IN ('eur','EUR')")
+    .groupBy(`"patientId"`);
+  //.addGroupBy(`"senderCurrency"`);
 }
 
 export async function getAllBeneficiariesQueryBuilder(
   dataSource: DataSource,
 ): Promise<SelectQueryBuilder<ObjectLiteral>> {
-  return dataSource
-    .createQueryBuilder()
-    .addCommonTableExpression(
-      await getPatientInfoQueryBuilder(dataSource),
-      'patientTable',
-    )
-    .addCommonTableExpression(
-      await getUniquePayerCountPerPatientQueryBuilder(dataSource),
-      'payerCountTable',
-    )
-    .addCommonTableExpression(
-      await getUniqueProviderCountPerPatientQueryBuilder(dataSource),
-      'providerCountTable',
-    )
-    .addCommonTableExpression(
-      await getTotalPaymentPerPatientQueryBuilder(dataSource),
-      'totalPaymentTable',
-    )
-    .addCommonTableExpression(
-      await getActiveVoucherPerPatientQueryBuilder(dataSource),
-      'activeVoucherTable',
-    )
-    .addCommonTableExpression(
-      await getPendingVoucherPerPatientQueryBuilder(dataSource),
-      'pendingVoucherTable',
-    )
-    .addCommonTableExpression(
-      await getUnclaimedVoucherPerPatientQueryBuilder(dataSource),
-      'unclaimedVoucherTable',
-    )
-    .addCommonTableExpression(
-      await getRedeemedVoucherPerPatientQueryBuilder(dataSource),
-      'redeemedVoucherTable',
-    )
-    .from('patientTable', 'p')
-    .leftJoin('payerCountTable', 'pc', `"p"."patientId"="pc"."patientId"`)
-    .leftJoin('providerCountTable', 'pdc', `"p"."patientId"="pdc"."patientId"`)
-    .leftJoin('totalPaymentTable', 'tp', `"p"."patientId"="tp"."patientId"`)
-    .leftJoin('activeVoucherTable', 'av', `"p"."patientId"="av"."patientId"`)
-    .leftJoin('pendingVoucherTable', 'pv', `"p"."patientId"="pv"."patientId"`)
-    .leftJoin('unclaimedVoucherTable', 'uv', `"p"."patientId"="uv"."patientId"`)
-    .leftJoin('redeemedVoucherTable', 'rv', `"p"."patientId"="rv"."patientId"`)
-    .addSelect(`"p"."patientId"`, 'id')
-    .addSelect(`"p"."name"`, 'name')
-    .addSelect(`"p"."country"`, 'country')
-    .addSelect(`"p"."registrationDate"`, 'registrationDate')
-    .addSelect(
-      `"pc"."totalNumberOfPayers"::integer`,
-      'totalNumberOfDistinctPayers',
-    )
-    .addSelect(
-      `"pdc"."totalNumberOfDistinctProviders"::integer`,
-      'totalNumberOfDistinctProviders',
-    )
-    .addSelect(`"tp"."senderCurrency"`, 'currency')
-    .addSelect(`"tp"."totalPayment"::real`, 'totalPayment')
-    .addSelect(`"tp"."totalPaymentCount"::integer`, 'totalPaymentCount')
-    .addSelect(
-      `"av"."numberOfActiveVouchers"::integer`,
-      'numberOfActiveVouchers',
-    )
-    .addSelect(
-      `"av"."totalAmountOfActiveVouchers"::real`,
-      'totalAmountOfActiveVouchers',
-    )
-    .addSelect(
-      `"pv"."numberOfPendingVouchers"::integer`,
-      'numberOfPendingVouchers',
-    )
-    .addSelect(
-      `"pv"."totalAmountOfPendingVouchers"::real`,
-      'totalAmountOfPendingVouchers',
-    )
-    .addSelect(
-      `"uv"."numberOfUnclaimedVouchers"::integer`,
-      'numberOfUnclaimedVouchers',
-    )
-    .addSelect(
-      `"uv"."totalAmountOfUnclaimedVouchers"::real`,
-      'totalAmountOfUnclaimedVouchers',
-    )
-    .addSelect(
-      `"rv"."numberOfRedeemedVouchers"::integer`,
-      'numberOfRedeemedVouchers',
-    )
-    .addSelect(
-      `"rv"."totalAmountOfRedeemedVouchers"::real`,
-      'totalAmountOfRedeemedVouchers',
-    );
+  return (
+    dataSource
+      .createQueryBuilder()
+      .addCommonTableExpression(
+        await getPatientInfoQueryBuilder(dataSource),
+        'patientTable',
+      )
+      .addCommonTableExpression(
+        await getUniquePayerCountPerPatientQueryBuilder(dataSource),
+        'payerCountTable',
+      )
+      .addCommonTableExpression(
+        await getUniqueProviderCountPerPatientQueryBuilder(dataSource),
+        'providerCountTable',
+      )
+      .addCommonTableExpression(
+        await getTotalPaymentPerPatientQueryBuilder(dataSource),
+        'totalPaymentTable',
+      )
+      .addCommonTableExpression(
+        await getActiveVoucherPerPatientQueryBuilder(dataSource),
+        'activeVoucherTable',
+      )
+      .addCommonTableExpression(
+        await getPendingVoucherPerPatientQueryBuilder(dataSource),
+        'pendingVoucherTable',
+      )
+      .addCommonTableExpression(
+        await getUnclaimedVoucherPerPatientQueryBuilder(dataSource),
+        'unclaimedVoucherTable',
+      )
+      .addCommonTableExpression(
+        await getRedeemedVoucherPerPatientQueryBuilder(dataSource),
+        'redeemedVoucherTable',
+      )
+      .from('patientTable', 'p')
+      .leftJoin('payerCountTable', 'pc', `"p"."patientId"="pc"."patientId"`)
+      .leftJoin(
+        'providerCountTable',
+        'pdc',
+        `"p"."patientId"="pdc"."patientId"`,
+      )
+      .leftJoin('totalPaymentTable', 'tp', `"p"."patientId"="tp"."patientId"`)
+      .leftJoin('activeVoucherTable', 'av', `"p"."patientId"="av"."patientId"`)
+      .leftJoin('pendingVoucherTable', 'pv', `"p"."patientId"="pv"."patientId"`)
+      .leftJoin(
+        'unclaimedVoucherTable',
+        'uv',
+        `"p"."patientId"="uv"."patientId"`,
+      )
+      .leftJoin(
+        'redeemedVoucherTable',
+        'rv',
+        `"p"."patientId"="rv"."patientId"`,
+      )
+      .addSelect(`"p"."patientId"`, 'id')
+      .addSelect(`"p"."name"`, 'name')
+      .addSelect(`"p"."country"`, 'country')
+      .addSelect(`"p"."registrationDate"`, 'registrationDate')
+      .addSelect(
+        `"pc"."totalNumberOfPayers"::integer`,
+        'totalNumberOfDistinctPayers',
+      )
+      .addSelect(
+        `"pdc"."totalNumberOfDistinctProviders"::integer`,
+        'totalNumberOfDistinctProviders',
+      )
+      //.addSelect(`"tp"."senderCurrency"`, 'currency')
+      .addSelect(`"tp"."totalPayment"::real`, 'totalPayment')
+      .addSelect(`"tp"."totalPaymentCount"::integer`, 'totalPaymentCount')
+      .addSelect(
+        `"av"."numberOfActiveVouchers"::integer`,
+        'numberOfActiveVouchers',
+      )
+      .addSelect(
+        `"av"."totalAmountOfActiveVouchers"::real`,
+        'totalAmountOfActiveVouchers',
+      )
+      .addSelect(
+        `"pv"."numberOfPendingVouchers"::integer`,
+        'numberOfPendingVouchers',
+      )
+      .addSelect(
+        `"pv"."totalAmountOfPendingVouchers"::real`,
+        'totalAmountOfPendingVouchers',
+      )
+      .addSelect(
+        `"uv"."numberOfUnclaimedVouchers"::integer`,
+        'numberOfUnclaimedVouchers',
+      )
+      .addSelect(
+        `"uv"."totalAmountOfUnclaimedVouchers"::real`,
+        'totalAmountOfUnclaimedVouchers',
+      )
+      .addSelect(
+        `"rv"."numberOfRedeemedVouchers"::integer`,
+        'numberOfRedeemedVouchers',
+      )
+      .addSelect(
+        `"rv"."totalAmountOfRedeemedVouchers"::real`,
+        'totalAmountOfRedeemedVouchers',
+      )
+  );
 }

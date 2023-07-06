@@ -2,7 +2,7 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { BeneficiaryService } from './beneficiary.service';
 import { Public } from 'src/common/decorators/public.decorator';
-import { BeneficiaryDTO } from './dto/beneficiary.dto';
+import { BeneficiaryDTO, BeneficiarySummaryDTO } from './dto/beneficiary.dto';
 
 @ApiTags('admin/beneficiaries')
 @Controller('beneficiaries')
@@ -25,8 +25,7 @@ export class BeneficiaryController {
   @ApiOperation({
     summary: 'API endpoint to get summary  of all Beneficiaries informations',
   })
-  getSummary(@Query() query) {
-    return { query };
-    //return this.beneficiaryService.getSummary();
+  async getSummary(): Promise<BeneficiarySummaryDTO> {
+    return await this.beneficiaryService.getSummary();
   }
 }

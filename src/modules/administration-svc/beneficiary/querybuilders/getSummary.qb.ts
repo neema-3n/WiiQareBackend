@@ -9,7 +9,7 @@ export async function getNumberOfRegisteredBeneficiariesQueryBuilder(
   return await dataSource
     .createQueryBuilder()
     .from(Patient, 'patient')
-    .addSelect('COUNT(patient.id)', 'numberOfRegisteredBeneficiaries');
+    .addSelect('COUNT(patient.id)::integer', 'numberOfRegisteredBeneficiaries');
 }
 
 export async function getPendingVouchersForAllBeneficiariesQueryBuilder(
@@ -19,11 +19,12 @@ export async function getPendingVouchersForAllBeneficiariesQueryBuilder(
     .createQueryBuilder()
     .from(Transaction, 'transaction')
     .addSelect('COUNT(transaction.voucher)::integer', 'numberOfPendingVouchers')
-    .addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
+    // .addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
     .addSelect('SUM(transaction.senderAmount)', 'totalAmountOfPendingVouchers')
     .where("transaction.status='PENDING'")
     .andWhere("transaction.ownerType='PATIENT'")
-    .groupBy(`"senderCurrency"`);
+    .andWhere("transaction.senderCurrency IN ('eur','EUR')");
+  // .groupBy(`"senderCurrency"`);
 }
 
 export async function getRedeemedVouchersForAllBeneficiariesQueryBuilder(
@@ -36,11 +37,12 @@ export async function getRedeemedVouchersForAllBeneficiariesQueryBuilder(
       'COUNT(transaction.voucher)::integer',
       'numberOfRedeemedVouchers',
     )
-    .addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
+    // .addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
     .addSelect('SUM(transaction.senderAmount)', 'totalAmountOfRedeemedVouchers')
     .where("transaction.status='CLAIMED'")
     .andWhere("transaction.ownerType='PROVIDER'")
-    .groupBy(`"senderCurrency"`);
+    .andWhere("transaction.senderCurrency IN ('eur','EUR')");
+  // .groupBy(`"senderCurrency"`);
 }
 
 export async function getBeneficiaryToProviderTransactionsQueryBuilder(
@@ -50,14 +52,15 @@ export async function getBeneficiaryToProviderTransactionsQueryBuilder(
     .createQueryBuilder()
     .from(Transaction, 'transaction')
     .addSelect('COUNT(transaction.id)::integer', 'numberOfProviderTransactions')
-    .addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
+    //.addSelect('lower(transaction.senderCurrency)', 'senderCurrency')
     .addSelect(
       'SUM(transaction.senderAmount)',
       'totalAmountOfProviderTransactions',
     )
     .where("transaction.status='UNCLAIMED'")
     .andWhere("transaction.ownerType='PROVIDER'")
-    .groupBy(`"senderCurrency"`);
+    .andWhere("transaction.senderCurrency IN ('eur','EUR')");
+  //.groupBy(`"senderCurrency"`);
 }
 
 export async function getActiveBeneficiariesQueryBuilder(
@@ -75,7 +78,7 @@ export async function getActiveBeneficiariesQueryBuilder(
       `COUNT(DISTINCT transaction.voucher->>'patientId')::integer`,
       'numberOfActiveBeneficiaries',
     )
-    .where('transaction.createdAt >= :datePrior', {
+    .where('transaction.updatedAt >= :datePrior', {
       datePrior: subMonths(Date.now(), 6),
     });
 }

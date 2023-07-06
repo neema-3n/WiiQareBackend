@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import {
-  convertToCurrency,
+  //convertToCurrency,
   getCountryNameFromCode,
 } from 'src/helpers/common.helper';
 
 import { DataSource } from 'typeorm';
-import { BeneficiaryDTO } from './dto/beneficiary.dto';
+import { BeneficiaryDTO, BeneficiarySummaryDTO } from './dto/beneficiary.dto';
 import { getAllBeneficiariesQueryBuilder } from './querybuilders/getAllbeneficiary.qb';
 import {
   getActiveBeneficiariesQueryBuilder,
@@ -33,7 +33,7 @@ export class BeneficiaryService {
       registrationDate,
       totalNumberOfDistinctPayers,
       totalNumberOfDistinctProviders,
-      currency,
+      // currency,
       totalPayment,
       totalPaymentCount,
       numberOfActiveVouchers,
@@ -56,39 +56,44 @@ export class BeneficiaryService {
         currency: 'EUR',
         totalPayment: {
           numberOfPayments: totalPaymentCount || 0,
-          value: await convertToCurrency(currency, totalPayment, 'EUR'),
+          //value: await convertToCurrency(currency, totalPayment, 'EUR'),
+          value: totalPayment || 0,
         },
         activeVouchers: {
           numberOfVouchers: numberOfActiveVouchers || 0,
-          value: await convertToCurrency(
-            currency,
-            totalAmountOfActiveVouchers,
-            'EUR',
-          ),
+          // value: await convertToCurrency(
+          //   currency,
+          //   totalAmountOfActiveVouchers,
+          //   'EUR',
+          // ),
+          value: totalAmountOfActiveVouchers || 0,
         },
         pendingVouchers: {
           numberOfVouchers: numberOfPendingVouchers || 0,
-          value: await convertToCurrency(
-            currency,
-            totalAmountOfPendingVouchers,
-            'EUR',
-          ),
+          // value: await convertToCurrency(
+          //   currency,
+          //   totalAmountOfPendingVouchers,
+          //   'EUR',
+          // ),
+          value: totalAmountOfPendingVouchers || 0,
         },
         unclaimedVouchers: {
           numberOfVouchers: numberOfUnclaimedVouchers || 0,
-          value: await convertToCurrency(
-            currency,
-            totalAmountOfUnclaimedVouchers,
-            'EUR',
-          ),
+          // value: await convertToCurrency(
+          //   currency,
+          //   totalAmountOfUnclaimedVouchers,
+          //   'EUR',
+          // ),
+          value: totalAmountOfUnclaimedVouchers || 0,
         },
         redeemedVouchers: {
           numberOfVouchers: numberOfRedeemedVouchers || 0,
-          value: await convertToCurrency(
-            currency,
-            totalAmountOfRedeemedVouchers,
-            'EUR',
-          ),
+          // value: await convertToCurrency(
+          //   currency,
+          //   totalAmountOfRedeemedVouchers,
+          //   'EUR',
+          // ),
+          value: totalAmountOfRedeemedVouchers || 0,
         },
       };
       beneficiaries.push(beneficiary);
@@ -97,24 +102,42 @@ export class BeneficiaryService {
     return beneficiaries;
   }
 
-  async getSummary() {
-    const result1 = await (
+  async getSummary(): Promise<BeneficiarySummaryDTO> {
+    const { numberOfRegisteredBeneficiaries } = await (
       await getNumberOfRegisteredBeneficiariesQueryBuilder(this.dataSource)
     ).getRawOne();
 
-    const result2 = await (
+    const { numberOfPendingVouchers, totalAmountOfPendingVouchers } = await (
       await getPendingVouchersForAllBeneficiariesQueryBuilder(this.dataSource)
-    ).getRawMany();
+    ).getRawOne();
 
-    const result3 = await (
+    const { numberOfRedeemedVouchers, totalAmountOfRedeemedVouchers } = await (
       await getRedeemedVouchersForAllBeneficiariesQueryBuilder(this.dataSource)
-    ).getRawMany();
-    const result4 = await (
-      await getBeneficiaryToProviderTransactionsQueryBuilder(this.dataSource)
-    ).getRawMany();
-    const result5 = await (
+    ).getRawOne();
+    const { numberOfProviderTransactions, totalAmountOfProviderTransactions } =
+      await (
+        await getBeneficiaryToProviderTransactionsQueryBuilder(this.dataSource)
+      ).getRawOne();
+    const { numberOfActiveBeneficiaries } = await (
       await getActiveBeneficiariesQueryBuilder(this.dataSource)
     ).getRawOne();
-    return { result1, result2, result3, result4, result5 };
+
+    return {
+      numberOfRegisteredBeneficiaries,
+      pendingVouchers: {
+        numberOfVouchers: numberOfPendingVouchers,
+        value: totalAmountOfPendingVouchers,
+      },
+      redeemedVouchers: {
+        numberOfVouchers: numberOfRedeemedVouchers,
+        value: totalAmountOfRedeemedVouchers,
+      },
+      totalProviderTransactions: {
+        numberOfPayments: numberOfProviderTransactions,
+        value: totalAmountOfProviderTransactions,
+      },
+      numberOfActiveBeneficiaries,
+      voucherCurrencies: 'EUR',
+    } as BeneficiarySummaryDTO;
   }
 }

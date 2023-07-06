@@ -73,9 +73,12 @@ export class BeneficiarySummaryDTO {
   @ValidateNested()
   redeemedVouchers: VoucherTotalsInfo;
 
-  @IsNumber()
-  totalProviderTransactions: number;
+  @ValidateNested()
+  totalProviderTransactions: PaymentTotalsInfo;
 
   @IsNumber()
   numberOfActiveBeneficiaries: number;
+
+  @IsString()
+  voucherCurrencies: string;
 }
