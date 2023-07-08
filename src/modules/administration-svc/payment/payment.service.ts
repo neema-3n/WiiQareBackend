@@ -35,67 +35,114 @@ export class PaymentService {
    */
   async getSummary(): Promise<PaymentSummaryDto> {
     // total number of payer payments received within one week
-    const totalPayerPaymentsInOneWeek = await this.transactionRepository
+    const payerPaymentsInOneWeek = await this.transactionRepository
       .createQueryBuilder('transaction')
-      .where('transaction.createdAt >= :datePrior', {
+      .select('COUNT(*)::integer', 'number')
+      .addSelect('SUM(transaction.senderAmount)', 'value')
+      .where("transaction.senderCurrency IN ('eur','EUR')")
+      .andWhere('transaction.createdAt >= :datePrior', {
         datePrior: subWeeks(Date.now(), 1),
       })
-      .getCount();
+      .getRawOne();
     // total number of payer payments received within one month
-    const totalPayerPaymentsInOneMonth = await this.transactionRepository
+    const payerPaymentsInOneMonth = await this.transactionRepository
       .createQueryBuilder('transaction')
-      .where('transaction.createdAt >= :datePrior', {
+      .select('COUNT(*)::integer', 'number')
+      .addSelect('SUM(transaction.senderAmount)', 'value')
+      .where("transaction.senderCurrency IN ('eur','EUR')")
+      .andWhere('transaction.createdAt >= :datePrior', {
         datePrior: subMonths(Date.now(), 1),
       })
-      .getCount();
+      .getRawOne();
     // total number of payer payments received within three month
-    const totalPayerPaymentsInThreeMonths = await this.transactionRepository
+    const payerPaymentsInThreeMonth = await this.transactionRepository
       .createQueryBuilder('transaction')
-      .where('transaction.createdAt >= :datePrior', {
+      .select('COUNT(*)::integer', 'number')
+      .addSelect('SUM(transaction.senderAmount)', 'value')
+      .where("transaction.senderCurrency IN ('eur','EUR')")
+      .andWhere('transaction.createdAt >= :datePrior', {
         datePrior: subMonths(Date.now(), 3),
       })
-      .getCount();
+      .getRawOne();
     // total number of payer payments received within six months
-    const totalPayerPaymentsInSixMonths = await this.transactionRepository
+    const payerPaymentsInSixMonth = await this.transactionRepository
       .createQueryBuilder('transaction')
-      .where('transaction.createdAt >= :datePrior', {
+      .select('COUNT(*)::integer', 'number')
+      .addSelect('SUM(transaction.senderAmount)', 'value')
+      .where("transaction.senderCurrency IN ('eur','EUR')")
+      .andWhere('transaction.createdAt >= :datePrior', {
         datePrior: subMonths(Date.now(), 6),
       })
-      .getCount();
+      .getRawOne();
     // total number of payer payments max
-    const totalPayerPaymentsMax = await this.transactionRepository.count();
+    const payerPaymentsMax = await this.transactionRepository
+      .createQueryBuilder('transaction')
+      .select('COUNT(*)::integer', 'number')
+      .addSelect('SUM(transaction.senderAmount)', 'value')
+      .where("transaction.senderCurrency IN ('eur','EUR')")
+      .getRawOne();
     // total claimed vouchers
-    const claimedVouchers = await this.transactionRepository.findAndCount({
-      where: {
-        ownerType: UserType.PROVIDER,
-        status: VoucherStatus.UNCLAIMED,
-      },
-    });
-    const totalClaimedVouchers = claimedVouchers[1];
+    const payerClaimedVouchers = await this.transactionRepository
+      .createQueryBuilder('transaction')
+      .select('COUNT(*)::integer', 'number')
+      .addSelect('SUM(transaction.senderAmount)', 'value')
+      .where("transaction.senderCurrency IN ('eur','EUR')")
+      .andWhere(
+        "transaction.ownerType = 'PROVIDER' AND transaction.status = 'UNCLAIMED'",
+      )
+      .getRawOne();
+
     // total provider payments
-    const providerPayment = await this.transactionRepository.findAndCount({
-      where: {
-        ownerType: UserType.PROVIDER,
-        status: VoucherStatus.CLAIMED,
-      },
-    });
-    const totalProviderPayments = providerPayment[1];
+    const payerProviderPayments = await this.transactionRepository
+      .createQueryBuilder('transaction')
+      .select('COUNT(*)::integer', 'number')
+      .addSelect('SUM(transaction.senderAmount)', 'value')
+      .where("transaction.senderCurrency IN ('eur','EUR')")
+      .andWhere(
+        "transaction.ownerType = 'PROVIDER' AND transaction.status = 'CLAIMED'",
+      )
+      .getRawOne();
+
     // total revenue = total value of redeemed vouchers MINUS payments made to providers
-    const redeemedVouchers = await this.transactionRepository.findAndCount({
-      where: {
-        status: VoucherStatus.CLAIMED,
-      },
-    });
-    const totalRevenue = redeemedVouchers[1] - totalProviderPayments;
+    const redeemedVouchers = await this.transactionRepository
+      .createQueryBuilder('transaction')
+      .select('SUM(transaction.senderAmount)', 'value')
+      .where("transaction.senderCurrency IN ('eur','EUR')")
+      .andWhere("transaction.status = 'CLAIMED'")
+      .getRawOne();
+
+    const totalRevenue =
+      redeemedVouchers.value || 0 - payerProviderPayments.value || 0;
 
     return {
-      totalPayerPaymentsInOneWeek,
-      totalPayerPaymentsInOneMonth,
-      totalPayerPaymentsInThreeMonths,
-      totalPayerPaymentsInSixMonths,
-      totalPayerPaymentsMax,
-      totalClaimedVouchers,
-      totalProviderPayments,
+      payerPaymentsInOneWeek: {
+        numberOfPayments: payerPaymentsInOneWeek.number,
+        value: payerPaymentsInOneWeek.value || 0,
+      },
+      payerPaymentsInOneMonth: {
+        numberOfPayments: payerPaymentsInOneMonth.number,
+        value: payerPaymentsInOneMonth.value || 0,
+      },
+      payerPaymentsInThreeMonths: {
+        numberOfPayments: payerPaymentsInThreeMonth.number,
+        value: payerPaymentsInThreeMonth.value || 0,
+      },
+      payerPaymentsInSixMonths: {
+        numberOfPayments: payerPaymentsInSixMonth.number,
+        value: payerPaymentsInSixMonth.value || 0,
+      },
+      payerPaymentsMax: {
+        numberOfPayments: payerPaymentsMax.number,
+        value: payerPaymentsMax.value || 0,
+      },
+      claimedVouchers: {
+        numberOfPayments: payerClaimedVouchers.number,
+        value: payerClaimedVouchers.value || 0,
+      },
+      providerPayments: {
+        numberOfPayments: payerProviderPayments.number,
+        value: payerProviderPayments.value || 0,
+      },
       totalRevenue,
     } as PaymentSummaryDto;
   }
@@ -122,10 +169,11 @@ export class PaymentService {
       .select([
         'transaction.id',
         'transaction.createdAt',
-        'transaction.amount',
+        'transaction.senderAmount',
         'payer.country',
         'patient.country',
       ])
+      .where("transaction.senderCurrency IN ('eur','EUR')")
       .getRawMany();
 
     return paymentsFromPayers.map((payment) => {
@@ -136,7 +184,7 @@ export class PaymentService {
         transactionDate: new Date(
           payment.transaction_created_at,
         ).toLocaleDateString(),
-        paymentValue: payment.transaction_amount,
+        paymentValue: payment.transaction_sender_amount,
         countryPayer: _country_payer != null ? _country_payer.country : '',
         countryBeneficiary:
           _country_beneficiary != null ? _country_beneficiary.country : '',
@@ -164,12 +212,15 @@ export class PaymentService {
         'provider.name',
         'provider.id',
         'provider.city',
-        'transaction.status',
+        //'transaction.status',
         'transaction.amount',
         'transaction.senderAmount',
       ])
       .addSelect("provider.contact_person->>'country'", 'provider_country')
-      .where("transaction.ownerType = 'PROVIDER'")
+      .where("transaction.senderCurrency IN ('eur','EUR')")
+      .andWhere(
+        "transaction.ownerType = 'PROVIDER' AND transaction.status = 'UNCLAIMED'",
+      )
       .getRawMany();
 
     return paymentsDueProvider.map((payment) => {
@@ -184,7 +235,7 @@ export class PaymentService {
         cityProvider: payment.provider_city,
         providerCountry:
           _country_provider != null ? _country_provider.country : '',
-        transactionStatus: payment.transaction_status === 'CLAIMED',
+        //transactionStatus: payment.transaction_status === 'CLAIMED',
         voucherValueLocal: payment.transaction_amount,
         voucherValue: payment.transaction_sender_amount,
       };
