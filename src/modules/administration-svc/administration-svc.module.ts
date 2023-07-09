@@ -33,7 +33,7 @@ import { ManagerModule } from './manager/manager.module';
     AdminService,
     BeneficiaryService,
     PaymentService,
-    //VoucherService,
+    VoucherService,
     //ProviderService,
     //ManagerService,
   ],
@@ -44,7 +44,7 @@ import { ManagerModule } from './manager/manager.module';
     PaymentController,
     //ProviderController,
     //ManagerController,
-    //VoucherController,
+    VoucherController,
   ],
 })
 export class AdministrationSvcModule {}
