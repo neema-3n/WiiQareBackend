@@ -1,70 +1,79 @@
 import {
-  IsArray,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
   IsDateString,
-  IsNumber
+  IsNumber,
+  ValidateNested,
 } from 'class-validator';
 
-
 export class PayerSummaryDto {
-    @IsNotEmpty()
-    @IsNumber()
-    numberOfRegisteredPayers: number;
-  
-    @IsNotEmpty()
-    @IsNumber()
-    totalNumberOfPurchasedVouchers: number;
-  
-    @IsNotEmpty()
-    @IsNumber()
-    totalNumberOfPendingVouchers: number;
-  
-    @IsNotEmpty()
-    @IsNumber()
-    totalNumberOfRedeemedVouchers: number;
-  
-    @IsNotEmpty()
-    @IsNumber()
-    numberOfActivePayers: number;
-  }
+  @IsNotEmpty()
+  @IsNumber()
+  numberOfRegisteredPayers: number;
 
-  export class PayerListDto {
-    @IsOptional()
-    @IsUUID()
-    payerId?: string;
-  
-    @IsOptional()
-    @IsString()
-    payerName?: string;
+  @IsNotEmpty()
+  @IsNumber()
+  totalNumberOfPurchasedVouchers: number;
 
-    @IsOptional()
-    @IsString()
-    payerCountry?: string;
-  
-    @IsOptional()
-    @IsDateString()
-    registredDate?: Date;
-  
-    @IsOptional()
-    @IsNumber()
-    totalBeneficiaries?: number;
-  
-    @IsOptional()
-    @IsNumber()
-    totalPurchasedVouchers?: number;
+  @IsNotEmpty()
+  @IsNumber()
+  totalNumberOfPendingVouchers: number;
 
-    @IsOptional()
-    @IsNumber()
-    totalUnspentVouchers?: number;
+  @IsNotEmpty()
+  @IsNumber()
+  totalNumberOfRedeemedVouchers: number;
 
-    @IsOptional()
-    @IsNumber()
-    totalOpenVouchers?: number;
+  @IsNotEmpty()
+  @IsNumber()
+  numberOfActivePayers: number;
+}
 
-    @IsOptional()
-    @IsNumber()
-    totalRedeemedVouchers?: number;
-  }
+class PayerVouchersInfo {
+  @IsNotEmpty()
+  @IsNumber()
+  numberOfVouchers: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  value: number;
+}
+
+export class PayerListDto {
+  @IsOptional()
+  @IsUUID()
+  payerId?: string;
+
+  @IsOptional()
+  @IsString()
+  payerName?: string;
+
+  @IsOptional()
+  @IsString()
+  payerCountry?: string;
+
+  @IsOptional()
+  @IsDateString()
+  registredDate?: Date;
+
+  @IsOptional()
+  @IsDateString()
+  lastActivityOn?: string;
+
+  @IsOptional()
+  @IsNumber()
+  totalBeneficiaries?: number;
+
+  @ValidateNested()
+  purchasedVouchers?: PayerVouchersInfo;
+
+  @ValidateNested()
+  pendingVouchers?: PayerVouchersInfo;
+
+  @ValidateNested()
+  unclaimedVouchers?: PayerVouchersInfo;
+
+  @ValidateNested()
+  redeemedVouchers?: PayerVouchersInfo;
+}

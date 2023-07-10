@@ -84,7 +84,7 @@ export class VoucherService {
       .addSelect('SUM(transaction.senderAmount)', 'value')
       .where("transaction.senderCurrency IN ('eur','EUR')")
       .andWhere(
-        "transaction.ownerType = 'PROVIDER' AND transaction.status = 'CLAIMED'",
+        "transaction.ownerType = 'PROVIDER' AND transaction.status = 'BURNED'",
       )
       .getRawOne();
 
@@ -106,7 +106,7 @@ export class VoucherService {
       .addSelect('SUM(transaction.senderAmount)', 'value')
       .where("transaction.senderCurrency IN ('eur','EUR')")
       .andWhere(
-        "transaction.ownerType = 'PROVIDER' AND transaction.status = 'PENDING'",
+        "transaction.ownerType = 'PROVIDER' AND transaction.status = 'CLAIMED'",
       )
       .getRawOne();
 

@@ -88,7 +88,7 @@ export class PaymentService {
       .addSelect('SUM(transaction.senderAmount)', 'value')
       .where("transaction.senderCurrency IN ('eur','EUR')")
       .andWhere(
-        "transaction.ownerType = 'PROVIDER' AND transaction.status = 'PENDING'",
+        "transaction.ownerType = 'PROVIDER' AND transaction.status = 'CLAIMED'",
       )
       .getRawOne();
 
@@ -108,7 +108,7 @@ export class PaymentService {
       .createQueryBuilder('transaction')
       .select('SUM(transaction.senderAmount)', 'value')
       .where("transaction.senderCurrency IN ('eur','EUR')")
-      .andWhere("transaction.status = 'CLAIMED'")
+      .andWhere("transaction.status = 'BURNED'")
       .getRawOne();
 
     const totalRevenue =
@@ -139,11 +139,11 @@ export class PaymentService {
         numberOfPayments: payerClaimedVouchers.number,
         value: payerClaimedVouchers.value || 0,
       },
-      providerPayments: {
-        numberOfPayments: payerProviderPayments.number,
-        value: payerProviderPayments.value || 0,
-      },
-      totalRevenue,
+      // providerPayments: {
+      //   numberOfPayments: payerProviderPayments.number,
+      //   value: payerProviderPayments.value || 0,
+      // },
+      // totalRevenue,
     } as PaymentSummaryDto;
   }
 
