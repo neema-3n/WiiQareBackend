@@ -1,43 +1,45 @@
 import {
-  IsArray,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
   IsDateString,
   IsNumber,
-  IsDate,
+  ValidateNested,
   IsBoolean,
 } from 'class-validator';
 
+class PaymentTotalsInfo {
+  @IsNotEmpty()
+  @IsNumber()
+  numberOfPayments: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  value: number;
+}
+
 export class PaymentSummaryDto {
-  @IsNotEmpty()
-  @IsNumber()
-  totalPayerPaymentsInOneWeek: number;
+  @ValidateNested()
+  payerPaymentsInOneWeek: PaymentTotalsInfo;
 
-  @IsNotEmpty()
-  @IsNumber()
-  totalPayerPaymentsInOneMonth: number;
+  @ValidateNested()
+  payerPaymentsInOneMonth: PaymentTotalsInfo;
 
-  @IsNotEmpty()
-  @IsNumber()
-  totalPayerPaymentsInThreeMonths: number;
+  @ValidateNested()
+  payerPaymentsInThreeMonths: PaymentTotalsInfo;
 
-  @IsNotEmpty()
-  @IsNumber()
-  totalPayerPaymentsInSixMonths: number;
+  @ValidateNested()
+  payerPaymentsInSixMonths: PaymentTotalsInfo;
 
-  @IsNotEmpty()
-  @IsNumber()
-  totalPayerPaymentsMax: number;
+  @ValidateNested()
+  payerPaymentsMax: PaymentTotalsInfo;
 
-  @IsNotEmpty()
-  @IsNumber()
-  totalClaimedVouchers: number;
+  @ValidateNested()
+  claimedVouchers: PaymentTotalsInfo;
 
-  @IsNotEmpty()
-  @IsNumber()
-  totalProviderPayments: number;
+  @ValidateNested()
+  providerPayments: PaymentTotalsInfo;
 
   @IsNotEmpty()
   @IsNumber()
@@ -91,9 +93,9 @@ export class PaymentsProviderListDto {
   @IsString()
   providerCountry?: string;
 
-  @IsOptional()
-  @IsBoolean()
-  transactionStatus?: boolean;
+  // @IsOptional()
+  // @IsBoolean()
+  // transactionStatus?: boolean;
 
   @IsOptional()
   @IsNumber()
