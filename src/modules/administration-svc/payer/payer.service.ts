@@ -81,8 +81,34 @@ export class PayerService {
    * @returns
    */
   async findAllPayers(): Promise<PayerListDto[]> {
+    const _lastActivityOn: any = await this.PayerRepository.createQueryBuilder(
+      'payer',
+    )
+      .leftJoinAndMapMany(
+        'payer.user',
+        Transaction,
+        'transaction',
+        'transaction.senderId = payer.user',
+      )
+      .leftJoinAndMapMany(
+        'patient.user',
+        Transaction,
+        'transaction',
+        'transaction.ownerId = patient.user',
+      )
+      .select('payer.id', 'id')
+      .addSelect('transaction.createAt', 'lastActivityOnTransaction')
+      .addSelect('patient.updatedAt', 'lastActivityOnPatient')
+      .groupBy('payer.id')
+      .where("transaction.senderCurrency IN ('eur','EUR')")
+      .orderBy('lastActivityOnTransaction', 'DESC')
+      .addOrderBy('lastActivityOnPatient', 'DESC')
+      .getRawMany();
+
+    return _lastActivityOn;
+
     // First request and get id, name,
-    const payerTotalBeneficiaries: any =
+    const payerBeneficiaries: any =
       await this.PayerRepository.createQueryBuilder('payer')
         .leftJoinAndMapMany(
           'payer.user',
@@ -92,6 +118,8 @@ export class PayerService {
         )
         .groupBy('payer.id')
         .select('payer.id', 'id')
+        .addSelect('COUNT(*)::integer', 'number')
+        .addSelect('SUM(transaction.senderAmount)', 'value')
         .addSelect('payer.lastName', 'lastName')
         .addSelect('payer.firstName', 'firstName')
         .addSelect('payer.country', 'countryISO2')
@@ -100,10 +128,29 @@ export class PayerService {
           "COUNT(DISTINCT(voucher->>'patientId'))",
           'totalBeneficiaries',
         )
-        .addSelect('COUNT(*)', 'totalPurchasedVouchers')
+        .where("transaction.senderCurrency IN ('eur','EUR')")
         .getRawMany();
 
-    const payerTotalPendingVouchers: any =
+    const _pendingVouchers: any = await this.PayerRepository.createQueryBuilder(
+      'payer',
+    )
+      .leftJoinAndMapMany(
+        'payer.user',
+        Transaction,
+        'transaction',
+        'transaction.senderId = payer.user',
+      )
+      .select('payer.id', 'id')
+      .addSelect('COUNT(*)::integer', 'number')
+      .addSelect('SUM(transaction.senderAmount)', 'value')
+      .groupBy('payer.id')
+      .where("transaction.senderCurrency IN ('eur','EUR')")
+      .andWhere(
+        "(transaction.ownerType = 'PATIENT' AND transaction.status = 'PENDING')",
+      )
+      .getRawMany();
+
+    const _unclaimedVouchers: any =
       await this.PayerRepository.createQueryBuilder('payer')
         .leftJoinAndMapMany(
           'payer.user',
@@ -112,30 +159,16 @@ export class PayerService {
           'transaction.senderId = payer.user',
         )
         .select('payer.id', 'id')
+        .addSelect('COUNT(*)::integer', 'number')
+        .addSelect('SUM(transaction.senderAmount)', 'value')
         .groupBy('payer.id')
-        .addSelect('COUNT(*)', 'totalPendingVouchers')
-        .where(
-          "(transaction.ownerType = 'PATIENT' AND transaction.status = 'UNCLAIMED')",
-        )
-        .getRawMany();
-
-    const payerTotalUnclaimedVouchers: any =
-      await this.PayerRepository.createQueryBuilder('payer')
-        .leftJoinAndMapMany(
-          'payer.user',
-          Transaction,
-          'transaction',
-          'transaction.senderId = payer.user',
-        )
-        .select('payer.id', 'id')
-        .groupBy('payer.id')
-        .addSelect('COUNT(*)', 'totalUnclaimedVouchers')
+        .where("transaction.senderCurrency IN ('eur','EUR')")
         .where(
           "(transaction.ownerType = 'PROVIDER' AND transaction.status = 'UNCLAIMED')",
         )
         .getRawMany();
 
-    const payerTotalRedeemedVouchers: any =
+    const _redeemedVouchers: any =
       await this.PayerRepository.createQueryBuilder('payer')
         .leftJoinAndMapMany(
           'payer.user',
@@ -144,53 +177,60 @@ export class PayerService {
           'transaction.senderId = payer.user',
         )
         .select('payer.id', 'id')
+        .addSelect('COUNT(*)::integer', 'number')
+        .addSelect('SUM(transaction.senderAmount)', 'value')
         .groupBy('payer.id')
         .addSelect('COUNT(*)', 'totalRedeemedVouchers')
-        .where("transaction.status = 'CLAIMED'")
-        // .where(
-        //   "(transaction.ownerType = 'PROVIDER' AND transaction.status = 'PENDING')",
-        // )
+        .where("transaction.senderCurrency IN ('eur','EUR')")
+        .andWhere("transaction.status = 'BURNED'")
         .getRawMany();
 
     const payers = [];
-    for (let _i = 0; _i < payerTotalBeneficiaries.length; _i++) {
-      const _country = lookup.byFips(payerTotalBeneficiaries[_i].countryISO2);
+    for (let _i = 0; _i < payerBeneficiaries.length; _i++) {
+      const _country = lookup.byFips(payerBeneficiaries[_i].countryISO2);
       payers.push({
-        payerId: payerTotalBeneficiaries[_i].id,
+        payerId: payerBeneficiaries[_i].id,
         payerName:
-          payerTotalBeneficiaries[_i].firstName +
+          payerBeneficiaries[_i].firstName +
           ' ' +
-          payerTotalBeneficiaries[_i].lastName,
+          payerBeneficiaries[_i].lastName,
         registeredDate: new Date(
-          payerTotalBeneficiaries[_i].createdAt,
+          payerBeneficiaries[_i].createdAt,
         ).toLocaleDateString(),
         payerCountry: _country != null ? _country.country : '',
-        beneficiaries: payerTotalBeneficiaries[_i].totalBeneficiaries,
-        purchasedVouchers: payerTotalBeneficiaries[_i].totalPurchasedVouchers,
-        pendingVouchers: this.getTotal(
-          payerTotalPendingVouchers,
-          payerTotalBeneficiaries[_i].id,
-          'totalPendingVouchers',
+        beneficiaries: payerBeneficiaries[_i].totalBeneficiaries,
+        purchasedVouchers: {
+          numberOfVouchers: payerBeneficiaries[_i].number,
+          value: payerBeneficiaries[_i].value || 0,
+        },
+        pendingVouchers: this.getVoucherInfoTotal(
+          _pendingVouchers,
+          payerBeneficiaries[_i].id,
         ),
-        unclaimedVouchers: this.getTotal(
-          payerTotalUnclaimedVouchers,
-          payerTotalBeneficiaries[_i].id,
-          'totalUnclaimedVouchers',
+        unclaimedVouchers: this.getVoucherInfoTotal(
+          _unclaimedVouchers,
+          payerBeneficiaries[_i].id,
         ),
-        redeemedVouchers: this.getTotal(
-          payerTotalRedeemedVouchers,
-          payerTotalBeneficiaries[_i].id,
-          'totalRedeemedVouchers',
+        redeemedVouchers: this.getVoucherInfoTotal(
+          _redeemedVouchers,
+          payerBeneficiaries[_i].id,
         ),
       });
     }
     return payers as PayerListDto[];
   }
 
-  private getTotal(totalObjet: [], _id: string, _key: string): number {
-    for (const total of totalObjet) {
-      if (total['id'] === _id) return total[_key];
+  private getVoucherInfoTotal(voucherType: [], _id: string): any {
+    for (const _v of voucherType) {
+      if (_v['id'] === _id)
+        return {
+          numberOfVouchers: _v['number'],
+          value: _v['value'] || 0,
+        };
     }
-    return 0;
+    return {
+      numberOfVouchers: 0,
+      value: 0,
+    };
   }
 }

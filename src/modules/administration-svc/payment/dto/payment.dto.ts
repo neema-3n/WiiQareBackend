@@ -38,12 +38,13 @@ export class PaymentSummaryDto {
   @ValidateNested()
   claimedVouchers: PaymentTotalsInfo;
 
-  @ValidateNested()
-  providerPayments: PaymentTotalsInfo;
-
   @IsNotEmpty()
   @IsNumber()
-  totalRevenue: number;
+  totalProviderPayments: number;
+
+  // @IsNotEmpty()
+  // @IsNumber()
+  // totalRevenue: number;
 }
 
 export class PaymentsPayerListDto {
