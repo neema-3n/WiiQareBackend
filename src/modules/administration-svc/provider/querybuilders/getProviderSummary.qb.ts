@@ -101,7 +101,7 @@ export async function getTotalBeneficiaryTransactionMadeWithinSixMonthsQueryBuil
     });
 }
 
-export async function getMaxBeneficiaryToProviderTransactionQueryBuilder(
+export async function getTotalBeneficiaryToProviderTransactionQueryBuilder(
   dataSource: DataSource,
 ): Promise<SelectQueryBuilder<Transaction>> {
   return await dataSource
@@ -109,8 +109,8 @@ export async function getMaxBeneficiaryToProviderTransactionQueryBuilder(
     .from(Transaction, 'transaction')
     .leftJoin(Provider, 'provider', 'transaction.ownerId=provider.id')
     .addSelect(
-      'max(transaction.senderAmount)::real',
-      'maxBeneficiaryProviderTransaction',
+      'sum(transaction.senderAmount)::real',
+      'totalBeneficiaryProviderTransaction',
     )
     .where("transaction.ownerType='PROVIDER'")
     .andWhere("transaction.status IN ('UNCLAIMED','CLAIMED','BURNED')")

@@ -6,7 +6,7 @@ import {
   getAllClaimedVouchersQueryBuilder,
   getAllRedeemedVouchersQueryBuilder,
   getAllUnclaimedVouchersQueryBuilder,
-  getMaxBeneficiaryToProviderTransactionQueryBuilder,
+  getTotalBeneficiaryToProviderTransactionQueryBuilder,
   getNumberOfRegisteredProvidersQueryBuilder,
   getTotalBeneficiaryTransactionMadeWithinOneMonthQueryBuilder,
   getTotalBeneficiaryTransactionMadeWithinOneWeekQueryBuilder,
@@ -38,7 +38,7 @@ export class ProviderService {
       totalBeneficiaryProviderTransactionWithinOneMonth,
       totalBeneficiaryProviderTransactionWithinThreeMonths,
       totalBeneficiaryProviderTransactionWithinSixMonths,
-      maxBeneficiaryProviderTransaction,
+      totalBeneficiaryProviderTransaction,
       totalNumberOfReceivedVouchers,
       totalAmountOfReceivedVouchers,
       totalNumberOfUnclaimedVouchers,
@@ -66,8 +66,8 @@ export class ProviderService {
           totalBeneficiaryProviderTransactionWithinThreeMonths || 0,
         totalBeneficiaryProviderTransactionWithinSixMonths:
           totalBeneficiaryProviderTransactionWithinSixMonths || 0,
-        maxBeneficiaryProviderTransaction:
-          maxBeneficiaryProviderTransaction || 0,
+        totalBeneficiaryProviderTransaction:
+          totalBeneficiaryProviderTransaction || 0,
         receivedVouchers: {
           numberOfVouchers: totalNumberOfReceivedVouchers || 0,
           value: totalAmountOfReceivedVouchers || 0,
@@ -133,8 +133,10 @@ export class ProviderService {
       )
     ).getRawOne();
 
-    const { maxBeneficiaryProviderTransaction } = await (
-      await getMaxBeneficiaryToProviderTransactionQueryBuilder(this.dataSource)
+    const { totalBeneficiaryProviderTransaction } = await (
+      await getTotalBeneficiaryToProviderTransactionQueryBuilder(
+        this.dataSource,
+      )
     ).getRawOne();
 
     const { totalNumberOfUniqueBeneficiaries } = await (
@@ -177,7 +179,8 @@ export class ProviderService {
           totalNumberOfBeneficiaryProviderTransactionWithinSixMonths || 0,
         value: totalValueOfBeneficiaryProviderTransactionWithinSixMonths,
       },
-      maxBeneficiaryProviderTransaction: maxBeneficiaryProviderTransaction || 0,
+      totalBeneficiaryProviderTransaction:
+        totalBeneficiaryProviderTransaction || 0,
       totalNumberOfUniqueBeneficiaries: totalNumberOfUniqueBeneficiaries || 0,
       currency: 'EUR',
       unclaimedVouchers: {

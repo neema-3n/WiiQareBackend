@@ -52,7 +52,7 @@ export class ProviderDTO {
   totalBeneficiaryProviderTransactionWithinSixMonths: number;
 
   @IsNumber()
-  maxBeneficiaryProviderTransaction: number;
+  totalBeneficiaryProviderTransaction: number;
 
   @ValidateNested()
   receivedVouchers: VoucherTotalsInfo;
@@ -81,7 +81,7 @@ export class ProviderSummaryDTO {
   totalBeneficiaryTransactionsWithinSixMonths: TransactionTotalsInfo;
 
   @IsNumber()
-  maxBeneficiaryProviderTransaction: number;
+  totalBeneficiaryProviderTransaction: number;
 
   @ValidateNested()
   unclaimedVouchers: VoucherTotalsInfo;

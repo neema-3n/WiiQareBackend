@@ -137,7 +137,7 @@ async function getTotalBeneficiaryProviderTransactionsWithinSixMonthQueryBuilder
     })
     .groupBy(`"providerId"`);
 }
-async function getMaxBeneficiaryTransactionPerProviderQueryBuilder(
+async function getTotalBeneficiaryTransactionPerProviderQueryBuilder(
   dataSource: DataSource,
 ): Promise<SelectQueryBuilder<Transaction>> {
   return await dataSource
@@ -146,8 +146,8 @@ async function getMaxBeneficiaryTransactionPerProviderQueryBuilder(
     .leftJoin(Provider, 'provider', 'transaction.ownerId=provider.id')
     .addSelect('provider.id::text', 'providerId')
     .addSelect(
-      'max(transaction.senderAmount)::real',
-      'maxBeneficiaryProviderTransaction',
+      'sum(transaction.senderAmount)',
+      'totalBeneficiaryProviderTransaction',
     )
     .where("transaction.ownerType='PROVIDER'")
     .andWhere("transaction.status IN ('UNCLAIMED','CLAIMED','BURNED')")
@@ -275,8 +275,8 @@ export async function getAllProvidersQueryBuilder(
       'totalBeneficiaryProviderTransactionWithinSixMonthTable',
     )
     .addCommonTableExpression(
-      await getMaxBeneficiaryTransactionPerProviderQueryBuilder(dataSource),
-      'maxBeneficiaryTransactionPerProviderTable',
+      await getTotalBeneficiaryTransactionPerProviderQueryBuilder(dataSource),
+      'totalBeneficiaryTransactionPerProviderTable',
     )
     .addCommonTableExpression(
       await getTotalValueAndCountOfReceivedVouchersPerProviderQueryBuilder(
@@ -328,9 +328,9 @@ export async function getAllProvidersQueryBuilder(
       `"tbptw6m"."providerId"="p"."providerId"`,
     )
     .leftJoin(
-      'maxBeneficiaryTransactionPerProviderTable',
-      'mbtp',
-      `"mbtp"."providerId"="p"."providerId"`,
+      'totalBeneficiaryTransactionPerProviderTable',
+      'tbtp',
+      `"tbtp"."providerId"="p"."providerId"`,
     )
     .leftJoin(
       'totalReceivedVouchersInfoTable',
@@ -382,8 +382,8 @@ export async function getAllProvidersQueryBuilder(
       'totalBeneficiaryProviderTransactionWithinSixMonths',
     )
     .addSelect(
-      `"mbtp"."maxBeneficiaryProviderTransaction"`,
-      'maxBeneficiaryProviderTransaction',
+      `"tbtp"."totalBeneficiaryProviderTransaction"`,
+      'totalBeneficiaryProviderTransaction',
     )
     .addSelect(
       `"trv"."totalNumberOfReceivedVouchers"`,
