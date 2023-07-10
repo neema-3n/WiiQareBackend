@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { BeneficiaryService } from './beneficiary.service';
 import { Public } from 'src/common/decorators/public.decorator';
@@ -15,8 +15,11 @@ export class BeneficiaryController {
   @ApiOperation({
     summary: 'API endpoint to get list of all Beneficiaries informations',
   })
-  async getAllBeneficiaries(): Promise<Array<BeneficiaryDTO>> {
-    return await this.beneficiaryService.findAllBeneficiaries();
+  async getAllBeneficiaries(
+    @Query('take', ParseIntPipe) take: number,
+    @Query('skip', ParseIntPipe) skip: number,
+  ): Promise<Array<BeneficiaryDTO>> {
+    return await this.beneficiaryService.findAllBeneficiaries(take, skip);
   }
 
   @Get('summary')

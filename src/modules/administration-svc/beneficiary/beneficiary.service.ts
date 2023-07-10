@@ -19,9 +19,12 @@ import {
 export class BeneficiaryService {
   constructor(private dataSource: DataSource) {}
 
-  async findAllBeneficiaries(): Promise<Array<BeneficiaryDTO>> {
+  async findAllBeneficiaries(
+    take = 10,
+    skip = 0,
+  ): Promise<Array<BeneficiaryDTO>> {
     const beneficiariesRawData = await (
-      await getAllBeneficiariesQueryBuilder(this.dataSource)
+      await getAllBeneficiariesQueryBuilder(this.dataSource, take, skip)
     ).getRawMany();
 
     const beneficiaries: Array<BeneficiaryDTO> = [];

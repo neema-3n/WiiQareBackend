@@ -9,6 +9,8 @@ import { SelectQueryBuilder, ObjectLiteral, DataSource } from 'typeorm';
  */
 async function getPatientInfoQueryBuilder(
   dataSource: DataSource,
+  take: number,
+  skip: number,
 ): Promise<SelectQueryBuilder<Patient>> {
   return await dataSource
     .createQueryBuilder()
@@ -17,6 +19,8 @@ async function getPatientInfoQueryBuilder(
     .addSelect("concat_ws(' ',patient.first_name, patient.last_name)", 'name')
     .addSelect('patient.country', 'country')
     .addSelect("to_char(patient.created_at,'dd/mm/yyyy')", 'registrationDate')
+    .take(take)
+    .skip(skip)
     .orderBy(`"name"`);
 }
 async function getUniqueProviderCountPerPatientQueryBuilder(
@@ -144,12 +148,14 @@ async function getRedeemedVoucherPerPatientQueryBuilder(
 
 export async function getAllBeneficiariesQueryBuilder(
   dataSource: DataSource,
+  take: number,
+  skip: number,
 ): Promise<SelectQueryBuilder<ObjectLiteral>> {
   return (
     dataSource
       .createQueryBuilder()
       .addCommonTableExpression(
-        await getPatientInfoQueryBuilder(dataSource),
+        await getPatientInfoQueryBuilder(dataSource, take, skip),
         'patientTable',
       )
       .addCommonTableExpression(
