@@ -6,13 +6,7 @@ import {
   ValidateNested,
   IsOptional,
 } from 'class-validator';
-
-class VoucherTotalsInfo {
-  @IsNumber()
-  numberOfVouchers: number;
-  @IsNumber()
-  value: number;
-}
+import { VoucherTotalsInfo } from '../../_common_/classes';
 
 class PaymentTotalsInfo {
   @IsNumber()

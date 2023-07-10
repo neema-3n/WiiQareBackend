@@ -34,7 +34,7 @@ import { ManagerModule } from './manager/manager.module';
     BeneficiaryService,
     PaymentService,
     VoucherService,
-    //ProviderService,
+    ProviderService,
     //ManagerService,
   ],
   controllers: [
@@ -42,7 +42,7 @@ import { ManagerModule } from './manager/manager.module';
     AdminController,
     BeneficiaryController,
     PaymentController,
-    //ProviderController,
+    ProviderController,
     //ManagerController,
     VoucherController,
   ],
