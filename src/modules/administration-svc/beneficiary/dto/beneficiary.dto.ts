@@ -6,7 +6,7 @@ import {
   ValidateNested,
   IsOptional,
 } from 'class-validator';
-import { VoucherTotalsInfo } from '../../_common_/classes';
+import { VoucherTotalsInfo } from '../../_common_';
 
 class PaymentTotalsInfo {
   @IsNumber()

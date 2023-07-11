@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  //convertToCurrency,
-  getCountryNameFromCode,
-} from 'src/helpers/common.helper';
-
+import { getCountryNameFromCode } from 'src/helpers/common.helper';
 import { DataSource } from 'typeorm';
 import { BeneficiaryDTO, BeneficiarySummaryDTO } from './dto/beneficiary.dto';
 import { getAllBeneficiariesQueryBuilder } from './querybuilders/getAllbeneficiary.qb';
@@ -13,7 +9,7 @@ import {
   getNumberOfRegisteredBeneficiariesQueryBuilder,
   getPendingVouchersForAllBeneficiariesQueryBuilder,
   getRedeemedVouchersForAllBeneficiariesQueryBuilder,
-} from './querybuilders/getSummary.qb';
+} from './querybuilders/getBeneficiarySummary.qb';
 
 @Injectable()
 export class BeneficiaryService {
@@ -24,8 +20,12 @@ export class BeneficiaryService {
     skip = 0,
   ): Promise<Array<BeneficiaryDTO>> {
     const beneficiariesRawData = await (
-      await getAllBeneficiariesQueryBuilder(this.dataSource, take, skip)
-    ).getRawMany();
+      await getAllBeneficiariesQueryBuilder(this.dataSource)
+    )
+      .orderBy('"name"')
+      .limit(take)
+      .offset(skip)
+      .getRawMany();
 
     const beneficiaries: Array<BeneficiaryDTO> = [];
 
@@ -36,7 +36,6 @@ export class BeneficiaryService {
       registrationDate,
       totalNumberOfDistinctPayers,
       totalNumberOfDistinctProviders,
-      // currency,
       totalPayment,
       totalPaymentCount,
       numberOfActiveVouchers,
@@ -59,43 +58,22 @@ export class BeneficiaryService {
         currency: 'EUR',
         totalPayment: {
           numberOfPayments: totalPaymentCount || 0,
-          //value: await convertToCurrency(currency, totalPayment, 'EUR'),
           value: totalPayment || 0,
         },
         activeVouchers: {
           numberOfVouchers: numberOfActiveVouchers || 0,
-          // value: await convertToCurrency(
-          //   currency,
-          //   totalAmountOfActiveVouchers,
-          //   'EUR',
-          // ),
           value: totalAmountOfActiveVouchers || 0,
         },
         pendingVouchers: {
           numberOfVouchers: numberOfPendingVouchers || 0,
-          // value: await convertToCurrency(
-          //   currency,
-          //   totalAmountOfPendingVouchers,
-          //   'EUR',
-          // ),
           value: totalAmountOfPendingVouchers || 0,
         },
         unclaimedVouchers: {
           numberOfVouchers: numberOfUnclaimedVouchers || 0,
-          // value: await convertToCurrency(
-          //   currency,
-          //   totalAmountOfUnclaimedVouchers,
-          //   'EUR',
-          // ),
           value: totalAmountOfUnclaimedVouchers || 0,
         },
         redeemedVouchers: {
           numberOfVouchers: numberOfRedeemedVouchers || 0,
-          // value: await convertToCurrency(
-          //   currency,
-          //   totalAmountOfRedeemedVouchers,
-          //   'EUR',
-          // ),
           value: totalAmountOfRedeemedVouchers || 0,
         },
       };
@@ -126,20 +104,20 @@ export class BeneficiaryService {
     ).getRawOne();
 
     return {
-      numberOfRegisteredBeneficiaries,
+      numberOfRegisteredBeneficiaries: numberOfRegisteredBeneficiaries || 0,
       pendingVouchers: {
-        numberOfVouchers: numberOfPendingVouchers,
-        value: totalAmountOfPendingVouchers,
+        numberOfVouchers: numberOfPendingVouchers || 0,
+        value: totalAmountOfPendingVouchers || 0,
       },
       redeemedVouchers: {
-        numberOfVouchers: numberOfRedeemedVouchers,
-        value: totalAmountOfRedeemedVouchers,
+        numberOfVouchers: numberOfRedeemedVouchers || 0,
+        value: totalAmountOfRedeemedVouchers || 0,
       },
       totalProviderTransactions: {
-        numberOfPayments: numberOfProviderTransactions,
-        value: totalAmountOfProviderTransactions,
+        numberOfPayments: numberOfProviderTransactions || 0,
+        value: totalAmountOfProviderTransactions || 0,
       },
-      numberOfActiveBeneficiaries,
+      numberOfActiveBeneficiaries: numberOfActiveBeneficiaries || 0,
       voucherCurrencies: 'EUR',
     } as BeneficiarySummaryDTO;
   }
