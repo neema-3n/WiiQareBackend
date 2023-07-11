@@ -19,6 +19,8 @@ import { ProviderController } from './provider/provider.controller';
 import { VoucherController } from './voucher/voucher.controller';
 import { VoucherService } from './voucher/voucher.service';
 import { ProviderService } from './provider/provider.service';
+import { ChartsService } from './charts/charts.service';
+import { ChartsController } from './charts/charts.controller';
 
 @Module({
   imports: [
@@ -31,6 +33,7 @@ import { ProviderService } from './provider/provider.service';
     PaymentService,
     VoucherService,
     ProviderService,
+    ChartsService,
   ],
   controllers: [
     PayerController,
@@ -39,6 +42,7 @@ import { ProviderService } from './provider/provider.service';
     PaymentController,
     ProviderController,
     VoucherController,
+    ChartsController,
   ],
 })
 export class AdministrationSvcModule {}
