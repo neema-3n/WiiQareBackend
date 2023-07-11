@@ -74,5 +74,6 @@ export async function getActiveBeneficiariesQueryBuilder(
     )
     .where('transaction.updatedAt >= :datePrior', {
       datePrior: subMonths(Date.now(), 6),
-    });
+    })
+    .andWhere("transaction.senderCurrency IN ('eur','EUR')");
 }
