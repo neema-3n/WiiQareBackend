@@ -16,17 +16,13 @@ import { BeneficiaryController } from './beneficiary/beneficiary.controller';
 import { Patient } from '../patient-svc/entities/patient.entity';
 import { Provider } from '../provider-svc/entities/provider.entity';
 import { ProviderController } from './provider/provider.controller';
-import { ManagerController } from './manager/manager.controller';
 import { VoucherController } from './voucher/voucher.controller';
 import { VoucherService } from './voucher/voucher.service';
 import { ProviderService } from './provider/provider.service';
-import { ManagerService } from './manager/manager.service';
-import { ManagerModule } from './manager/manager.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Payer, Transaction, User, Patient, Provider]),
-    ManagerModule,
   ],
   providers: [
     PayerService,
@@ -35,7 +31,6 @@ import { ManagerModule } from './manager/manager.module';
     PaymentService,
     VoucherService,
     ProviderService,
-    //ManagerService,
   ],
   controllers: [
     PayerController,
@@ -43,7 +38,6 @@ import { ManagerModule } from './manager/manager.module';
     BeneficiaryController,
     PaymentController,
     ProviderController,
-    //ManagerController,
     VoucherController,
   ],
 })
