@@ -1,79 +1,64 @@
 import {
   IsNotEmpty,
-  IsOptional,
   IsString,
-  IsUUID,
   IsDateString,
   IsNumber,
   ValidateNested,
 } from 'class-validator';
+import { VoucherTotalsInfo } from '../../_common_';
 
-export class PayerSummaryDto {
+export class PayerSummaryDTO {
   @IsNotEmpty()
   @IsNumber()
   numberOfRegisteredPayers: number;
 
-  @IsNotEmpty()
-  @IsNumber()
-  totalNumberOfPurchasedVouchers: number;
+  @ValidateNested()
+  purchasedVouchers: VoucherTotalsInfo;
 
-  @IsNotEmpty()
-  @IsNumber()
-  totalNumberOfPendingVouchers: number;
+  @ValidateNested()
+  pendingVouchers: VoucherTotalsInfo;
 
-  @IsNotEmpty()
-  @IsNumber()
-  totalNumberOfRedeemedVouchers: number;
+  @ValidateNested()
+  redeemedVouchers: VoucherTotalsInfo;
 
-  @IsNotEmpty()
   @IsNumber()
   numberOfActivePayers: number;
 }
 
-class PayerVouchersInfo {
-  @IsNotEmpty()
-  @IsNumber()
-  numberOfVouchers: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  value: number;
-}
-
-export class PayerListDto {
-  @IsOptional()
-  @IsUUID()
-  payerId?: string;
-
-  @IsOptional()
+export class PayerDTO {
   @IsString()
-  payerName?: string;
+  id: string;
 
-  @IsOptional()
   @IsString()
-  payerCountry?: string;
+  name: string;
 
-  @IsOptional()
+  @IsString()
+  country: string;
+
   @IsDateString()
-  registredDate?: Date;
+  registrationDate: string;
 
-  @IsOptional()
   @IsDateString()
-  lastActivityOn?: string;
+  lastActivityOn: string;
 
-  @IsOptional()
   @IsNumber()
-  totalBeneficiaries?: number;
+  uniqueBeneficiaryCount: number;
 
   @ValidateNested()
-  purchasedVouchers?: PayerVouchersInfo;
+  purchasedVouchers: VoucherTotalsInfo;
 
   @ValidateNested()
-  pendingVouchers?: PayerVouchersInfo;
+  pendingVouchers: VoucherTotalsInfo;
 
   @ValidateNested()
-  unclaimedVouchers?: PayerVouchersInfo;
+  unclaimedVouchers: VoucherTotalsInfo;
 
   @ValidateNested()
-  redeemedVouchers?: PayerVouchersInfo;
+  redeemedVouchers: VoucherTotalsInfo;
+
+  @IsString()
+  currency: string;
+
+  @ValidateNested()
+  vouchersNotSent: VoucherTotalsInfo;
 }

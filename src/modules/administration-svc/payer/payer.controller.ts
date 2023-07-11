@@ -1,8 +1,8 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { PayerService } from './payer.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
-import { PayerListDto, PayerSummaryDto } from './dto/payers.dto';
+import { PayerDTO, PayerSummaryDTO } from './dto/payers.dto';
 
 @ApiTags('admin/payers')
 @Controller('payers')
@@ -15,7 +15,7 @@ export class PayerController {
   @ApiOperation({
     summary: 'API endpoint to get summary list of all Payers informations',
   })
-  getSummary(): Promise<PayerSummaryDto> {
+  getSummary(): Promise<PayerSummaryDTO> {
     return this.payerService.getSummary();
   }
 
@@ -25,7 +25,10 @@ export class PayerController {
   @ApiOperation({
     summary: 'This API is used retrieve Migrant Payers List.',
   })
-  async getAllPayers(): Promise<PayerListDto[]> {
-    return this.payerService.findAllPayers();
+  async getAllPayers(
+    @Query('take', ParseIntPipe) take: number,
+    @Query('skip', ParseIntPipe) skip: number,
+  ): Promise<PayerDTO[]> {
+    return await this.payerService.findAllPayers(take, skip);
   }
 }
