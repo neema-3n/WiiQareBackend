@@ -224,6 +224,7 @@ export class PaymentService {
         providerCity: payment.provider_city,
         providerCountry:
           _country_provider != null ? _country_provider.country : '',
+        //TODO : transactionStatus
         //transactionStatus: payment.transaction_status === 'CLAIMED',
         voucherAmountInLocalCurrency: payment.transaction_amount,
         voucherAmountInSenderCurrency: payment.transaction_sender_amount,

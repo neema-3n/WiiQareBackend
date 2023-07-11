@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserType, VoucherStatus } from 'src/common/constants/enums';
 import { Transaction } from 'src/modules/smart-contract/entities/transaction.entity';
 import { Repository } from 'typeorm';
 import { VoucherDTO, VoucherSummaryDTO } from './dto/voucher.dto';
