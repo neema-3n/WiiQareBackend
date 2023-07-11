@@ -5,8 +5,6 @@ import { DataSource, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 
 async function getProviderInfoQueryBuilder(
   dataSource: DataSource,
-  take: number,
-  skip: number,
 ): Promise<SelectQueryBuilder<Provider>> {
   return await dataSource
     .createQueryBuilder()
@@ -15,10 +13,7 @@ async function getProviderInfoQueryBuilder(
     .addSelect('provider.name', 'name')
     .addSelect('provider.city', 'city')
     .addSelect("provider.contact_person->>'country'", 'country')
-    .addSelect("to_char(provider.createdAt,'dd/mm/yyyy')", 'registrationDate')
-    .take(take)
-    .skip(skip)
-    .orderBy(`"name"`);
+    .addSelect("to_char(provider.createdAt,'dd/mm/yyyy')", 'registrationDate');
 }
 
 async function getLastProviderToBeneficiaryTransactionDateQueryBuilder(
@@ -233,13 +228,11 @@ async function getRedeemedVouchersPerProviderQueryBuilder(
 
 export async function getAllProvidersQueryBuilder(
   dataSource: DataSource,
-  take,
-  skip,
 ): Promise<SelectQueryBuilder<ObjectLiteral>> {
   return await dataSource
     .createQueryBuilder()
     .addCommonTableExpression(
-      await getProviderInfoQueryBuilder(dataSource, take, skip),
+      await getProviderInfoQueryBuilder(dataSource),
       'ProviderTable',
     )
     .addCommonTableExpression(

@@ -21,8 +21,12 @@ export class ProviderService {
 
   async findAllProviders(take = 10, skip = 0): Promise<Array<ProviderDTO>> {
     const providersRawData = await (
-      await getAllProvidersQueryBuilder(this.dataSource, take, skip)
-    ).getRawMany();
+      await getAllProvidersQueryBuilder(this.dataSource)
+    )
+      .take(take)
+      .skip(skip)
+      .orderBy(`"name"`)
+      .getRawMany();
 
     const providersList: Array<ProviderDTO> = [];
 

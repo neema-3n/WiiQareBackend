@@ -4,7 +4,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { VoucherTotalsInfo } from '../../_common_/classes';
+import { VoucherTotalsInfo } from '../../_common_';
 
 class TransactionTotalsInfo {
   @IsNumber()
