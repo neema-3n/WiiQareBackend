@@ -24,10 +24,6 @@ export class createAdminAccountReponseDTO {
   email: string;
 
   @IsNotEmpty()
-  @IsString()
-  username: string;
-
-  @IsNotEmpty()
   @IsEnum(UserRole)
   userRole: UserRole;
 

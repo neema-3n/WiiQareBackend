@@ -35,13 +35,12 @@ export class AdminController {
 
     if (userExists) throw new ConflictException(_409.USER_ALREADY_EXISTS);
 
-    const { id, email, username, status, role } =
+    const { id, email, status, role } =
       await this.adminService.registerNewAdminAccount(createAdminAccount);
 
     return {
       userId: id,
       email,
-      username,
       status,
       userRole: role,
     } as createAdminAccountReponseDTO;
