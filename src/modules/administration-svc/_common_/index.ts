@@ -6,3 +6,10 @@ export class VoucherTotalsInfo {
   @IsNumber()
   value: number;
 }
+
+export class PaymentTotalsInfo {
+  @IsNumber()
+  numberOfPayments: number;
+  @IsNumber()
+  value: number;
+}

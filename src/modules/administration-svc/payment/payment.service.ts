@@ -1,15 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserType, VoucherStatus } from 'src/common/constants/enums';
 import { Payer } from 'src/modules/payer-svc/entities/payer.entity';
 import { Patient } from 'src/modules/patient-svc/entities/patient.entity';
-import { User } from 'src/modules/session/entities/user.entity';
 import { Transaction } from 'src/modules/smart-contract/entities/transaction.entity';
 import { Repository } from 'typeorm';
 import {
-  PaymentsPayerListDto,
-  PaymentsProviderListDto,
-  PaymentSummaryDto,
+  PayerPaymentsDTO,
+  ProviderPaymentsDTO,
+  PaymentSummaryDTO,
 } from './dto/payment.dto';
 
 import lookup from 'country-code-lookup';
@@ -19,21 +17,15 @@ import { Provider } from 'src/modules/provider-svc/entities/provider.entity';
 @Injectable()
 export class PaymentService {
   constructor(
-    @InjectRepository(Payer)
-    private payerRepository: Repository<Payer>,
-
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
-
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
   ) {}
 
   /**
    * This method is used to get global summary of payments
    * @returns
    */
-  async getSummary(): Promise<PaymentSummaryDto> {
+  async getSummary(): Promise<PaymentSummaryDTO> {
     // total number of payer payments received within one week
     const payerPaymentsInOneWeek = await this.transactionRepository
       .createQueryBuilder('transaction')
@@ -93,26 +85,15 @@ export class PaymentService {
       .getRawOne();
 
     // total provider payments
-    const payerProviderPayments = await this.transactionRepository
+    const providerPayments = await this.transactionRepository
       .createQueryBuilder('transaction')
-      .select('COUNT(*)::integer', 'number')
+      .select('COUNT(transaction.voucher)::integer', 'number')
       .addSelect('SUM(transaction.senderAmount)', 'value')
       .where("transaction.senderCurrency IN ('eur','EUR')")
       .andWhere(
-        "transaction.ownerType = 'PROVIDER' AND transaction.status = 'CLAIMED'",
+        "transaction.ownerType = 'PROVIDER' AND transaction.status = 'BURNED'",
       )
       .getRawOne();
-
-    // total revenue = total value of redeemed vouchers MINUS payments made to providers
-    const redeemedVouchers = await this.transactionRepository
-      .createQueryBuilder('transaction')
-      .select('SUM(transaction.senderAmount)', 'value')
-      .where("transaction.senderCurrency IN ('eur','EUR')")
-      .andWhere("transaction.status = 'BURNED'")
-      .getRawOne();
-
-    const totalRevenue =
-      redeemedVouchers.value || 0 - payerProviderPayments.value || 0;
 
     return {
       payerPaymentsInOneWeek: {
@@ -139,19 +120,22 @@ export class PaymentService {
         numberOfPayments: payerClaimedVouchers.number,
         value: payerClaimedVouchers.value || 0,
       },
-      // providerPayments: {
-      //   numberOfPayments: payerProviderPayments.number,
-      //   value: payerProviderPayments.value || 0,
-      // },
-      // totalRevenue,
-    } as PaymentSummaryDto;
+
+      totalProviderPayments: {
+        numberOfPayments: providerPayments.number || 0,
+        value: providerPayments.value || 0,
+      },
+
+      //TODO
+      totalRevenue: 0,
+    } as PaymentSummaryDTO;
   }
 
   /**
    * This method is used to retrieve list of payments received from payer
    * @returns
    */
-  async getPaymentsFromPayer(): Promise<PaymentsPayerListDto[]> {
+  async getPaymentsFromPayer(take = 10, skip = 0): Promise<PayerPaymentsDTO[]> {
     const paymentsFromPayers = await this.transactionRepository
       .createQueryBuilder('transaction')
       .leftJoinAndMapOne(
@@ -174,6 +158,8 @@ export class PaymentService {
         'patient.country',
       ])
       .where("transaction.senderCurrency IN ('eur','EUR')")
+      .limit(take)
+      .offset(skip)
       .getRawMany();
 
     return paymentsFromPayers.map((payment) => {
@@ -184,20 +170,21 @@ export class PaymentService {
         transactionDate: new Date(
           payment.transaction_created_at,
         ).toLocaleDateString(),
-        paymentValue: payment.transaction_sender_amount,
-        countryPayer: _country_payer != null ? _country_payer.country : '',
-        countryBeneficiary:
-          _country_beneficiary != null ? _country_beneficiary.country : '',
+        paymentValue: payment.transaction_sender_amount || 0,
+        payerCountry: _country_payer.country || '',
+        beneficiaryCountry: _country_beneficiary.country || '',
       };
-    }) as PaymentsPayerListDto[];
-    //return paymentsFromPayers as PaymentsPayerListDto[];
+    }) as PayerPaymentsDTO[];
   }
 
   /**
    * This method is used to retrieve list of payments due to provider.
    * @returns
    */
-  async getPaymentsDueProvider(): Promise<PaymentsProviderListDto[]> {
+  async getPaymentsDueProvider(
+    take = 10,
+    skip = 0,
+  ): Promise<ProviderPaymentsDTO[]> {
     const paymentsDueProvider = await this.transactionRepository
       .createQueryBuilder('transaction')
       .leftJoinAndMapOne(
@@ -221,6 +208,8 @@ export class PaymentService {
       .andWhere(
         "transaction.ownerType = 'PROVIDER' AND transaction.status = 'UNCLAIMED'",
       )
+      .limit(take)
+      .offset(skip)
       .getRawMany();
 
     return paymentsDueProvider.map((payment) => {
@@ -232,14 +221,13 @@ export class PaymentService {
         ).toLocaleDateString(),
         providerName: payment.provider_name,
         providerId: payment.provider_id,
-        cityProvider: payment.provider_city,
+        providerCity: payment.provider_city,
         providerCountry:
           _country_provider != null ? _country_provider.country : '',
         //transactionStatus: payment.transaction_status === 'CLAIMED',
-        voucherValueLocal: payment.transaction_amount,
-        voucherValue: payment.transaction_sender_amount,
+        voucherAmountInLocalCurrency: payment.transaction_amount,
+        voucherAmountInSenderCurrency: payment.transaction_sender_amount,
       };
-    }) as PaymentsProviderListDto[];
-    //return paymentsDueProvider as PaymentsProviderListDto[];
+    }) as ProviderPaymentsDTO[];
   }
 }

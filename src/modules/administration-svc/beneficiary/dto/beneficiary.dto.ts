@@ -6,14 +6,7 @@ import {
   ValidateNested,
   IsOptional,
 } from 'class-validator';
-import { VoucherTotalsInfo } from '../../_common_';
-
-class PaymentTotalsInfo {
-  @IsNumber()
-  numberOfPayments: number;
-  @IsNumber()
-  value: number;
-}
+import { PaymentTotalsInfo, VoucherTotalsInfo } from '../../_common_';
 
 export class BeneficiaryDTO {
   @IsUUID()

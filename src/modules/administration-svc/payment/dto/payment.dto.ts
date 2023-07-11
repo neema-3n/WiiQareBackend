@@ -8,18 +8,9 @@ import {
   ValidateNested,
   IsBoolean,
 } from 'class-validator';
+import { PaymentTotalsInfo } from '../../_common_';
 
-class PaymentTotalsInfo {
-  @IsNotEmpty()
-  @IsNumber()
-  numberOfPayments: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  value: number;
-}
-
-export class PaymentSummaryDto {
+export class PaymentSummaryDTO {
   @ValidateNested()
   payerPaymentsInOneWeek: PaymentTotalsInfo;
 
@@ -38,71 +29,55 @@ export class PaymentSummaryDto {
   @ValidateNested()
   claimedVouchers: PaymentTotalsInfo;
 
-  @IsNotEmpty()
   @IsNumber()
-  totalProviderPayments: number;
+  totalProviderPayments: PaymentTotalsInfo;
 
-  // @IsNotEmpty()
-  // @IsNumber()
-  // totalRevenue: number;
+  @IsNumber()
+  totalRevenue?: number;
 }
 
-export class PaymentsPayerListDto {
-  @IsOptional()
+export class PayerPaymentsDTO {
   @IsUUID()
-  transactionId?: string;
+  transactionId: string;
 
-  @IsOptional()
   @IsDateString()
-  transactionDate?: string;
+  transactionDate: string;
 
-  @IsOptional()
   @IsNumber()
-  paymentValue?: number;
+  paymentValue: number;
 
-  @IsOptional()
-  @IsDateString()
-  countryPayer?: string;
+  @IsString()
+  payerCountry: string;
 
-  @IsOptional()
   @IsDateString()
-  countryBeneficiary?: string;
+  beneficiaryCountry: string;
 }
 
-export class PaymentsProviderListDto {
-  @IsOptional()
+export class ProviderPaymentsDTO {
   @IsUUID()
-  transactionId?: string;
+  transactionId: string;
 
-  @IsOptional()
   @IsDateString()
-  transactionDate?: string;
+  transactionDate: string;
 
-  @IsOptional()
   @IsString()
-  providerName?: string;
+  providerName: string;
 
-  @IsOptional()
   @IsUUID()
-  providerId?: string;
+  providerId: string;
 
-  @IsOptional()
   @IsString()
-  cityProvider?: string;
+  providerCity: string;
 
-  @IsOptional()
   @IsString()
-  providerCountry?: string;
+  providerCountry: string;
 
-  // @IsOptional()
-  // @IsBoolean()
-  // transactionStatus?: boolean;
+  @IsBoolean()
+  transactionStatus?: boolean;
 
-  @IsOptional()
   @IsNumber()
-  voucherValueLocal?: number;
+  voucherAmountInLocalCurrency: number;
 
-  @IsOptional()
   @IsNumber()
-  voucherValue?: number; // in EUR
+  voucherAmountInSenderCurrency: number; // in EUR
 }
