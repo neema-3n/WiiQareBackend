@@ -1,8 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
-import { VoucherListDto, VoucherSummaryDto } from './dto/voucher.dto';
+import { VoucherDTO, VoucherSummaryDTO } from './dto/voucher.dto';
 
 @ApiTags('admin/vouchers')
 @Controller('vouchers')
@@ -15,8 +15,8 @@ export class VoucherController {
   @ApiOperation({
     summary: 'API endpoint to get summary list of all Vouchers informations',
   })
-  getSummary(): Promise<VoucherSummaryDto> {
-    return this.voucherService.getSummary();
+  async getSummary(): Promise<VoucherSummaryDTO> {
+    return await this.voucherService.getSummary();
   }
 
   @Get()
@@ -25,7 +25,10 @@ export class VoucherController {
   @ApiOperation({
     summary: 'This API is used retrieve list of all vouchers.',
   })
-  async getAllVouchers(): Promise<VoucherListDto[]> {
-    return this.voucherService.getAllVouchers();
+  async getAllVouchers(
+    @Query('take', ParseIntPipe) take: number,
+    @Query('skip', ParseIntPipe) skip: number,
+  ): Promise<VoucherDTO[]> {
+    return await this.voucherService.getAllVouchers(take, skip);
   }
 }

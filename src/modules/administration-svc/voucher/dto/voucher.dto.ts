@@ -6,18 +6,9 @@ import {
   IsNumber,
   ValidateNested,
 } from 'class-validator';
+import { VoucherTotalsInfo } from '../../_common_';
 
-class VoucherTotalsInfo {
-  @IsNotEmpty()
-  @IsNumber()
-  numberOfVouchers: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  value: number;
-}
-
-export class VoucherSummaryDto {
+export class VoucherSummaryDTO {
   @ValidateNested()
   vouchersInOneWeek: VoucherTotalsInfo;
 
@@ -46,32 +37,25 @@ export class VoucherSummaryDto {
   claimedVouchers: VoucherTotalsInfo;
 }
 
-export class VoucherListDto {
-  @IsOptional()
+export class VoucherDTO {
   @IsString()
-  voucherId?: string;
+  voucherId: string;
 
-  @IsOptional()
   @IsNumber()
-  voucherValueLocal?: number;
+  amountInLocalCurrency: number;
 
-  @IsOptional()
   @IsNumber()
-  voucherValueEUR?: number;
+  amountInSenderCurrency: number;
 
-  @IsOptional()
   @IsUUID()
-  voucherPayerId?: string;
+  payerId: string;
 
-  @IsOptional()
   @IsUUID()
-  voucherBeneficiaryId?: string;
+  beneficiaryId: string;
 
-  @IsOptional()
   @IsUUID()
-  voucherOwnerId?: string;
+  voucherOwnerId: string;
 
-  @IsOptional()
   @IsString()
-  voucherStatus?: string;
+  voucherStatus: string;
 }

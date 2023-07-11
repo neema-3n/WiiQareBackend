@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserType, VoucherStatus } from 'src/common/constants/enums';
 import { Transaction } from 'src/modules/smart-contract/entities/transaction.entity';
 import { Repository } from 'typeorm';
-import { VoucherListDto, VoucherSummaryDto } from './dto/voucher.dto';
+import { VoucherDTO, VoucherSummaryDTO } from './dto/voucher.dto';
 import { subMonths, subWeeks } from 'date-fns';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class VoucherService {
    * This method is used to get global summary of vouchers
    * @returns
    */
-  async getSummary(): Promise<VoucherSummaryDto> {
+  async getSummary(): Promise<VoucherSummaryDTO> {
     // Vouchers made in one week
     const vouchersInOneWeek = await this.transactionRepository
       .createQueryBuilder('transaction')
@@ -147,7 +147,7 @@ export class VoucherService {
         numberOfVouchers: claimedVouchers.number,
         value: claimedVouchers.value || 0,
       },
-    } as VoucherSummaryDto;
+    } as VoucherSummaryDTO;
 
     //return {} as VoucherSummaryDto;
   }
@@ -156,7 +156,7 @@ export class VoucherService {
    * This method is used to retrieve list of all vouchers
    * @returns
    */
-  async getAllVouchers(): Promise<VoucherListDto[]> {
+  async getAllVouchers(take = 10, skip = 0): Promise<VoucherDTO[]> {
     const vouchers = await this.transactionRepository
       .createQueryBuilder('transaction')
       .select([
@@ -172,16 +172,18 @@ export class VoucherService {
         'transaction_voucher_beneficiary',
       )
       .where("transaction.senderCurrency IN ('eur','EUR')")
+      .limit(take)
+      .offset(skip)
       .getRawMany();
 
     // return vouchers as VoucherListDto[];
     return vouchers.map((voucher) => {
       return {
         voucherId: voucher.transaction_id,
-        voucherValueLocal: voucher.transaction_amount,
-        voucherValueEUR: voucher.transaction_sender_amount,
-        voucherPayerId: voucher.transaction_sender_id,
-        voucherBeneficiaryId: voucher.transaction_voucher_beneficiary,
+        amountInLocalCurrency: voucher.transaction_amount,
+        amountInSenderCurrency: voucher.transaction_sender_amount,
+        payerId: voucher.transaction_sender_id,
+        beneficiaryId: voucher.transaction_voucher_beneficiary,
         voucherOwnerId: voucher.transaction_owner_id,
         voucherStatus:
           voucher.status === 'BURNED'
@@ -190,6 +192,6 @@ export class VoucherService {
             ? 'redeemed'
             : 'unredeemed',
       };
-    }) as VoucherListDto[];
+    }) as VoucherDTO[];
   }
 }
