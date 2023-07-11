@@ -8,7 +8,6 @@ import {
 import { VoucherTotalsInfo } from '../../_common_';
 
 export class PayerSummaryDTO {
-  @IsNotEmpty()
   @IsNumber()
   numberOfRegisteredPayers: number;
 
@@ -23,6 +22,9 @@ export class PayerSummaryDTO {
 
   @IsNumber()
   numberOfActivePayers: number;
+
+  @IsString()
+  currency: string;
 }
 
 export class PayerDTO {

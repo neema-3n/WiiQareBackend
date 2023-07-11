@@ -61,6 +61,7 @@ export class PayerService {
         numberOfVouchers: totalNumberOfRedeemedVouchers || 0,
         value: totalValueOfRedeemedVouchers || 0,
       },
+      currency: 'EUR',
     } as PayerSummaryDTO;
   }
 
