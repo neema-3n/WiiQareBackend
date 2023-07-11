@@ -10,7 +10,7 @@ export async function getNumberOfRegisteredPayersPerCountryQueryBuilder(
   return await dataSource
     .createQueryBuilder()
     .from(Payer, 'payer')
-    .addSelect('COUNT(payer.id)::integer', 'numberOfRegisteredPayers')
+    .addSelect('COUNT(payer.id)::integer', 'count')
     .addSelect('payer.country', 'country')
     .groupBy('"country"')
     .orderBy('COUNT(payer.id)', 'DESC');

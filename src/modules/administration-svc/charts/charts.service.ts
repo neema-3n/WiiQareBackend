@@ -7,6 +7,7 @@ import {
   getNumberOfRegisteredBeneficiariesPerCountryQueryBuilder,
   getNumberOfRegisteredPayersPerCountryQueryBuilder,
 } from './querybuilders/charts.qb';
+import { getCountryNameFromCode } from 'src/helpers/common.helper';
 
 @Injectable()
 export class ChartsService {
@@ -37,10 +38,35 @@ export class ChartsService {
       .getRawMany();
 
     return {
-      activeBeneficiariesPerCountry,
-      activePayersPerCountry,
-      registeredBeneficiariesPerCountry,
-      registeredPayersPerCountry,
+      activeBeneficiariesPerCountry: this.transformCountryNameInArray(
+        activeBeneficiariesPerCountry,
+      ),
+      activePayersPerCountry: this.transformCountryNameInArray(
+        activePayersPerCountry,
+      ),
+      registeredBeneficiariesPerCountry: this.transformCountryNameInArray(
+        registeredBeneficiariesPerCountry,
+      ),
+      registeredPayersPerCountry: this.transformCountryNameInArray(
+        registeredPayersPerCountry,
+      ),
     } as ChartsDTO;
+  }
+
+  /**
+   * Transforms country code to its country name in an array
+   * @param arrWithCountryCodes Array of countryInfo
+   * @type CountryInfo {country:string,count:number}
+   * @returns Array with transform country names
+   */
+  private transformCountryNameInArray(arrWithCountryCodes: Array<CountryInfo>) {
+    const listWithCountryName: Array<CountryInfo> = [];
+    for (const { count, country } of arrWithCountryCodes) {
+      listWithCountryName.push({
+        country: getCountryNameFromCode(country),
+        count,
+      });
+    }
+    return listWithCountryName;
   }
 }
