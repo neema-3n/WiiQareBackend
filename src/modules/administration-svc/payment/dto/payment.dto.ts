@@ -1,6 +1,4 @@
 import {
-  IsNotEmpty,
-  IsOptional,
   IsString,
   IsUUID,
   IsDateString,
@@ -34,6 +32,12 @@ export class PaymentSummaryDTO {
 
   @IsNumber()
   totalRevenue?: number;
+
+  @IsNumber()
+  numberOFPayerPayments: number;
+
+  @IsNumber()
+  numberOfProviderPayments: number;
 }
 
 export class PayerPaymentsDTO {

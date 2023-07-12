@@ -20,7 +20,7 @@ async function getPayerInfoQueryBuilder(
 async function getUniqueBeneficiaryCountPerPayerQueryBuilder(
   dataSource: DataSource,
 ) {
-  return await dataSource
+  return dataSource
     .createQueryBuilder()
     .from(Payer, 'payer')
     .leftJoin(Transaction, 'transaction', 'transaction.senderId=payer.id')

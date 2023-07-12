@@ -3,22 +3,27 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Payer } from 'src/modules/payer-svc/entities/payer.entity';
 import { Patient } from 'src/modules/patient-svc/entities/patient.entity';
 import { Transaction } from 'src/modules/smart-contract/entities/transaction.entity';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import {
   PayerPaymentsDTO,
   ProviderPaymentsDTO,
   PaymentSummaryDTO,
 } from './dto/payment.dto';
 
-import lookup from 'country-code-lookup';
 import { subMonths, subWeeks } from 'date-fns';
 import { Provider } from 'src/modules/provider-svc/entities/provider.entity';
+import {
+  getCountPayerPaymentsQueryBuilder,
+  getCountProviderPaymentsQueryBuilder,
+} from './querybuilders/getCount.qb';
+import { getCountryNameFromCode } from '../_common_';
 
 @Injectable()
 export class PaymentService {
   constructor(
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
+    private dataSource: DataSource,
   ) {}
 
   /**
@@ -95,7 +100,16 @@ export class PaymentService {
       )
       .getRawOne();
 
+    const { numberOfPayerPayments } = await getCountPayerPaymentsQueryBuilder(
+      this.dataSource,
+    ).getRawOne();
+
+    const { numberOfProviderPayments } =
+      await getCountProviderPaymentsQueryBuilder(this.dataSource).getRawOne();
+
     return {
+      numberOFPayerPayments: numberOfPayerPayments || 0,
+      numberOfProviderPayments: numberOfProviderPayments || 0,
       payerPaymentsInOneWeek: {
         numberOfPayments: payerPaymentsInOneWeek.number,
         value: payerPaymentsInOneWeek.value || 0,
@@ -163,16 +177,18 @@ export class PaymentService {
       .getRawMany();
 
     return paymentsFromPayers.map((payment) => {
-      const _country_payer = lookup.byFips(payment.payer_country);
-      const _country_beneficiary = lookup.byFips(payment.patient_country);
+      const _country_payer = getCountryNameFromCode(payment.payer_country);
+      const _country_beneficiary = getCountryNameFromCode(
+        payment.patient_country,
+      );
       return {
         transactionId: payment.transaction_id,
         transactionDate: new Date(
           payment.transaction_created_at,
         ).toLocaleDateString(),
         paymentValue: payment.transaction_sender_amount || 0,
-        payerCountry: _country_payer.country || '',
-        beneficiaryCountry: _country_beneficiary.country || '',
+        payerCountry: _country_payer || '',
+        beneficiaryCountry: _country_beneficiary || '',
       };
     }) as PayerPaymentsDTO[];
   }
@@ -213,7 +229,9 @@ export class PaymentService {
       .getRawMany();
 
     return paymentsDueProvider.map((payment) => {
-      const _country_provider = lookup.byFips(payment.provider_country);
+      const _country_provider = getCountryNameFromCode(
+        payment.provider_country,
+      );
       return {
         transactionId: payment.transaction_id,
         transactionDate: new Date(
@@ -222,8 +240,7 @@ export class PaymentService {
         providerName: payment.provider_name,
         providerId: payment.provider_id,
         providerCity: payment.provider_city,
-        providerCountry:
-          _country_provider != null ? _country_provider.country : '',
+        providerCountry: _country_provider != null ? _country_provider : '',
         //TODO : to do later
         //transactionStatus: payment.transaction_status === 'CLAIMED',
         voucherAmountInLocalCurrency: payment.transaction_amount,
