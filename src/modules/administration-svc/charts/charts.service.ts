@@ -1,77 +1,61 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { ChartsDTO, CountryInfo } from './dto/chart.dto';
-import {
-  getActiveBeneficiariesPerCountryQueryBuilder,
-  getNumberOfActivePayersPerCountryQueryBuilder,
-  getNumberOfRegisteredBeneficiariesPerCountryQueryBuilder,
-  getNumberOfRegisteredPayersPerCountryQueryBuilder,
-} from './querybuilders/charts.qb';
+
 import { getCountryNameFromCode } from '../_common_';
+import { ChartDTO } from './dto/chart.dto';
+import { getBeneficiariesChartInfoQueryBuilder } from './querybuilders/beneficiariesChart.qb';
+import be from 'date-fns/esm/locale/be/index.js';
+import { getPayersChartInfoQueryBuilder } from './querybuilders/payersChart.qb';
 
 @Injectable()
 export class ChartsService {
   constructor(private dataSource: DataSource) {}
 
   /**
-   * Method used to retrieve list of active beneficiaries and payers per country,total number of registered beneficiaries and payers per country, and sorts them in descending order
+   * Method used to retrieve list of active  payers ,total number of registered payers per country, and sorts them in descending order
    * @param take number of records
    * @returns
    */
-  async findChartsInfo(take: number): Promise<ChartsDTO> {
-    const activeBeneficiariesPerCountry: CountryInfo[] = await (
-      await getActiveBeneficiariesPerCountryQueryBuilder(this.dataSource)
+  async findPayersChartInfo(take: number) {
+    const payersChartRawData = await getPayersChartInfoQueryBuilder(
+      this.dataSource,
     )
-      .limit(take)
-      .getRawMany();
-    const activePayersPerCountry: CountryInfo[] = await (
-      await getNumberOfActivePayersPerCountryQueryBuilder(this.dataSource)
-    )
-      .limit(take)
-      .getRawMany();
-    const registeredBeneficiariesPerCountry: CountryInfo[] = await (
-      await getNumberOfRegisteredBeneficiariesPerCountryQueryBuilder(
-        this.dataSource,
-      )
-    )
-      .limit(take)
-      .getRawMany();
-    const registeredPayersPerCountry: CountryInfo[] = await (
-      await getNumberOfRegisteredPayersPerCountryQueryBuilder(this.dataSource)
-    )
+      .orderBy(`"registeredCount"`, 'DESC')
+      .addOrderBy(`"activeCount"`, 'DESC')
       .limit(take)
       .getRawMany();
 
-    return {
-      activeBeneficiariesPerCountry: this.transformCountryNameInArray(
-        activeBeneficiariesPerCountry,
-      ),
-      activePayersPerCountry: this.transformCountryNameInArray(
-        activePayersPerCountry,
-      ),
-      registeredBeneficiariesPerCountry: this.transformCountryNameInArray(
-        registeredBeneficiariesPerCountry,
-      ),
-      registeredPayersPerCountry: this.transformCountryNameInArray(
-        registeredPayersPerCountry,
-      ),
-    } as ChartsDTO;
+    return this.transformChartDTO(payersChartRawData) as Array<ChartDTO>;
   }
 
   /**
-   * Transforms country code to its country name in an array
-   * @param arrWithCountryCodes Array of countryInfo
-   * @type CountryInfo {country:string,count:number}
-   * @returns Array with transform country names
+   * Method used to retrieve list of active beneficiaries ,total number of registered beneficiaries per country, and sorts them in descending order
+   * @param take number of records
+   * @returns
    */
-  private transformCountryNameInArray(arrWithCountryCodes: Array<CountryInfo>) {
-    const listWithCountryName: Array<CountryInfo> = [];
-    for (const { count, country } of arrWithCountryCodes) {
-      listWithCountryName.push({
+  async findBeneficiariesChartInfo(take: number) {
+    const beneficiaryChartRawData = await getBeneficiariesChartInfoQueryBuilder(
+      this.dataSource,
+    )
+      .orderBy(`"registeredCount"`, 'DESC')
+      .addOrderBy(`"activeCount"`, 'DESC')
+      .limit(take)
+      .getRawMany();
+    return this.transformChartDTO(beneficiaryChartRawData) as Array<ChartDTO>;
+  }
+
+  /**
+   * Transforms country code to its country name and set null active,registered count to zero
+   */
+  private transformChartDTO(chartRawData: Array<any>) {
+    const transformedChartData = [];
+    for (const { country, registeredCount, activeCount } of chartRawData) {
+      transformedChartData.push({
         country: getCountryNameFromCode(country),
-        count,
+        registeredCount: registeredCount || 0,
+        activeCount: activeCount || 0,
       });
     }
-    return listWithCountryName;
+    return transformedChartData;
   }
 }

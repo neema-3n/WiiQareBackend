@@ -22,5 +22,5 @@ export class PaymentTotalsInfo {
  */
 
 export const getCountryNameFromCode = (countryCode: string) => {
-  return countryLookup.byFips(countryCode)?.country;
+  return countryLookup.byIso(countryCode)?.country;
 };
