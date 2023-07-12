@@ -288,6 +288,7 @@ export class ProviderService {
     const transactions = await this.transactionRepository
       .createQueryBuilder('transaction')
       .where('transaction.ownerId = :providerId', { providerId })
+      .orderBy('transaction.updatedAt', 'DESC')
       .getMany();
     //TODO: paginate this!.
     return transactions;
@@ -447,5 +448,16 @@ export class ProviderService {
 
     // Save package
     await this.packageRepository.save(pkg);
+  }
+
+  async listProvider(): Promise<any> {
+
+    let providers = await this.providerRepository.createQueryBuilder('providers')
+    .leftJoinAndSelect('providers.packages', 'packages')
+    .orderBy('providers.createdAt', 'DESC').take(5)
+    .getMany();
+
+    return providers
+
   }
 }
