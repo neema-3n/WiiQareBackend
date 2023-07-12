@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 import { getCountryNameFromCode } from '../_common_';
 import { ChartDTO } from './dto/chart.dto';
 import { getBeneficiariesChartInfoQueryBuilder } from './querybuilders/beneficiariesChart.qb';
+import be from 'date-fns/esm/locale/be/index.js';
 import { getPayersChartInfoQueryBuilder } from './querybuilders/payersChart.qb';
 
 @Injectable()
