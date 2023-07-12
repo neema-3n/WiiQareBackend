@@ -7,12 +7,17 @@ import {
   getNumberOfRegisteredBeneficiariesPerCountryQueryBuilder,
   getNumberOfRegisteredPayersPerCountryQueryBuilder,
 } from './querybuilders/charts.qb';
-import { getCountryNameFromCode } from 'src/helpers/common.helper';
+import { getCountryNameFromCode } from '../_common_';
 
 @Injectable()
 export class ChartsService {
   constructor(private dataSource: DataSource) {}
 
+  /**
+   * Method used to retrieve list of active beneficiaries and payers per country,total number of registered beneficiaries and payers per country, and sorts them in descending order
+   * @param take number of records
+   * @returns
+   */
   async findChartsInfo(take: number): Promise<ChartsDTO> {
     const activeBeneficiariesPerCountry: CountryInfo[] = await (
       await getActiveBeneficiariesPerCountryQueryBuilder(this.dataSource)

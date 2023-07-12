@@ -19,6 +19,12 @@ import {
 export class ProviderService {
   constructor(private dataSource: DataSource) {}
 
+  /**
+   * Method used to get the list of all Providers
+   * @param take number of records to select (for pagination)
+   * @param skip number of records to skip (for pagination)
+   * @returns
+   */
   async findAllProviders(take = 10, skip = 0): Promise<Array<ProviderDTO>> {
     const providersRawData = await (
       await getAllProvidersQueryBuilder(this.dataSource)
@@ -95,7 +101,10 @@ export class ProviderService {
 
     return providersList;
   }
-
+  /**
+   * Gets global summary of all providers information
+   * @returns
+   */
   async getSummary() {
     const { numberOfRegisteredProviders } = await (
       await getNumberOfRegisteredProvidersQueryBuilder(this.dataSource)

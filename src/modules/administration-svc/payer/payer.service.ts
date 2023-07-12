@@ -9,7 +9,7 @@ import {
   getNumberOfRegisteredPayersQueryBuilder,
 } from './querybuilders/getPayerSummary.qb';
 import { getAllPayersQueryBuilder } from './querybuilders/getAllPayers.qb';
-import { getCountryNameFromCode } from 'src/helpers/common.helper';
+import { getCountryNameFromCode } from '../_common_';
 
 @Injectable()
 export class PayerService {

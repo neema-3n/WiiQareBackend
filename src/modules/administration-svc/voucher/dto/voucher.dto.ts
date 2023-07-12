@@ -1,11 +1,4 @@
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-  IsNumber,
-  ValidateNested,
-} from 'class-validator';
+import { IsString, IsUUID, IsNumber, ValidateNested } from 'class-validator';
 import { VoucherTotalsInfo } from '../../_common_';
 
 export class VoucherSummaryDTO {

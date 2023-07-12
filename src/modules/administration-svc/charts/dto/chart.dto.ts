@@ -1,6 +1,4 @@
-import { Transform } from 'class-transformer';
 import { IsNumber, IsString, ValidateNested } from 'class-validator';
-import { getCountryNameFromCode } from 'src/helpers/common.helper';
 
 export class CountryInfo {
   @IsString()

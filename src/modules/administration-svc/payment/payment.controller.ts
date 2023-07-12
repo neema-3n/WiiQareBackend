@@ -1,7 +1,6 @@
 import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-// import { Public } from 'src/common/decorators/public.decorator';
 import {
   PayerPaymentsDTO,
   ProviderPaymentsDTO,
@@ -17,7 +16,6 @@ export class PaymentController {
 
   @Get('summary')
   @Roles(UserRole.WIIQARE_ADMIN)
-  // @Public()
   @ApiOperation({
     summary: 'API endpoint to get summary list of all Payments informations',
   })
@@ -27,7 +25,6 @@ export class PaymentController {
 
   @Get('payers')
   @Roles(UserRole.WIIQARE_ADMIN)
-  // @Public()
   @ApiOperation({
     summary: 'This API is used retrieve list of payments received from payer.',
   })

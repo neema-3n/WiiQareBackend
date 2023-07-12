@@ -1,6 +1,5 @@
 import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-// import { Public } from 'src/common/decorators/public.decorator';
 import { ProviderService } from './provider.service';
 import { ProviderDTO } from './dto/provider.dto';
 import { UserRole } from 'src/common/constants/enums';
@@ -12,7 +11,6 @@ export class ProviderController {
   constructor(private readonly providerService: ProviderService) {}
   @Get()
   @Roles(UserRole.WIIQARE_ADMIN)
-  // @Public()
   @ApiOperation({
     summary: 'API endpoint to get list of all Providers informations',
   })
@@ -25,7 +23,6 @@ export class ProviderController {
 
   @Get('summary')
   @Roles(UserRole.WIIQARE_ADMIN)
-  // @Public()
   @ApiOperation({
     summary: 'API endpoint to get summary informations related to providers',
   })

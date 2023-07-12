@@ -1,4 +1,5 @@
 import { IsNumber } from 'class-validator';
+import countryLookup from 'country-code-lookup';
 
 export class VoucherTotalsInfo {
   @IsNumber()
@@ -13,3 +14,13 @@ export class PaymentTotalsInfo {
   @IsNumber()
   value: number;
 }
+
+/**
+ * This helper function returns a country name based on the country code
+ * @param countryCode Country Code
+ *
+ */
+
+export const getCountryNameFromCode = (countryCode: string) => {
+  return countryLookup.byFips(countryCode)?.country;
+};

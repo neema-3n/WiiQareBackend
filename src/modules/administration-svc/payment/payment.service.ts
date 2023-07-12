@@ -126,7 +126,7 @@ export class PaymentService {
         value: providerPayments.value || 0,
       },
 
-      //TODO
+      //TODO: to do later
       totalRevenue: 0,
     } as PaymentSummaryDTO;
   }
@@ -224,7 +224,7 @@ export class PaymentService {
         providerCity: payment.provider_city,
         providerCountry:
           _country_provider != null ? _country_provider.country : '',
-        //TODO : transactionStatus
+        //TODO : to do later
         //transactionStatus: payment.transaction_status === 'CLAIMED',
         voucherAmountInLocalCurrency: payment.transaction_amount,
         voucherAmountInSenderCurrency: payment.transaction_sender_amount,

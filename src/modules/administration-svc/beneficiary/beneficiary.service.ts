@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { getCountryNameFromCode } from 'src/helpers/common.helper';
+import { getCountryNameFromCode } from '../_common_';
 import { DataSource } from 'typeorm';
 import { BeneficiaryDTO, BeneficiarySummaryDTO } from './dto/beneficiary.dto';
 import { getAllBeneficiariesQueryBuilder } from './querybuilders/getAllbeneficiary.qb';
@@ -15,6 +15,12 @@ import {
 export class BeneficiaryService {
   constructor(private dataSource: DataSource) {}
 
+  /**
+   * Method used to get a list of All beneficiaries
+   * @param take number of records to select (for pagination)
+   * @param skip  number of records to skip (for pagination)
+   * @returns
+   */
   async findAllBeneficiaries(
     take = 10,
     skip = 0,
@@ -83,6 +89,10 @@ export class BeneficiaryService {
     return beneficiaries;
   }
 
+  /**
+   * Method used to get a global summary of all beneficiaries information
+   * @returns
+   */
   async getSummary(): Promise<BeneficiarySummaryDTO> {
     const { numberOfRegisteredBeneficiaries } = await (
       await getNumberOfRegisteredBeneficiariesQueryBuilder(this.dataSource)

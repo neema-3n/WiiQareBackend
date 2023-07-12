@@ -1,7 +1,5 @@
 import { ApiResponseOptions } from '@nestjs/swagger';
 import * as crypto from 'crypto';
-import countryLookup from 'country-code-lookup';
-import cc from 'currency-converter-lt';
 
 export const logSuccess = (...data: any[]): void => console.log(`✓ ${data}`);
 export const logInfo = (...data: any[]): void => console.info(`→ ${data}`);
@@ -32,13 +30,4 @@ export const randomSixDigit = (): string => {
  */
 export const generateToken = (): string => {
   return crypto.randomBytes(16).toString('hex');
-};
-
-/**
- * This helper function returns a country name based on the country code
- * @param countryCode Country Code
- *
- */
-export const getCountryNameFromCode = (countryCode: string) => {
-  return countryLookup.byFips(countryCode)?.country;
 };
