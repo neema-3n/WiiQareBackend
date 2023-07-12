@@ -29,8 +29,8 @@ export class ProviderService {
     const providersRawData = await (
       await getAllProvidersQueryBuilder(this.dataSource)
     )
-      .take(take)
-      .skip(skip)
+      .limit(take)
+      .offset(skip)
       .orderBy(`"name"`)
       .getRawMany();
 
