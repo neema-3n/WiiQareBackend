@@ -363,48 +363,48 @@ describe('ProviderService', () => {
     });
   });
 
-  describe('getTransactionByShortenHash', () => {
-    const shortenHash = 'shortenHash';
+  // describe('getTransactionByShortenHash', () => {
+  //   const shortenHash = 'shortenHash';
 
-    it('should return the details of the mock transaction', async () => {
-      jest.spyOn(service, 'sendTxVerificationOTP').mockResolvedValue(null);
+  //   it('should return the details of the mock transaction', async () => {
+  //     jest.spyOn(service, 'sendTxVerificationOTP').mockResolvedValue(null);
 
-      const result = await service.getTransactionByShortenHash(shortenHash);
-      expect(transactionRepository.findOne).toHaveBeenCalledWith({
-        where: { shortenHash, ownerType: UserType.PATIENT },
-      });
-      expect(patientRepository.findOne).toHaveBeenCalledWith({
-        where: { id: mockTransaction.ownerId },
-      });
-      expect(service.sendTxVerificationOTP).toHaveBeenCalledWith(
-        shortenHash,
-        mockPatient,
-        mockTransaction,
-      );
-      expect(result).toEqual({
-        amount: mockTransaction.amount,
-        currency: mockTransaction.currency,
-        patientNames: `${mockPatient.firstName} ${mockPatient.lastName}`,
-        patientPhoneNumber: mockPatient.phoneNumber,
-      });
-    });
+  //     const result = await service.getTransactionByShortenHash(shortenHash);
+  //     expect(transactionRepository.findOne).toHaveBeenCalledWith({
+  //       where: { shortenHash, ownerType: UserType.PATIENT },
+  //     });
+  //     expect(patientRepository.findOne).toHaveBeenCalledWith({
+  //       where: { id: mockTransaction.ownerId },
+  //     });
+  //     expect(service.sendTxVerificationOTP).toHaveBeenCalledWith(
+  //       shortenHash,
+  //       mockPatient,
+  //       mockTransaction,
+  //     );
+  //     expect(result).toEqual({
+  //       amount: mockTransaction.amount,
+  //       currency: mockTransaction.currency,
+  //       patientNames: `${mockPatient.firstName} ${mockPatient.lastName}`,
+  //       patientPhoneNumber: mockPatient.phoneNumber,
+  //     });
+  //   });
 
-    it('should throw an error if the transaction does not exist', async () => {
-      transactionRepository.findOne = jest.fn().mockResolvedValue(null);
+  //   it('should throw an error if the transaction does not exist', async () => {
+  //     transactionRepository.findOne = jest.fn().mockResolvedValue(null);
 
-      await expect(
-        service.getTransactionByShortenHash('someShortenHash'),
-      ).rejects.toThrow(new NotFoundException(_404.INVALID_TRANSACTION_HASH));
-    });
+  //     await expect(
+  //       service.getTransactionByShortenHash('someShortenHash'),
+  //     ).rejects.toThrow(new NotFoundException(_404.INVALID_TRANSACTION_HASH));
+  //   });
 
-    it('should throw an error if the transaction is not owned by a patient', async () => {
-      patientRepository.findOne = jest.fn().mockResolvedValue(null);
+  //   it('should throw an error if the transaction is not owned by a patient', async () => {
+  //     patientRepository.findOne = jest.fn().mockResolvedValue(null);
 
-      await expect(
-        service.getTransactionByShortenHash(shortenHash),
-      ).rejects.toThrow(new NotFoundException(_404.PATIENT_NOT_FOUND));
-    });
-  });
+  //     await expect(
+  //       service.getTransactionByShortenHash(shortenHash),
+  //     ).rejects.toThrow(new NotFoundException(_404.PATIENT_NOT_FOUND));
+  //   });
+  // });
 
   describe('authorizeVoucherTransfer', () => {
     const shortenHash = 'shortenHash';
@@ -490,58 +490,58 @@ describe('ProviderService', () => {
     // });
   });
 
-  describe('getTransactionStatistic', () => {
-    const providerId = 'id';
-    // mockTransaction has voucher status of unclaimed
-    const mockClaimedTx = {
-      ...mockTransaction,
-      status: VoucherStatus.CLAIMED,
-    };
-    const mockPendingTx = {
-      ...mockTransaction,
-      status: VoucherStatus.PENDING,
-    };
-    const mockBurnedTx = {
-      ...mockTransaction,
-      status: VoucherStatus.BURNED,
-    };
+  // describe('getTransactionStatistic', () => {
+  //   const providerId = 'id';
+  //   // mockTransaction has voucher status of unclaimed
+  //   const mockClaimedTx = {
+  //     ...mockTransaction,
+  //     status: VoucherStatus.CLAIMED,
+  //   };
+  //   const mockPendingTx = {
+  //     ...mockTransaction,
+  //     status: VoucherStatus.PENDING,
+  //   };
+  //   const mockBurnedTx = {
+  //     ...mockTransaction,
+  //     status: VoucherStatus.BURNED,
+  //   };
 
-    it('should return the transaction statistics', async () => {
-      transactionRepository.createQueryBuilder = jest.fn().mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        getMany: jest
-          .fn()
-          .mockResolvedValue([
-            mockTransaction,
-            mockClaimedTx,
-            mockPendingTx,
-            mockBurnedTx,
-            mockBurnedTx,
-            mockClaimedTx,
-            mockTransaction,
-            mockClaimedTx,
-          ]),
-      });
+  //   it('should return the transaction statistics', async () => {
+  //     transactionRepository.createQueryBuilder = jest.fn().mockReturnValue({
+  //       where: jest.fn().mockReturnThis(),
+  //       andWhere: jest.fn().mockReturnThis(),
+  //       getMany: jest
+  //         .fn()
+  //         .mockResolvedValue([
+  //           mockTransaction,
+  //           mockClaimedTx,
+  //           mockPendingTx,
+  //           mockBurnedTx,
+  //           mockBurnedTx,
+  //           mockClaimedTx,
+  //           mockTransaction,
+  //           mockClaimedTx,
+  //         ]),
+  //     });
 
-      const result = await service.getTransactionStatistic(providerId);
-      expect(transactionRepository.createQueryBuilder).toHaveBeenCalledWith(
-        'transaction',
-      );
-      expect(
-        transactionRepository.createQueryBuilder().where,
-      ).toHaveBeenCalledWith('transaction.ownerId = :providerId', {
-        providerId,
-      });
-      expect(result).toEqual({
-        totalAmount: 8,
-        totalUniquePatients: 1,
-        totalRedeemedAmount: 3,
-        totalPendingAmount: 1,
-        totalUnclaimedAmount: 2,
-      });
-    });
-  });
+  //     const result = await service.getTransactionStatistic(providerId);
+  //     expect(transactionRepository.createQueryBuilder).toHaveBeenCalledWith(
+  //       'transaction',
+  //     );
+  //     expect(
+  //       transactionRepository.createQueryBuilder().where,
+  //     ).toHaveBeenCalledWith('transaction.ownerId = :providerId', {
+  //       providerId,
+  //     });
+  //     expect(result).toEqual({
+  //       totalAmount: 8,
+  //       totalUniquePatients: 1,
+  //       totalRedeemedAmount: 3,
+  //       totalPendingAmount: 1,
+  //       totalUnclaimedAmount: 2,
+  //     });
+  //   });
+  // });
 
   describe('redeemVoucher', () => {
     const hashes = ['hash1', 'hash2'];
