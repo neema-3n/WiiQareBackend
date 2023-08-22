@@ -131,7 +131,7 @@ describe('ProviderService', () => {
     role: UserRole.PATIENT,
     status: UserStatus.ACTIVE,
     password: 'password',
-    savings: []
+    savings: [],
   };
 
   const mockPatient: Patient = {
@@ -159,8 +159,8 @@ describe('ProviderService', () => {
     receiverId: mockPatient.id,
     receiverType: ReceiverType.PATIENT,
     status: VoucherStatus.PENDING,
-    transaction: mockTransaction.id
-  }
+    transaction: mockTransaction.id,
+  };
 
   // Mock relations
   mockProvider.user = mockUser;

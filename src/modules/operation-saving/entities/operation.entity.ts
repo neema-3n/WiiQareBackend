@@ -1,5 +1,11 @@
-import { Saving } from 'src/modules/saving/entities/saving.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Saving } from '../../saving/entities/saving.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 export enum OperationType {
   CREDIT = 'CREDIT',
@@ -11,7 +17,7 @@ export class OperationSaving {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Saving, saving => saving.operations)
+  @ManyToOne(() => Saving, (saving) => saving.operations)
   @JoinColumn({ name: 'idSaving' })
   saving: Saving;
 

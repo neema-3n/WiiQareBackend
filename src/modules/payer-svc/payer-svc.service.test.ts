@@ -14,7 +14,6 @@ import {
   TransactionStatus,
   UserRole,
   UserStatus,
-  UserType,
   VoucherStatus,
 } from '../../common/constants/enums';
 import { SendInviteDto } from './dto/payer.dto';
@@ -25,7 +24,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { _400, _404, _403 } from '../../common/constants/errors';
-
 
 describe('PayerService', () => {
   let service: PayerService;
@@ -55,7 +53,7 @@ describe('PayerService', () => {
     role: UserRole.PAYER,
     status: UserStatus.ACTIVE,
     password: 'password',
-    savings: []
+    savings: [],
   };
 
   const mockPayer: Payer = {
@@ -112,8 +110,8 @@ describe('PayerService', () => {
     receiverId: mockPatient.id,
     receiverType: ReceiverType.PATIENT,
     status: VoucherStatus.PENDING,
-    transaction: mockTransaction.id
-  }
+    transaction: mockTransaction.id,
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
