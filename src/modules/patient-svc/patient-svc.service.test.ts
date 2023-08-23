@@ -5,8 +5,6 @@ import { User } from '../session/entities/user.entity';
 import { Transaction } from '../smart-contract/entities/transaction.entity';
 import { CreatePatientDto, PatientResponseDto } from './dto/patient.dto';
 import {
-  ReceiverType,
-  TransactionStatus,
   UserRole,
   UserStatus,
   UserType,
@@ -27,7 +25,7 @@ describe('PatientSvcService', () => {
     role: UserRole.PATIENT,
     status: UserStatus.INACTIVE,
     password: 'password',
-    savings: [],
+    savings: []
   };
 
   const mockPatient: Patient = {
@@ -56,8 +54,10 @@ describe('PatientSvcService', () => {
     amount: 1,
     conversionRate: 1,
     currency: 'FC',
-    ownerType: ReceiverType.PATIENT,
-    status: TransactionStatus.PENDING,
+    ownerType: UserType.PATIENT,
+    status: VoucherStatus.UNCLAIMED,
+    transactionHash: 'transactionHash1',
+    shortenHash: 'shortenHash1',
     stripePaymentId: 'stripePaymentId1',
     voucher: { voucher: 'voucher1' },
   };

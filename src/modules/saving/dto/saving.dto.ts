@@ -11,10 +11,11 @@ import {
 import { SavingFrequency, SavingType } from '../entities/saving.entity';
 
 export class CreateSavingDto {
+
   @IsNotEmpty()
   @IsString()
   user: string;
-
+  
   @IsNotEmpty()
   @IsEnum(SavingType)
   type: SavingType;

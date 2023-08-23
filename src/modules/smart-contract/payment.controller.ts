@@ -14,13 +14,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
 import _ from 'lodash';
 import { InjectStripe } from 'nestjs-stripe';
-import {
-  ReceiverType,
-  SenderType,
-  TransactionStatus,
-  UserRole,
-  VoucherStatus,
-} from 'src/common/constants/enums';
+import { UserRole, VoucherStatus } from 'src/common/constants/enums';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { Public } from 'src/common/decorators/public.decorator';
 import { Roles } from 'src/common/decorators/user-role.decorator';
@@ -35,7 +29,11 @@ import { Transaction } from './entities/transaction.entity';
 import { SmartContractService } from './smart-contract.service';
 import { TransactionService } from './transaction.service';
 import { _400 } from 'src/common/constants/errors';
-import { Voucher } from './entities/voucher.entity';
+import { SavingService } from '../saving/saving.service';
+import { Saving } from '../saving/entities/saving.entity';
+import { User } from '../session/entities/user.entity';
+import { operationService } from '../operation-saving/operation.service';
+import { OperationType } from '../operation-saving/entities/operation.entity';
 
 @ApiTags('payment')
 @Controller('payment')
@@ -44,12 +42,11 @@ export class PaymentController {
     @InjectStripe() private readonly stripe: Stripe,
     private readonly appConfigService: AppConfigService,
     private readonly smartContractService: SmartContractService,
+    private readonly operationService: operationService,
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
-    @InjectRepository(Voucher)
-    private readonly voucherRepository: Repository<Voucher>,
     private readonly transactionService: TransactionService,
-  ) {}
+  ) { }
 
   @Get()
   @ApiOperation({
@@ -82,8 +79,6 @@ export class PaymentController {
       // Verify the webhook event with Stripe to ensure it is authentic
       const webhookSecret = this.appConfigService.stripeWebHookSecret;
 
-      console.log(webhookSecret);
-
       const verifiedEvent = this.stripe.webhooks.constructEvent(
         req.rawBody,
         signature,
@@ -114,7 +109,11 @@ export class PaymentController {
             currencyPatientAmount,
             currencyPatient,
             currencyRate,
+            forSaving,
+            idSaving
           } = metadata;
+
+          if (forSaving == true && idSaving) return this.operationService.paymentSaving({saving: idSaving, amount: senderAmount, currency: senderCurrency, type: OperationType.CREDIT})
 
           const voucherData = await this.smartContractService.mintVoucher({
             amount: Math.round(currencyPatientAmount),
@@ -123,7 +122,7 @@ export class PaymentController {
             patientId: patientId,
           });
 
-          const voucherJSON = {
+          const voucherToSave = {
             id: _.get(voucherData, 'events.mintVoucherEvent.returnValues.0'),
             amount: _.get(
               voucherData,
@@ -167,26 +166,12 @@ export class PaymentController {
             senderId,
             ownerId: patientId,
             stripePaymentId,
-            voucher: voucherJSON,
-            status: TransactionStatus.PENDING,
-          });
-          const savedTransaction = await this.transactionRepository.save(
-            transactionToSave,
-          );
-
-          // update this
-          const voucherToSave = this.voucherRepository.create({
-            voucherHash: transactionHash,
-            shortenHash: shortenHash,
-            value: currencyPatientAmount,
-            senderId: senderId,
-            senderType: SenderType.PAYER,
-            receiverId: patientId,
-            receiverType: ReceiverType.PATIENT,
+            transactionHash,
+            shortenHash,
+            voucher: voucherToSave,
             status: VoucherStatus.UNCLAIMED,
-            transaction: savedTransaction.id,
           });
-          await this.voucherRepository.save(voucherToSave);
+          await this.transactionRepository.save(transactionToSave);
 
           break;
         case 'payment_intent.payment_failed':
@@ -207,7 +192,7 @@ export class PaymentController {
   async retrieveVoucherByPaymentId(
     @Query('paymentId') paymentId: string,
   ): Promise<any> {
-    const transaction = await this.transactionRepository
+    let transaction = await this.transactionRepository
       .createQueryBuilder('transaction')
       .leftJoinAndMapOne(
         'transaction.sender',
@@ -221,12 +206,6 @@ export class PaymentController {
         'patient',
         'patient.id = transaction.ownerId',
       )
-      .leftJoinAndMapOne(
-        'transaction.voucherEntity',
-        Voucher,
-        'voucherEntity',
-        'voucherEntity.transaction = transaction.id',
-      )
       .select([
         'transaction',
         'payer.firstName',
@@ -235,14 +214,14 @@ export class PaymentController {
         'patient.firstName',
         'patient.lastName',
         'patient.phoneNumber',
-        'voucherEntity',
       ])
       .where('transaction.stripePaymentId = :paymentId', { paymentId })
       .getOne();
-    console.log(transaction);
 
-    if (!transaction) throw new NotFoundException('Resource not found');
 
-    return transaction;
+      if (!transaction) throw new NotFoundException('Resource not found')
+
+
+      return transaction
   }
 }

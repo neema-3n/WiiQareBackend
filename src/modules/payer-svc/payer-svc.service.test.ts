@@ -6,14 +6,11 @@ import { Payer } from './entities/payer.entity';
 import { User } from '../session/entities/user.entity';
 import { Transaction } from '../smart-contract/entities/transaction.entity';
 import { Patient } from '../patient-svc/entities/patient.entity';
-import { Voucher } from '../smart-contract/entities/voucher.entity';
 import {
   InviteType,
-  ReceiverType,
-  SenderType,
-  TransactionStatus,
   UserRole,
   UserStatus,
+  UserType,
   VoucherStatus,
 } from '../../common/constants/enums';
 import { SendInviteDto } from './dto/payer.dto';
@@ -31,7 +28,6 @@ describe('PayerService', () => {
   let transactionRepository: Repository<Transaction>;
   let patientRepository: Repository<Patient>;
   let userRepository: Repository<User>;
-  let voucherRepository: Repository<Voucher>;
 
   // Mock services
   const mockMailService = {
@@ -53,7 +49,7 @@ describe('PayerService', () => {
     role: UserRole.PAYER,
     status: UserStatus.ACTIVE,
     password: 'password',
-    savings: [],
+    savings: []
   };
 
   const mockPayer: Payer = {
@@ -92,25 +88,12 @@ describe('PayerService', () => {
     senderId: mockPayer.id,
     ownerId: mockPayer.id,
     hospitalId: null,
-    ownerType: ReceiverType.PROVIDER,
-    status: TransactionStatus.PENDING,
+    ownerType: UserType.PAYER,
+    status: VoucherStatus.UNCLAIMED,
+    transactionHash: 'transactionHash',
+    shortenHash: 'shortenHash',
     stripePaymentId: 'stripePaymentId',
     voucher: { voucher: 'voucher' },
-  };
-
-  const mockVoucher: Voucher = {
-    id: '',
-    updatedAt: new Date(),
-    createdAt: new Date(),
-    voucherHash: '',
-    shortenHash: '',
-    value: 1,
-    senderId: mockPayer.id,
-    senderType: SenderType.PAYER,
-    receiverId: mockPatient.id,
-    receiverType: ReceiverType.PATIENT,
-    status: VoucherStatus.PENDING,
-    transaction: mockTransaction.id,
   };
 
   beforeEach(async () => {
@@ -140,16 +123,11 @@ describe('PayerService', () => {
       findOne: jest.fn().mockResolvedValue(mockTransaction),
     } as unknown as Repository<Transaction>;
 
-    voucherRepository = {
-      findOne: jest.fn().mockResolvedValue(mockVoucher),
-    } as unknown as Repository<Voucher>;
-
     service = new PayerService(
       patientRepository,
       payerRepository,
       userRepository,
       transactionRepository,
-      voucherRepository,
       mockMailService as MailService,
       mockSmsService as SmsService,
     );
@@ -296,7 +274,7 @@ describe('PayerService', () => {
     expect(payerRepository.createQueryBuilder).toBeCalledTimes(1);
     expect(transactionRepository.findOne).toBeCalledTimes(1);
     expect(transactionRepository.findOne).toBeCalledWith({
-      where: { id: 'id' },
+      where: { shortenHash: 'shortenHash' },
     });
     expect(mockSmsService.sendVoucherAsAnSMS).toBeCalledTimes(1);
   });
@@ -322,23 +300,22 @@ describe('PayerService', () => {
     ).rejects.toThrow(new NotFoundException(_404.PAYER_NOT_FOUND));
   });
 
-  // TODO: Fix this test
-  // it('should raise an error if the transaction is not found', async () => {
-  //   const authUser: JwtClaimsDataDto = {
-  //     sub: mockPayer.id,
-  //     type: UserRole.PAYER,
-  //     phoneNumber: mockPayer.user.phoneNumber,
-  //     names: `${mockPayer.firstName} ${mockPayer.lastName}`,
-  //     status: UserStatus.ACTIVE,
-  //   };
+  it('should raise an error if the transaction is not found', async () => {
+    const authUser: JwtClaimsDataDto = {
+      sub: mockPayer.id,
+      type: UserRole.PAYER,
+      phoneNumber: mockPayer.user.phoneNumber,
+      names: `${mockPayer.firstName} ${mockPayer.lastName}`,
+      status: UserStatus.ACTIVE,
+    };
 
-  //   // Mock transaction repository to return undefined
-  //   transactionRepository.findOne = jest.fn().mockResolvedValue(undefined);
+    // Mock transaction repository to return undefined
+    transactionRepository.findOne = jest.fn().mockResolvedValue(undefined);
 
-  //   expect(async () =>
-  //     service.sendSmsVoucher('someHash', authUser),
-  //   ).rejects.toThrow(new NotFoundException(_404.INVALID_TRANSACTION_HASH));
-  // });
+    expect(async () =>
+      service.sendSmsVoucher('someHash', authUser),
+    ).rejects.toThrow(new NotFoundException(_404.INVALID_TRANSACTION_HASH));
+  });
 
   it("should raise an error if the transaction's sender is not the auth user", async () => {
     const authUser: JwtClaimsDataDto = {
