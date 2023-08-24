@@ -1,5 +1,5 @@
 {
-    "cSpell.words": [
-        "Qare"
-    ]
+  "cSpell.words": ["Qare"],
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
