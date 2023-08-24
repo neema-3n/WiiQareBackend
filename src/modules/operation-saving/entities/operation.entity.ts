@@ -1,6 +1,6 @@
-import { BaseEntity } from 'src/db/base-entity';
-import { Saving } from 'src/modules/saving/entities/saving.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { BaseEntity } from '../../../db/base-entity';
+import { Saving } from '../../saving/entities/saving.entity';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 
 export enum OperationType {
   CREDIT = 'CREDIT',
@@ -9,8 +9,7 @@ export enum OperationType {
 
 @Entity('operation_savings')
 export class OperationSaving extends BaseEntity {
-
-  @ManyToOne(() => Saving, saving => saving.operations)
+  @ManyToOne(() => Saving, (saving) => saving.operations)
   @JoinColumn({ name: 'idSaving' })
   saving: Saving;
 
@@ -25,5 +24,4 @@ export class OperationSaving extends BaseEntity {
 
   @Column()
   currency: string;
-  
 }

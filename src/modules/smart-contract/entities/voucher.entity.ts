@@ -1,4 +1,4 @@
-import { BaseEntity } from 'src/db/base-entity';
+import { BaseEntity } from '../../../db/base-entity';
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import {
   ReceiverType,
