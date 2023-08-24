@@ -1,17 +1,11 @@
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { OperationType } from '../entities/operation.entity';
 
 export class CreateOperationDto {
-
   @IsNotEmpty()
   @IsString()
   saving: string;
-  
+
   @IsNotEmpty()
   @IsEnum(OperationType)
   type: OperationType;
@@ -23,5 +17,4 @@ export class CreateOperationDto {
   @IsNotEmpty()
   @IsString()
   currency: string;
-
 }

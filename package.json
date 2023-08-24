@@ -22,7 +22,8 @@
     "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate -n",
     "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run",
-    "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed"
+    "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@json2csv/node": "^7.0.1",
@@ -88,7 +89,8 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.1.1",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "husky": "^8.0.0"
   },
   "jest": {
     "moduleFileExtensions": [
