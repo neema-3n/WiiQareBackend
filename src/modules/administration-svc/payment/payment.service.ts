@@ -183,7 +183,7 @@ export class PaymentService {
       .offset(skip)
       .getRawMany();
 
-    return paymentsDueProvider.map((payment) => {
+    return paymentsDueProvider.map((payment): ProviderPaymentsDTO => {
       return {
         transactionId: payment.id,
         transactionDate: payment.transactionDate,
@@ -196,6 +196,6 @@ export class PaymentService {
         voucherAmountInLocalCurrency: payment.amountInLocalCurrency,
         voucherAmountInSenderCurrency: payment.amountInSenderCurrency,
       };
-    }) as ProviderPaymentsDTO[];
+    });
   }
 }

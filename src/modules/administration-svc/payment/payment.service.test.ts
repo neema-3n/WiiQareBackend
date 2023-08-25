@@ -60,4 +60,82 @@ describe('PaymentService', () => {
 
     expect(summary).toBeDefined();
   });
+
+  it('should return payments from payer', async () => {
+    const txRepo: Repository<Transaction> = {} as Repository<Transaction>;
+    const dataSource: DataSource = {
+      createQueryBuilder: jest.fn().mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          leftJoin: jest.fn().mockReturnValue({
+            leftJoin: jest.fn().mockReturnValue({
+              addSelect: jest.fn().mockReturnValue({
+                addSelect: jest.fn().mockReturnValue({
+                  addSelect: jest.fn().mockReturnValue({
+                    addSelect: jest.fn().mockReturnValue({
+                      addSelect: jest.fn().mockReturnValue({
+                        where: jest.fn().mockReturnValue({
+                          limit: jest.fn().mockReturnValue({
+                            offset: jest.fn().mockReturnValue({
+                              getRawMany: jest.fn().mockResolvedValue([]),
+                            }),
+                          }),
+                        }),
+                      }),
+                    }),
+                  }),
+                }),
+              }),
+            }),
+          }),
+        }),
+      }),
+    } as unknown as DataSource;
+    const service = new PaymentService(txRepo, dataSource);
+
+    const payments = await service.getPaymentsFromPayer();
+
+    expect(payments).toBeDefined();
+  });
+
+  it('should return payments due provider', async () => {
+    const txRepo: Repository<Transaction> = {} as Repository<Transaction>;
+    const dataSource: DataSource = {
+      createQueryBuilder: jest.fn().mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          leftJoin: jest.fn().mockReturnValue({
+            addSelect: jest.fn().mockReturnValue({
+              addSelect: jest.fn().mockReturnValue({
+                addSelect: jest.fn().mockReturnValue({
+                  addSelect: jest.fn().mockReturnValue({
+                    addSelect: jest.fn().mockReturnValue({
+                      addSelect: jest.fn().mockReturnValue({
+                        addSelect: jest.fn().mockReturnValue({
+                          addSelect: jest.fn().mockReturnValue({
+                            where: jest.fn().mockReturnValue({
+                              andWhere: jest.fn().mockReturnValue({
+                                limit: jest.fn().mockReturnValue({
+                                  offset: jest.fn().mockReturnValue({
+                                    getRawMany: jest.fn().mockResolvedValue([]),
+                                  }),
+                                }),
+                              }),
+                            }),
+                          }),
+                        }),
+                      }),
+                    }),
+                  }),
+                }),
+              }),
+            }),
+          }),
+        }),
+      }),
+    } as unknown as DataSource;
+    const service = new PaymentService(txRepo, dataSource);
+
+    const payments = await service.getPaymentsDueProvider();
+
+    expect(payments).toBeDefined();
+  });
 });
