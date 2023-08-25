@@ -156,7 +156,7 @@ export class PaymentService {
       .offset(skip)
       .getRawMany();
 
-    return paymentsFromPayers.map((payment) => {
+    return paymentsFromPayers.map((payment): PayerPaymentsDTO => {
       return {
         transactionId: payment.id,
         transactionDate: payment.transactionDate,
@@ -165,7 +165,7 @@ export class PaymentService {
         beneficiaryCountry:
           getCountryNameFromCode(payment.patientCountry) || '',
       };
-    }) as PayerPaymentsDTO[];
+    });
   }
 
   /**
