@@ -116,12 +116,10 @@ export class PaymentController {
             patientId,
             currencyPatientAmount,
             currencyPatient,
-            currencyRate,
-            forSaving,
-            idSaving
+            currencyRate
           } = metadata;
 
-          if (forSaving == true && idSaving) return this.operationService.paymentSaving({saving: idSaving, amount: senderAmount, currency: senderCurrency, type: OperationType.CREDIT})
+          //if (forSaving == true && idSaving) return this.operationService.paymentSaving({saving: idSaving, amount: senderAmount, currency: senderCurrency, type: OperationType.CREDIT})
 
           const voucherData = await this.smartContractService.mintVoucher({
             amount: Math.round(currencyPatientAmount),
