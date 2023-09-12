@@ -23,6 +23,7 @@ import { SessionModule } from './modules/session/session.module';
 import { SmartContractModule } from './modules/smart-contract/smart-contract.module';
 import { SMSModule } from './modules/sms/sms.module';
 import { SavingModule } from './modules/saving/saving.module';
+import { OperationModule } from './modules/operation-saving/operation.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { SavingModule } from './modules/saving/saving.module';
     PatientSvcModule,
     PayerSvcModule,
     SavingModule,
+    OperationModule,
     ProviderSvcModule,
     CommonModule,
     SmartContractModule,

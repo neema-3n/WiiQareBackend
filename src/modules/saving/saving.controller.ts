@@ -31,4 +31,10 @@ export class SavingController {
   async retrieving(@Param('userId') userId: string) {
     return await this.savingService.retrieving(userId);
   }
+
+  @Get('/details/:savingId')
+  @ApiOperation({ summary: 'All savings for user' })
+  async details(@Param('savingId') savingId: string) {
+    return await this.savingService.getSavingDetailsById(savingId);
+  }
 }

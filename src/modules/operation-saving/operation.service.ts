@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { OperationSaving } from './entities/operation.entity';
+import { OperationSaving, OperationType } from './entities/operation.entity';
 import { CreateOperationDto } from './dto/operation.dto';
 import { Saving } from '../saving/entities/saving.entity';
 import { _404 } from 'src/common/constants/errors';

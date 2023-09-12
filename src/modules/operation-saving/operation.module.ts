@@ -4,10 +4,11 @@ import { SessionModule } from '../session/session.module';
 import { OperationSaving } from './entities/operation.entity';
 import { OperationController } from './operation.controller';
 import { operationService } from './operation.service';
+import { Saving } from '../saving/entities/saving.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([OperationSaving]),
+    TypeOrmModule.forFeature([OperationSaving, Saving]),
     forwardRef(() => SessionModule),
   ],
   controllers: [OperationController],

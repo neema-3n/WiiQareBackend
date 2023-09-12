@@ -42,4 +42,13 @@ export class SavingService {
 
     return savings;
   }
+
+  async getSavingDetailsById(savingId: string): Promise<Saving | undefined> {
+    return this.savingRepository
+      .createQueryBuilder('saving')
+      .leftJoinAndSelect('saving.operations', 'operations')
+      .leftJoinAndSelect('saving.user', 'users')
+      .where('saving.id = :savingId', { savingId })
+      .getOne();
+  }
 }

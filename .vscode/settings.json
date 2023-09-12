@@ -1,5 +1,6 @@
 {
   "cSpell.words": ["Qare"],
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "python.analysis.autoImportCompletions": true
 }

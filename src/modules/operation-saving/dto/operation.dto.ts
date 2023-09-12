@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsDecimal, IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { OperationType } from '../entities/operation.entity';
 
 export class CreateOperationDto {
@@ -11,7 +11,7 @@ export class CreateOperationDto {
   type: OperationType;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsDecimal()
   amount: number;
 
   @IsNotEmpty()

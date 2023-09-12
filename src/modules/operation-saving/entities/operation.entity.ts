@@ -19,7 +19,7 @@ export class OperationSaving extends BaseEntity {
   })
   type: OperationType;
 
-  @Column()
+  @Column({type: 'float'})
   amount: number;
 
   @Column()
