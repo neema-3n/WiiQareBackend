@@ -1,15 +1,13 @@
 import {
-  CacheModuleOptions,
-  CacheOptionsFactory,
   Injectable,
 } from '@nestjs/common';
 import { AppConfigService } from 'src/config/app-config.service';
 
 @Injectable()
-export class CacheConfig implements CacheOptionsFactory {
+export class CacheConfig {
   constructor(private readonly configService: AppConfigService) {}
 
-  createCacheOptions(): CacheModuleOptions {
+  createCacheOptions() {
     return this.configService.redisConfigOptions;
   }
 }

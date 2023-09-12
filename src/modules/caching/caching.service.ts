@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { AUTO_FORGOT_TTL } from '../../common/constants/constants';
 
@@ -9,7 +9,7 @@ import { AUTO_FORGOT_TTL } from '../../common/constants/constants';
  */
 @Injectable()
 export class CachingService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(private cacheManager: Cache) {}
 
   /**
    * This function is used to save key in redis cache
