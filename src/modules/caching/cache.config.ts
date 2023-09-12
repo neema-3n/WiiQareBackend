@@ -1,6 +1,4 @@
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AppConfigService } from 'src/config/app-config.service';
 
 @Injectable()

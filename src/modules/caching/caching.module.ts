@@ -1,4 +1,4 @@
-import {  Global, Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { CacheConfig } from './cache.config';
 import { CachingService } from './caching.service';
 
