@@ -27,12 +27,11 @@ export class OperationController {
     private readonly cachingService: CachingService,
     private readonly sessionService: SessionService,
     private readonly operationService: operationService,
-
   ) {}
 
   @Post()
   @ApiOperation({ summary: 'Add operation for user' })
   async add(@Body() operationDto: CreateOperationDto) {
-    return this.operationService.paymentSaving(operationDto)
+    return this.operationService.paymentSaving(operationDto);
   }
 }

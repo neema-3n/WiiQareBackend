@@ -25,7 +25,6 @@ import {
 } from '@nestjs/common';
 import { _400, _404, _403 } from '../../common/constants/errors';
 
-
 describe('PayerService', () => {
   let service: PayerService;
   let payerRepository: Repository<Payer>;

@@ -186,7 +186,7 @@ export class PaymentController {
             receiverId: patientId,
             receiverType: ReceiverType.PATIENT,
             status: VoucherStatus.UNCLAIMED,
-            transaction: transactionToSave
+            transaction: transactionToSave,
           });
           await this.voucherRepository.save(voucherToSave);
 

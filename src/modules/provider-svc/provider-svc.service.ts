@@ -208,12 +208,12 @@ export class ProviderService {
   async getTransactionByShortenHash(
     shortenHash: string,
   ): Promise<Record<string, any>> {
-    const voucher:any = await this.voucherRepository.findOne({
+    const voucher: any = await this.voucherRepository.findOne({
       where: { shortenHash },
-      relations: [ 'transaction' ]
+      relations: ['transaction'],
     });
 
-    console.log('v', voucher );
+    console.log('v', voucher);
 
     if (!voucher.transaction)
       throw new NotFoundException(_404.INVALID_TRANSACTION_HASH);
@@ -252,8 +252,8 @@ export class ProviderService {
     // verify the transaction exists and if securityCode is right!
     const voucher = await this.voucherRepository.findOne({
       where: { shortenHash },
-      relations: ['transaction']
-    })
+      relations: ['transaction'],
+    });
     const [transaction, provider] = await Promise.all([
       this.transactionRepository.findOne({
         where: { id: voucher.transaction.id, ownerType: ReceiverType.PATIENT },
@@ -315,15 +315,20 @@ export class ProviderService {
         'transaction.voucherEntity',
         Voucher,
         'voucherEntity',
-        'voucherEntity.transaction = transaction.id'
+        'voucherEntity.transaction = transaction.id',
       )
       .leftJoinAndMapOne(
         'transaction.owner',
         Patient,
         'owner',
-        'owner.id = transaction.ownerId'
+        'owner.id = transaction.ownerId',
       )
-      .select(['transaction', 'voucherEntity', 'owner.firstName', 'owner.lastName'])
+      .select([
+        'transaction',
+        'voucherEntity',
+        'owner.firstName',
+        'owner.lastName',
+      ])
       // .where('transaction.ownerId = :providerId', { providerId })
       .where('transaction.hospitalId = :providerId', { providerId })
       .orderBy('transaction.updatedAt', 'DESC')
@@ -386,24 +391,28 @@ export class ProviderService {
       status: TransactionStatus.SUCCESSFUL,
       voucher: {
         ...transaction.voucher,
-        status: VoucherStatus.CLAIMED
-      }
+        status: VoucherStatus.CLAIMED,
+      },
     }));
 
-    const updatedTransactions = await this.transactionRepository.save(updatedTransactionList);
+    const updatedTransactions = await this.transactionRepository.save(
+      updatedTransactionList,
+    );
 
     //update voucher status to claimed
     const vouchers = await this.voucherRepository
-    .createQueryBuilder('voucher')
-    .where(`voucher.transaction_id In (:...ids)`, { ids: transactions.map( e=>e.id )})
-    .andWhere(`voucher.status = :status`, {
-      status: VoucherStatus.UNCLAIMED,
-    })
-    .getMany();
+      .createQueryBuilder('voucher')
+      .where(`voucher.transaction_id In (:...ids)`, {
+        ids: transactions.map((e) => e.id),
+      })
+      .andWhere(`voucher.status = :status`, {
+        status: VoucherStatus.UNCLAIMED,
+      })
+      .getMany();
 
     const updatedVoucherList = vouchers.map((voucher) => ({
       ...voucher,
-      status: VoucherStatus.PENDING
+      status: VoucherStatus.PENDING,
     }));
     await this.voucherRepository.save(updatedVoucherList);
 
@@ -428,16 +437,15 @@ export class ProviderService {
 
     // Save service
     service = await this.servicesRepository.save(service);
-    return service
+    return service;
   }
 
   // Get services of provider
   async getServicesByProviderId(providerId: string): Promise<Service[]> {
-
     const services = await this.servicesRepository.find({
-      where: {provider: {id: providerId}},
+      where: { provider: { id: providerId } },
       relations: ['provider'],
-      select: ['id', 'createdAt', 'description', 'price', 'name']
+      select: ['id', 'createdAt', 'description', 'price', 'name'],
     });
 
     return services;
@@ -461,15 +469,14 @@ export class ProviderService {
 
     // Save package
     newPackage = await this.packageRepository.save(newPackage);
-    return newPackage
+    return newPackage;
   }
 
   // Get services of provider
   async getPackagesByProviderId(providerId: string): Promise<Package[]> {
-
     const packages = await this.packageRepository.find({
-      where: {provider: {id: providerId}},
-      relations: ['provider', 'services']
+      where: { provider: { id: providerId } },
+      relations: ['provider', 'services'],
     });
 
     return packages;
@@ -518,7 +525,6 @@ export class ProviderService {
       .take(5)
       .getMany();
 
-    return providers
-
+    return providers;
   }
 }

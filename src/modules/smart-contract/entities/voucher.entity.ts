@@ -37,7 +37,9 @@ export class Voucher extends BaseEntity {
   })
   status: VoucherStatus;
 
-  @OneToOne(() => Transaction, (transaction) => transaction.id, { nullable: true })
+  @OneToOne(() => Transaction, (transaction) => transaction.id, {
+    nullable: true,
+  })
   @JoinColumn()
   transaction?: Transaction;
 }

@@ -1,4 +1,10 @@
-import { IsDecimal, IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsDecimal,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { OperationType } from '../entities/operation.entity';
 
 export class CreateOperationDto {
