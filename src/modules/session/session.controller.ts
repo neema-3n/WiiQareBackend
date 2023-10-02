@@ -11,6 +11,7 @@ import { _404 } from '../../common/constants/errors';
 import { Public } from '../../common/decorators/public.decorator';
 import { http_statuses } from '../../helpers/common.helper';
 import {
+  CreateDashboardSessionDto,
   CreateSessionDto,
   SessionEmailVerifyRequestDto,
   SessionVerifyEmailOTPRequestDto,
@@ -35,6 +36,17 @@ export class SessionController {
   @ApiOperation({ summary: 'API endpoint for authentication' })
   authenticate(@Body() payload: CreateSessionDto): Promise<SessionResponseDto> {
     return this.sessionService.authenticateUser(payload);
+  }
+
+  @Post('/admin')
+  @HttpCode(HttpStatus.OK)
+  @Public()
+  @ApiNotFoundResponse(http_statuses([_404.USER_NOT_FOUND]))
+  @ApiOperation({ summary: 'API endpoint for  Dashboard authentication' })
+  authenticateDashboard(
+    @Body() payload: CreateDashboardSessionDto,
+  ): Promise<any> {
+    return this.sessionService.authenticateDashboardUser(payload);
   }
 
   @Post('email-verification')

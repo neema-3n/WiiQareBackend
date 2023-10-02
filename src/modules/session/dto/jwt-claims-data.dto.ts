@@ -19,3 +19,17 @@ export class JwtClaimsDataDto {
   @IsEnum(UserStatus)
   status: UserStatus;
 }
+
+export class DashboardJwtClaimsDataDto {
+  @IsUUID()
+  @IsNotEmpty()
+  sub: string;
+
+  @IsNotEmpty()
+  @IsEnum(UserRole)
+  type: UserRole;
+
+  @IsNotEmpty()
+  @IsEnum(UserStatus)
+  status: UserStatus;
+}

@@ -42,3 +42,13 @@ export class SessionVerifyEmailOTPRequestDto {
   @IsNumber()
   otpCode: number;
 }
+
+export class CreateDashboardSessionDto {
+  @IsNotEmpty()
+  @IsString()
+  readonly password: string;
+
+  @IsEmail()
+  @Transform(({ value }) => value.toLowerCase().trim())
+  readonly email: string;
+}

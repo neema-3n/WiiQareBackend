@@ -22,9 +22,16 @@ import { CachingService } from '../caching/caching.service';
 import { MailService } from '../mail/mail.service';
 import { PayerService } from '../payer-svc/payer.service';
 import { ProviderService } from '../provider-svc/provider-svc.service';
-import { CreateSessionDto } from './dto/create-session.dto';
-import { JwtClaimsDataDto } from './dto/jwt-claims-data.dto';
 import {
+  CreateDashboardSessionDto,
+  CreateSessionDto,
+} from './dto/create-session.dto';
+import {
+  DashboardJwtClaimsDataDto,
+  JwtClaimsDataDto,
+} from './dto/jwt-claims-data.dto';
+import {
+  DashboardSessionResponseDto,
   SessionResponseDto,
   SessionVerifyEmailOTPResponseDto,
   UpdatePasswordDto,
@@ -103,11 +110,8 @@ export class SessionService {
 
     //TODO: improve this!.
     let names: string;
-    if (user.role === UserRole.WIIQARE_ADMIN) {
-      names = 'ADMIN';
-    } else if (user.role === UserRole.WIIQARE_MANAGER) {
-      names = 'MANAGER';
-    } else if (user.role === UserRole.PROVIDER) {
+
+    if (user.role === UserRole.PROVIDER) {
       names = detailsInformation.name;
     } else {
       names = `${detailsInformation.firstName} ${detailsInformation.lastName}`;
@@ -133,6 +137,49 @@ export class SessionService {
       access_token: jsonWebToken,
       ...otherData,
     } as SessionResponseDto;
+  }
+
+  async authenticateDashboardUser(payload: CreateDashboardSessionDto) {
+    const { password, email } = payload;
+
+    const user: User = await this.userRepository.findOne({
+      where: { email },
+    });
+
+    if (!user) throw new NotFoundException(_404.USER_NOT_FOUND);
+
+    if (user.status !== UserStatus.ACTIVE) {
+      throw new ForbiddenException(_403.USER_ACCOUNT_NOT_ACTIVE);
+    }
+
+    const isValidPassword = bcrypt.compareSync(password, user.password);
+
+    if (!isValidPassword) {
+      throw new UnauthorizedException(_401.INVALID_CREDENTIALS);
+    }
+
+    const JwtClaims = {
+      sub: user.id,
+      type: user.role,
+      status: user.status,
+    } as DashboardJwtClaimsDataDto;
+
+    const access_token = await this.jwtService.signAsync(JwtClaims, {
+      secret: this.appConfigService.adminAccessTokenSecretKey,
+      expiresIn: this.appConfigService.adminAccessTokenExpiration,
+    });
+
+    const refresh_token = await this.jwtService.signAsync(JwtClaims, {
+      secret: this.appConfigService.adminRefreshTokenSecretKey,
+      expiresIn: this.appConfigService.adminRefreshTokenExpiration,
+    });
+
+    return {
+      userId: user.id,
+      userType: user.role,
+      access_token,
+      refresh_token,
+    } as DashboardSessionResponseDto;
   }
 
   /**

@@ -59,3 +59,21 @@ export class UpdatePasswordDto {
   @IsString()
   resetPasswordToken: string;
 }
+
+export class DashboardSessionResponseDto {
+  @IsNotEmpty()
+  @IsEnum(UserRole)
+  userType: UserRole;
+
+  @IsNotEmpty()
+  @IsUUID(4)
+  userId: string;
+
+  @IsNotEmpty()
+  @IsJWT()
+  access_token: string;
+
+  @IsNotEmpty()
+  @IsJWT()
+  refresh_token: string;
+}
