@@ -129,4 +129,24 @@ export class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   MINIO_SECRET_KEY: string;
+
+  @Expose()
+  @IsString()
+  @IsNotEmpty()
+  ADMIN_ACCESS_TOKEN_SECRET_KEY: string;
+
+  @Expose()
+  @IsString()
+  @IsNotEmpty()
+  ADMIN_ACCESS_TOKEN_EXPIRATION: string;
+
+  @Expose()
+  @IsString()
+  @IsNotEmpty()
+  ADMIN_REFRESH_TOKEN_SECRET_KEY: string;
+
+  @Expose()
+  @IsString()
+  @IsNotEmpty()
+  ADMIN_REFRESH_TOKEN_EXPIRATION: string;
 }

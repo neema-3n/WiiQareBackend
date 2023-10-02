@@ -30,6 +30,22 @@ export class AppConfigService {
     return this.configService.get<string>('TOKEN_EXPIRATION');
   }
 
+  get adminAccessTokenSecretKey(): string {
+    return this.configService.get<string>('ADMIN_ACCESS_TOKEN_SECRET_KEY');
+  }
+
+  get adminAccessTokenExpiration(): string {
+    return this.configService.get<string>('ADMIN_ACCESS_TOKEN_EXPIRATION');
+  }
+
+  get adminRefreshTokenSecretKey(): string {
+    return this.configService.get<string>('ADMIN_REFRESH_TOKEN_SECRET_KEY');
+  }
+
+  get adminRefreshTokenExpiration(): string {
+    return this.configService.get<string>('ADMIN_REFRESH_TOKEN_EXPIRATION');
+  }
+
   get dbHost(): string {
     return this.configService.get<string>('DB_HOST');
   }
